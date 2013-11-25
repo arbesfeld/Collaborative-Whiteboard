@@ -10,6 +10,7 @@ import com.google.gson.JsonParser;
 public abstract class Packet {
     
     private final PacketType packetType;
+    private final int boardID;
     
     public static Packet createPacketWithData(String data) {
         // Format of all packets is { "packetType": <Integer>, ... }
@@ -18,7 +19,7 @@ public abstract class Packet {
         
         // Get the packet type from JSON object.
         int packetTypeNumber = jobject.get("packetType").getAsInt();
-        
+       
         PacketType packetType = null;
         try {
             packetType = PacketType.values()[packetTypeNumber];
@@ -28,32 +29,40 @@ public abstract class Packet {
         }
         assert packetType != null;
         
+        Packet packet;
         switch (packetType) {
         
         case PacketTypeNewClient:
-            return PacketNewClient.createPacketWithDataInternal(jobject);
+            packet = PacketNewClient.createPacketWithDataInternal(jobject);
+            break;
             
         case PacketTypeDisconnectClient:
-            return PacketDisconnectClient.createPacketWithDataInternal(jobject);
+            packet = PacketDisconnectClient.createPacketWithDataInternal(jobject);
+            break;
             
         case PacketTypeGameState:
-            return PacketGameState.createPacketWithDataInternal(jobject);
+            packet = PacketGameState.createPacketWithDataInternal(jobject);
+            break;
             
         case PacketTypeDrawPixel:
-            return PacketDrawPixel.createPacketWithDataInternal(jobject);
+            packet = PacketDrawPixel.createPacketWithDataInternal(jobject);
+            break;
             
         default:
             throw new InvalidPacketTypeException();
             
         }
+        
+        return packet;
     }
     
-    protected Packet(PacketType packetType) {
+    protected Packet(PacketType packetType, int boardID) {
+        if (boardID < 0) {
+            throw new IllegalArgumentException("BoardID must be non-negative.");
+        }
+        
         this.packetType = packetType;
-    }
-    
-    protected Packet() {
-        throw new UnsupportedOperationException();
+        this.boardID = boardID;
     }
     
     protected abstract void addPayloadToData(HashMap<Object, Object> data);
@@ -61,17 +70,27 @@ public abstract class Packet {
     public String data() {
         HashMap<Object, Object> data = new HashMap<Object, Object>();
         data.put("packetType", packetType.ordinal());
+        data.put("boardID", boardID);
         addPayloadToData(data);
         
         // Convert data to JSON format.
         Gson gson = new Gson();
         return gson.toJson(data);
     }
-
+    
+    public PacketType packetType() {
+        return packetType;
+    }
+    
+    public int boardID() {
+        return boardID;
+    }
+    
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + boardID;
         result = prime * result
                 + ((packetType == null) ? 0 : packetType.hashCode());
         return result;
@@ -86,6 +105,8 @@ public abstract class Packet {
         if (getClass() != obj.getClass())
             return false;
         Packet other = (Packet) obj;
+        if (boardID != other.boardID)
+            return false;
         if (packetType != other.packetType)
             return false;
         return true;

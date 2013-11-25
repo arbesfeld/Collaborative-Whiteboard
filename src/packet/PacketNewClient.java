@@ -14,13 +14,15 @@ public final class PacketNewClient extends Packet {
      * @return the constructed Packet
      */
     protected static Packet createPacketWithDataInternal(JsonObject data) {
+        int boardID = data.get("boardID").getAsInt();
+        
         String id = data.get("id").getAsString();
         String name = data.get("name").getAsString();
-        return new PacketNewClient(id, name);
+        return new PacketNewClient(boardID, id, name);
     }
     
-    public PacketNewClient(String id, String name) {
-        super(PacketType.PacketTypeNewClient);
+    public PacketNewClient(int boardID, String id, String name) {
+        super(PacketType.PacketTypeNewClient, boardID);
         this.id = id;
         this.name = name;
     }

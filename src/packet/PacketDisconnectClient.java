@@ -14,13 +14,14 @@ public final class PacketDisconnectClient extends Packet {
      * @return the constructed Packet
      */
     protected static Packet createPacketWithDataInternal(JsonObject data) {
+        int boardID = data.get("boardID").getAsInt();
         String name = data.get("name").getAsString();
         String id = data.get("id").getAsString();
-        return new PacketDisconnectClient(id, name);
+        return new PacketDisconnectClient(boardID, id, name);
     }
     
-    public PacketDisconnectClient(String id, String name) {
-        super(PacketType.PacketTypeDisconnectClient);
+    public PacketDisconnectClient(int boardID, String id, String name) {
+        super(PacketType.PacketTypeDisconnectClient, boardID);
         this.id = id;
         this.name = name;
     }

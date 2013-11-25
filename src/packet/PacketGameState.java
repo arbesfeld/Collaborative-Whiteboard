@@ -18,6 +18,8 @@ public final class PacketGameState extends Packet {
      * @return the constructed Packet
      */
     protected static Packet createPacketWithDataInternal(JsonObject data) {
+        int boardID = data.get("boardID").getAsInt();
+        
         JsonArray jclients = data.get("clients").getAsJsonArray();
         
         @SuppressWarnings("unchecked")
@@ -41,11 +43,11 @@ public final class PacketGameState extends Packet {
             pixels[i] = new Pixel(x, y, rgb);
         }
         
-        return new PacketGameState(clients, pixels);
+        return new PacketGameState(boardID, clients, pixels);
     }
     
-    public PacketGameState(Pair<String, String>[] clients, Pixel[] pixels) {
-        super(PacketType.PacketTypeGameState);
+    public PacketGameState(int boardID, Pair<String, String>[] clients, Pixel[] pixels) {
+        super(PacketType.PacketTypeGameState, boardID);
         this.clients = clients;
         this.pixels = pixels;
     }

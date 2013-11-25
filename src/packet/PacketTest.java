@@ -14,7 +14,7 @@ public class PacketTest {
         // Create a NewClientPacket, convert it to data, and ensure that
         // the reconstructed packet is identical to the original packet.
         
-        Packet packet = new PacketNewClient("id", "name");
+        Packet packet = new PacketNewClient(2, "id", "name");
         String data = packet.data();
         PacketNewClient newPacket = (PacketNewClient) Packet.createPacketWithData(data);
         
@@ -23,6 +23,7 @@ public class PacketTest {
         
         assertTrue(newPacket.id().equals("id"));
         assertTrue(newPacket.name().equals("name"));
+        assertTrue(newPacket.boardID() == 2);
     }
     
     @Test
@@ -30,7 +31,7 @@ public class PacketTest {
         // Create a DisconnectClientPacket, convert it to data, and ensure that
         // the reconstructed packet is identical to the original packet.
         
-        Packet packet = new PacketDisconnectClient("id", "name");
+        Packet packet = new PacketDisconnectClient(3, "id", "name");
         String data = packet.data();
         PacketDisconnectClient newPacket = (PacketDisconnectClient) Packet.createPacketWithData(data);
         
@@ -53,7 +54,7 @@ public class PacketTest {
         pixels[0] = new Pixel(0, 0, "white");
         pixels[1] = new Pixel(1, 2, "black");
         
-        Packet packet = new PacketGameState(clients, pixels);
+        Packet packet = new PacketGameState(100, clients, pixels);
         String data = packet.data();
         PacketGameState newPacket = (PacketGameState) Packet.createPacketWithData(data);
         
@@ -67,7 +68,7 @@ public class PacketTest {
     public void drawPixelPacketTest() {
         Pixel whitePixel = new Pixel(0, 0, "white");
         
-        Packet packet = new PacketDrawPixel(whitePixel);
+        Packet packet = new PacketDrawPixel(13, whitePixel);
         String data = packet.data();
         PacketDrawPixel newPacket = (PacketDrawPixel) Packet.createPacketWithData(data);
         
@@ -80,9 +81,9 @@ public class PacketTest {
     public void differentPacketTest() {
         // Assert that different packets produce different data.
         
-        Packet packet1 = new PacketNewClient("id", "name");
-        Packet packet2 = new PacketDisconnectClient("id", "name");
-        Packet packet3 = new PacketNewClient("id2", "name2");
+        Packet packet1 = new PacketNewClient(2, "id", "name");
+        Packet packet2 = new PacketDisconnectClient(2, "id", "name");
+        Packet packet3 = new PacketNewClient(2, "id2", "name2");
         
         assertFalse(packet1.data().equals(packet2.data()));
         assertFalse(packet1.data().equals(packet3.data()));
