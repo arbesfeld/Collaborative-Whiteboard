@@ -9,7 +9,7 @@ import util.Pair;
 
 import canvas.Canvas;
 
-public class Whiteboard {
+public class Board {
     // A HashMap from id to name of the current clients.
     private final HashMap<String, String> clientNames;
     private final Canvas canvas;
@@ -21,14 +21,14 @@ public class Whiteboard {
      * @param width
      * @param height
      */
-    public Whiteboard(int boardID, int width, int height) {
+    public Board(int boardID, int width, int height) {
         this.boardID = boardID;
         this.canvas = new Canvas(width, height);
         this.clientNames = new HashMap<String, String>();
     }
     
     // Initialize a board with names, and a list of Pixels
-    public Whiteboard(int boardID, int width, int height, 
+    public Board(int boardID, int width, int height, 
                       Pair<String, String>[] initClients, Pixel[] initPixels) {
         this(boardID, width, height);
         
