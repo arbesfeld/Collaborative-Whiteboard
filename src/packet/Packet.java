@@ -33,6 +33,12 @@ public abstract class Packet {
         case PacketTypeNewClient:
             return PacketNewClient.createPacketWithDataInternal(jobject);
             
+        case PacketTypeDisconnectClient:
+            return PacketDisconnectClient.createPacketWithDataInternal(jobject);
+            
+        case PacketTypeGameState:
+            return PacketGameState.createPacketWithDataInternal(jobject);
+            
         default:
             throw new InvalidPacketTypeException();
             

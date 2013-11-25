@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import com.google.gson.JsonObject;
 
-public final class PacketNewClient extends Packet {
+public final class PacketDisconnectClient extends Packet {
     private final String name;
     private final String id;
     
@@ -14,32 +14,32 @@ public final class PacketNewClient extends Packet {
      * @return the constructed Packet
      */
     protected static Packet createPacketWithDataInternal(JsonObject data) {
-        String id = data.get("id").getAsString();
         String name = data.get("name").getAsString();
-        return new PacketNewClient(id, name);
+        String id = data.get("id").getAsString();
+        return new PacketDisconnectClient(id, name);
     }
     
-    public PacketNewClient(String id, String name) {
-        super(PacketType.PacketTypeNewClient);
+    public PacketDisconnectClient(String id, String name) {
+        super(PacketType.PacketTypeDisconnectClient);
         this.id = id;
         this.name = name;
     }
     
     /**
-     * See specification in superclass.
+     * See specification in superclass Packet.
      */
     @Override
     protected void addPayloadToData(HashMap<Object, Object> data) {
         data.put("name", name);
         data.put("id", id);
     }
+    
+    public String name() {
+        return name;
+    }
 
     public String id() {
         return id;
-    }
-
-    public String name() {
-        return name;
     }
     
     @Override
@@ -59,7 +59,7 @@ public final class PacketNewClient extends Packet {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        PacketNewClient other = (PacketNewClient) obj;
+        PacketDisconnectClient other = (PacketDisconnectClient) obj;
         if (id == null) {
             if (other.id != null)
                 return false;
