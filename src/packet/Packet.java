@@ -39,6 +39,9 @@ public abstract class Packet {
         case PacketTypeGameState:
             return PacketGameState.createPacketWithDataInternal(jobject);
             
+        case PacketTypeDrawPixel:
+            return PacketDrawPixel.createPacketWithDataInternal(jobject);
+            
         default:
             throw new InvalidPacketTypeException();
             

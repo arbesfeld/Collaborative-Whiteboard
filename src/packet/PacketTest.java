@@ -2,8 +2,6 @@ package packet;
 
 import static org.junit.Assert.*;
 
-import java.util.HashMap;
-
 import org.junit.Test;
 
 import pixel.Pixel;
@@ -44,18 +42,6 @@ public class PacketTest {
     }
     
     @Test
-    public void differentPacketTest() {
-        // Assert that different packets produce different data.
-        
-        Packet packet1 = new PacketNewClient("id", "name");
-        Packet packet2 = new PacketDisconnectClient("id", "name");
-        Packet packet3 = new PacketNewClient("id2", "name2");
-        
-        assertFalse(packet1.data().equals(packet2.data()));
-        assertFalse(packet1.data().equals(packet3.data()));
-    }
-    
-    @Test
     public void gameStatePacketTest() {
         @SuppressWarnings("unchecked")
         Pair<String, String>[] clients = new Pair[2];
@@ -75,5 +61,30 @@ public class PacketTest {
         assertEquals(packet.hashCode(), newPacket.hashCode());
         assertArrayEquals(newPacket.clients(), clients);
         assertArrayEquals(newPacket.pixels(), pixels);
+    }
+
+    @Test
+    public void drawPixelPacketTest() {
+        Pixel whitePixel = new Pixel(0, 0, "white");
+        
+        Packet packet = new PacketDrawPixel(whitePixel);
+        String data = packet.data();
+        PacketDrawPixel newPacket = (PacketDrawPixel) Packet.createPacketWithData(data);
+        
+        assertEquals(packet, newPacket);
+        assertEquals(packet.hashCode(), newPacket.hashCode());
+        assertEquals(newPacket.pixel(), whitePixel);
+    }
+    
+    @Test
+    public void differentPacketTest() {
+        // Assert that different packets produce different data.
+        
+        Packet packet1 = new PacketNewClient("id", "name");
+        Packet packet2 = new PacketDisconnectClient("id", "name");
+        Packet packet3 = new PacketNewClient("id2", "name2");
+        
+        assertFalse(packet1.data().equals(packet2.data()));
+        assertFalse(packet1.data().equals(packet3.data()));
     }
 }

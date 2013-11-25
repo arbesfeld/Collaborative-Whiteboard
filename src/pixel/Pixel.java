@@ -74,5 +74,7 @@ public class Pixel {
         return true;
     }
     
-    
+    public Pixel clone() {
+        return new Pixel(x, y, color);
+    }
 }
