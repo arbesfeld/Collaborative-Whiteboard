@@ -172,6 +172,7 @@ public class BoardClientGUI extends JFrame{
     public void setModel(ClientBoardModel model) {
         this.model = model;
         updateContentPane();
+        updateUserList();
         pack();
     }
 
