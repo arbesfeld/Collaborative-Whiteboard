@@ -36,7 +36,7 @@ public class BoardServer extends PacketHandler {
 	private final ServerSocket serverSocket;
 	private final Map<BoardName, ServerBoardModel> boards;
     private final Map<User, PrintWriter> users;
-	private final int SIZE = 256;
+	private final int SIZE = 512;
 	
 	public BoardServer(int port) throws IOException
 	{
