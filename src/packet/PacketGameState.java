@@ -1,10 +1,13 @@
 package packet;
 
 import java.awt.Color;
+import java.util.Arrays;
 import java.util.HashMap;
 
+import name.BoardName;
+import name.User;
+
 import pixel.Pixel;
-import util.Pair;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -24,9 +27,8 @@ public final class PacketGameState extends Packet {
         int width = data.get("width").getAsInt();
         int height = data.get("height").getAsInt();
         
-        JsonObject board = data.get("boardName").getAsJsonObject();
-        int boardId = board.get("id").getAsInt();
-        String boardName = board.get("name").getAsString();
+        BoardName boardName = getBoardName(data);
+        User senderName = getSenderName(data);
         
         JsonArray jclients = data.get("clients").getAsJsonArray();
         
@@ -54,11 +56,11 @@ public final class PacketGameState extends Packet {
             pixels[i] = new Pixel(x, y, new Color(r/255.0f, g/255.0f, b/255.0f));
         }
         
-        return new PacketGameState(new BoardName(boardId, boardName), width, height, clients, pixels);
+        return new PacketGameState(boardName, senderName, width, height, clients, pixels);
     }
     
-    public PacketGameState(BoardName boardName, int width, int height, User[] clients, Pixel[] pixels) {
-        super(PacketType.PacketTypeGameState, boardName);
+    public PacketGameState(BoardName boardName, User senderName, int width, int height, User[] clients, Pixel[] pixels) {
+        super(PacketType.PacketTypeGameState, boardName, senderName);
         this.width = width;
         this.height = height;
         this.clients = clients;
@@ -91,4 +93,36 @@ public final class PacketGameState extends Packet {
     public Pixel[] pixels() {
         return pixels.clone();
     }
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + Arrays.hashCode(clients);
+		result = prime * result + height;
+		result = prime * result + Arrays.hashCode(pixels);
+		result = prime * result + width;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PacketGameState other = (PacketGameState) obj;
+		if (!Arrays.equals(clients, other.clients))
+			return false;
+		if (height != other.height)
+			return false;
+		if (!Arrays.equals(pixels, other.pixels))
+			return false;
+		if (width != other.width)
+			return false;
+		return true;
+	}
+    
 }

@@ -1,9 +1,10 @@
 package packet;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
-import pixel.Pixel;
-import util.Pair;
+import name.BoardName;
+import name.User;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -23,18 +24,21 @@ public final class PacketBoardState extends Packet {
         
         for (int i = 0; i < jboards.size(); i++) {
             JsonObject jobject = jboards.get(i).getAsJsonObject();
-     
-            int id = jobject.get("id").getAsInt();
-            String name = jobject.get("name").getAsString();
-            
-            boards[i] = new BoardName(id, name);
+
+            int boardId = jobject.get("id").getAsInt();
+            String boardName = jobject.get("name").getAsString();
+            boards[i] = new BoardName(boardId, boardName);
         }
+
+        BoardName boardName = getBoardName(data);
+        assert boardName.equals(BoardName.NULL_BOARD);
         
-        return new PacketBoardState(boards);
+        User senderName = getSenderName(data);
+        return new PacketBoardState(boards, senderName);
     }
     
-    public PacketBoardState(BoardName[] boards) {
-        super(PacketType.PacketTypeBoardState);
+    public PacketBoardState(BoardName[] boards, User senderName) {
+        super(PacketType.PacketTypeBoardState, senderName);
         this.boards = boards;
     }
     
@@ -49,4 +53,28 @@ public final class PacketBoardState extends Packet {
     public BoardName[] boards() {
         return boards.clone();
     }
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + Arrays.hashCode(boards);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PacketBoardState other = (PacketBoardState) obj;
+		if (!Arrays.equals(boards, other.boards))
+			return false;
+		return true;
+	}
+    
+    
 }

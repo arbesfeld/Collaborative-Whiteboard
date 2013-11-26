@@ -1,4 +1,4 @@
-package BoardClient;
+package client;
 
 import java.awt.GridLayout;
 

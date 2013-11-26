@@ -3,8 +3,9 @@ package models;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import packet.BoardName;
-import packet.User;
+import name.BoardName;
+import name.User;
+
 import pixel.Pixel;
 
 public abstract class BoardModel {

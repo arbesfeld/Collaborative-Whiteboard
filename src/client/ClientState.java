@@ -1,4 +1,4 @@
-package BoardClient;
+package client;
 
 public enum ClientState { 
     // Client has not yet joined a board.

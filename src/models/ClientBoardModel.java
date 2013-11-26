@@ -1,10 +1,10 @@
 package models;
 
-import BoardClient.BoardClientController;
+import name.BoardName;
+import name.User;
+import client.BoardClientController;
 import canvas.Canvas;
 
-import packet.BoardName;
-import packet.User;
 import pixel.Pixel;
 
 public class ClientBoardModel extends BoardModel {

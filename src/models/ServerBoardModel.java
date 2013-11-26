@@ -2,9 +2,11 @@ package models;
 
 import java.awt.Color;
 
-import packet.BoardName;
+import name.BoardName;
+
 import packet.PacketGameState;
 import pixel.Pixel;
+import server.BoardServer;
 
 public class ServerBoardModel extends BoardModel {
     private final Color[][] pixels;
@@ -42,6 +44,6 @@ public class ServerBoardModel extends BoardModel {
     }
     
     public synchronized PacketGameState constructGameStatePacket() {
-        return new PacketGameState(boardName(), width, height, users(), getAllPixels());
+        return new PacketGameState(boardName(), BoardServer.SERVER_NAME, width, height, users(), getAllPixels());
     }
 }

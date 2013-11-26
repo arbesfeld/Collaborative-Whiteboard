@@ -1,4 +1,4 @@
-package BoardClient;
+package client;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -11,102 +11,99 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
+
+import name.BoardName;
 
 import models.ClientBoardModel;
 
-import packet.BoardName;
 import util.Utils;
 
 
 public class BoardClientGUI extends JFrame{
     private static final long serialVersionUID = 1L;
-    private static JMenuBar menuBar;
-    private static JPanel contentPane;
+    private final JMenuBar menuBar;
+    private final JMenu menu;
+    
+    private final JMenu joinGameSubmenu;
+    private final JMenuItem newBoard;
     
     private BoardName[] boardNames;
     private ClientBoardModel model;
-    private BoardClientController controller;
-    
-    public void setController(BoardClientController controller) {
-        this.controller = controller;
-    }
+    private final BoardClientController controller;
     
     /**
      * Create the GUI and show it.  For thread safety,
      * this method should be invoked from the
      * event-dispatching thread.
      */
-    public void display() {
+    public BoardClientGUI(BoardClientController controller) {
+        this.controller = controller;
+
+        // Create the menu bar.
+        this.menuBar = new JMenuBar();
+        this.menu = new JMenu("File");
+        this.newBoard = new JMenuItem("New Board", KeyEvent.VK_T);
+
+        // Join Game submenu.
+        this.joinGameSubmenu = new JMenu("Join Game");
+        
         //Create and set up the window.
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     
         //Create and set up the content pane.
-        updateMenuBar();
+        setMenuBar();
         updateContentPane();
-    
-        //Display the window.
-        setSize(450, 260);
-        setVisible(true);
     }
     
-    private void updateMenuBar() {
-        JMenu menu, submenu;
-        JMenuItem menuItem;
-        
-        // Create the menu bar.
-        menuBar = new JMenuBar();
-    
+    private void setMenuBar() {
         // Build the first menu.
-        menu = new JMenu("File");
         menu.setMnemonic(KeyEvent.VK_F);
         menuBar.add(menu);
     
-        menuItem = new JMenuItem("New Board",
-                                 KeyEvent.VK_T);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
-        menuItem.getAccessibleContext().setAccessibleDescription("Create a new Board");
+        newBoard.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
+        newBoard.getAccessibleContext().setAccessibleDescription("Create a new Board");
         
-        menuItem.addActionListener(new ActionListener() {
+        newBoard.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 newBoardAction();
             }
         });
         
-        menu.add(menuItem);
-    
-        // Join Game submenu.
-        submenu = new JMenu("Join Game");  
-        if (boardNames != null) {
-            for (BoardName boardName : boardNames) {
-                JMenuItem subMenuItem = new JMenuItem(boardName.name());        
-
-                final BoardName boardNameF = boardName;
-                subMenuItem.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        joinBoardAction(boardNameF);
-                    }
-                });
-                
-                submenu.add(subMenuItem);
-            }
-        }
-        menu.add(submenu);
+        menu.add(newBoard);
+        menu.add(joinGameSubmenu);
         setJMenuBar(menuBar);
     }
     
-    private void updateContentPane() {
-        // Create the content-pane-to-be.
+    private void updateMenuBar() {
+    	joinGameSubmenu.removeAll();
+        if (boardNames == null) {
+        	return;
+        }
         
+        for (BoardName boardName : boardNames) {
+            JMenuItem subMenuItem = new JMenuItem(boardName.name());        
+
+            final BoardName boardNameF = boardName;
+            subMenuItem.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    joinBoardAction(boardNameF);
+                }
+            });
+            
+            joinGameSubmenu.add(subMenuItem);
+        }
+    }
+    
+    private void updateContentPane() {
+    	JPanel contentPane;
         if (model == null) {
             contentPane = new JPanel(new BorderLayout());
         } else {
             contentPane = model.canvas();
         }
-        contentPane.setOpaque(true);
-    
+        contentPane.setVisible(true);
         setContentPane(contentPane);
     }
     
@@ -137,18 +134,9 @@ public class BoardClientGUI extends JFrame{
      */
     public void updateUserList() {
         assert this.model != null;
-        
-    }
-
-    /**
-     * Update the board Image from the current model.
-     */
-    public void updateBoard() {
-        assert this.model != null;
         // TODO
-        
     }
-
+    
     /**
      * Update the list of boards.
      * @param boards
@@ -156,16 +144,5 @@ public class BoardClientGUI extends JFrame{
     public void updateBoardList(BoardName[] boards) {
         this.boardNames = boards;
         updateMenuBar();
-        System.out.println("Update board list");
-    }
-
-    /**
-     * Clear the model and deactivate drawing to the canvas until
-     * setModel() is called.
-     */
-    public void clearModel() {
-        this.model = null;
-        updateContentPane();
-        pack();
     }
 }

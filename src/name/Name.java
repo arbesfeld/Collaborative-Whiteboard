@@ -1,4 +1,4 @@
-package packet;
+package name;
 
 public abstract class Name {
 

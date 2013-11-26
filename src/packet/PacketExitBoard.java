@@ -7,23 +7,22 @@ import name.User;
 
 import com.google.gson.JsonObject;
 
-public final class PacketNewClient extends Packet {
+public final class PacketExitBoard extends Packet {
+	
     /**
      * 
      * @param data JSON representation of the data.
      * @return the constructed Packet
      */
     protected static Packet createPacketWithDataInternal(JsonObject data) {
-	    BoardName boardName = getBoardName(data);
-	    assert boardName.equals(BoardName.NULL_BOARD);
-	    
-	    User senderName = getSenderName(data);
-	    
-        return new PacketNewClient(senderName);
+    	BoardName boardName = getBoardName(data);
+        User senderName = getSenderName(data);
+        
+        return new PacketExitBoard(boardName, senderName);
     }
     
-    public PacketNewClient(User senderName) {
-        super(PacketType.PacketTypeNewClient, senderName);
+    public PacketExitBoard(BoardName boardName, User senderName) {
+        super(PacketType.PacketTypeExitBoard, boardName, senderName);
     }
     
     /**
@@ -31,7 +30,7 @@ public final class PacketNewClient extends Packet {
      */
     @Override
     protected void addPayloadToData(HashMap<Object, Object> data) {
-    	// Do nothing.
+    	// Nothing to add.
     }
     
 }

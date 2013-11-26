@@ -1,35 +1,37 @@
 package packet;
 
-import java.io.PrintWriter;
-
 abstract public class PacketHandler {
     
     /*
      * Methods for receiving packets.
      */
-    protected void receivedPacket(Packet packet, PrintWriter out) {
+    protected void receivedPacket(Packet packet) {
         PacketType packetType = packet.packetType();
         
         switch(packetType) {
         
         case PacketTypeNewClient:
-            receivedNewClientPacket((PacketNewClient) packet, out);
+            receivedNewClientPacket((PacketNewClient) packet);
             break;
             
-        case PacketTypeDisconnectClient:
-            receivedDisconnectClientPacket((PacketDisconnectClient) packet, out);
+        case PacketTypeJoinBoard:
+        	receivedJoinBoardPacket((PacketJoinBoard) packet);
+            break;
+            
+        case PacketTypeExitBoard:
+            receivedExitBoardPacket((PacketExitBoard) packet);
             break;
             
         case PacketTypeGameState:
-            receivedGameStatePacket((PacketGameState) packet, out);
+            receivedGameStatePacket((PacketGameState) packet);
             break;
             
         case PacketTypeBoardState:
-            receivedBoardStatePacket((PacketBoardState) packet, out);
+            receivedBoardStatePacket((PacketBoardState) packet);
             break;
             
         case PacketTypeDrawPixel:
-            receivedDrawPixelPacket((PacketDrawPixel) packet, out);
+            receivedDrawPixelPacket((PacketDrawPixel) packet);
             break;
             
         default:
@@ -38,9 +40,10 @@ abstract public class PacketHandler {
         }
     }
     
-    protected abstract void receivedNewClientPacket(PacketNewClient packet, PrintWriter out);
-    protected abstract void receivedDisconnectClientPacket(PacketDisconnectClient packet, PrintWriter out);
-    protected abstract void receivedGameStatePacket(PacketGameState packet, PrintWriter out);
-    protected abstract void receivedBoardStatePacket(PacketBoardState packet, PrintWriter out);
-    protected abstract void receivedDrawPixelPacket(PacketDrawPixel packet, PrintWriter out);
+    protected abstract void receivedNewClientPacket(PacketNewClient packet);
+    protected abstract void receivedJoinBoardPacket(PacketJoinBoard packet);
+    protected abstract void receivedExitBoardPacket(PacketExitBoard packet);
+    protected abstract void receivedGameStatePacket(PacketGameState packet);
+    protected abstract void receivedBoardStatePacket(PacketBoardState packet);
+    protected abstract void receivedDrawPixelPacket(PacketDrawPixel packet);
 }

@@ -6,18 +6,22 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import packet.BoardName;
+import name.BoardName;
+import name.User;
+
 import packet.Packet;
 import packet.PacketBoardState;
-import packet.PacketDisconnectClient;
+import packet.PacketExitBoard;
 import packet.PacketDrawPixel;
 import packet.PacketGameState;
+import packet.PacketJoinBoard;
 import packet.PacketNewClient;
 import packet.PacketHandler;
-import packet.User;
+import packet.PacketType;
 import pixel.Pixel;
 
 import models.ServerBoardModel;
@@ -25,6 +29,9 @@ import models.ServerBoardModel;
 
 public class BoardServer extends PacketHandler {
     public static final String DEFAULT_PORT = "4444";
+    
+    // The name used by the server for constructing packets.
+    public static final User SERVER_NAME = new User(0, "server");
     
 	private final ServerSocket serverSocket;
 	private final Map<BoardName, ServerBoardModel> boards;
@@ -87,18 +94,104 @@ public class BoardServer extends PacketHandler {
 		
 		// Update the new client's list of boards.
 		sendPacket(constructBoardStatePacket(), out);
-		
+
 		try {
 			for (String line = in.readLine(); line != null; line = in.readLine()) {
 				Packet packet = Packet.createPacketWithData(line);
-				receivedPacket(packet, out);
+				
+				
+				receivedPacket(packet);
+				
+				// Add ourselves to the output stream cache if this is a new client.
+				if (packet.packetType() == PacketType.PacketTypeNewClient) {
+					User senderName = packet.senderName();
+					
+					// We shouldn't have cached this user yet.
+					assert !users.containsKey(senderName);
+					
+			        users.put(senderName, out);
+				}
 			}
 		} finally {
+			// Remove the instance of "out" from our cache.
+			users.values().removeAll(Collections.singleton(out));
+			
 			out.close();
 			in.close();
 		}	
 	}
-	
+
+    @Override
+    protected void receivedNewClientPacket(PacketNewClient packet) {
+    	// do nothing
+    }
+    
+    @Override
+    protected void receivedJoinBoardPacket(PacketJoinBoard packet) {
+        User sender = packet.senderName();
+        
+        BoardName boardName = packet.boardName();
+        
+        ServerBoardModel model;
+        
+        // Check if we have created a board with this board name.
+        if (boards.containsKey(boardName)) {
+            // A new client has connected.
+            model = boards.get(boardName);
+        } else {
+            // Create a new model under this boardName.
+            model = new ServerBoardModel(boardName, SIZE, SIZE);
+            boards.put(boardName, model);
+            broadcastPacketToAllUsers(constructBoardStatePacket());
+        }
+        
+        // First send a GameState packet, then start sending the client new pixel locations.
+        sendPacket(model.constructGameStatePacket(), users.get(sender));
+        model.addUser(sender);
+        
+        // Tell the other users on the board that a new 
+        // client has joined.
+        broadcastPacket(model, packet);
+    }
+
+    @Override
+    protected void receivedExitBoardPacket(PacketExitBoard packet) {
+        BoardName boardName = packet.boardName();
+        
+        // We surely must have already initialized this board.
+        assert boards.containsKey(boardName);
+        
+        ServerBoardModel model = boards.get(boardName);
+        
+        // Broadcast the packet to all the users of the board.
+        broadcastPacket(model, packet);
+    }
+
+    @Override
+    protected void receivedGameStatePacket(PacketGameState packet) {
+        // We only send GameStatePackets from the server.
+        assert false;
+    }
+
+    @Override
+    protected void receivedBoardStatePacket(PacketBoardState packet) {
+        // We only send BoardStatePackets from the server.
+        assert false;
+    }
+
+    @Override
+    protected void receivedDrawPixelPacket(PacketDrawPixel packet) {
+        BoardName boardName = packet.boardName();
+        Pixel pixel = packet.pixel();
+        
+        assert boards.containsKey(boardName);
+        
+        ServerBoardModel model = boards.get(boardName);
+        model.putPixel(pixel);
+        
+        broadcastPacket(model, packet);
+    }
+    
 	/**
 	 * Broadcast a packet to all the users of a specific model.
 	 * @param model
@@ -122,83 +215,8 @@ public class BoardServer extends PacketHandler {
 	}
 	
 	private PacketBoardState constructBoardStatePacket() {
-	    return new PacketBoardState(boards.keySet().toArray(new BoardName[boards.keySet().size()]));
+	    return new PacketBoardState(boards.keySet().toArray(new BoardName[boards.keySet().size()]), SERVER_NAME);
 	}
-	
-    @Override
-    protected void receivedNewClientPacket(PacketNewClient packet,
-            PrintWriter out) {
-        User user = packet.user();
-        
-        // If this is a new user, cache his output stream.
-        if (!users.containsKey(user)) {
-            users.put(user, out);
-        }
-        
-        BoardName boardName = packet.boardName();
-        
-        ServerBoardModel model;
-        
-        // Check if we have created a board with this board name.
-        if (boards.containsKey(boardName)) {
-            // A new client has connected.
-            model = boards.get(boardName);
-        } else {
-            // Create a new model under this boardName.
-            model = new ServerBoardModel(boardName, SIZE, SIZE);
-            boards.put(boardName, model);
-            broadcastPacketToAllUsers(constructBoardStatePacket());
-        }
-
-        model.addUser(user);
-        
-        // Tell the other users on the board that a new 
-        // client has joined.
-        broadcastPacket(model, packet);
-        sendPacket(model.constructGameStatePacket(), out);
-    }
-
-    @Override
-    protected void receivedDisconnectClientPacket(
-            PacketDisconnectClient packet, PrintWriter out) {
-        BoardName boardName = packet.boardName();
-        
-        // We surely must have already initialized this board.
-        assert boards.containsKey(boardName);
-        
-        ServerBoardModel model = boards.get(boardName);
-        
-        // Broadcast the packet to all the users of the board.
-        broadcastPacket(model, packet);
-    }
-
-    @Override
-    protected void receivedGameStatePacket(PacketGameState packet,
-            PrintWriter out) {
-        // We only send GameStatePackets from the server.
-        assert false;
-    }
-
-    @Override
-    protected void receivedBoardStatePacket(PacketBoardState packet,
-            PrintWriter out) {
-        // We only send BoardStatePackets from the server.
-        assert false;
-    }
-
-    @Override
-    protected void receivedDrawPixelPacket(PacketDrawPixel packet,
-            PrintWriter out) {
-        BoardName boardName = packet.boardName();
-        Pixel pixel = packet.pixel();
-        
-        assert boards.containsKey(boardName);
-        
-        ServerBoardModel model = boards.get(boardName);
-        model.putPixel(pixel);
-        
-        broadcastPacket(model, packet);
-    }
 	
     private void sendPacket(Packet packet, PrintWriter out) {
         out.println(packet.data());

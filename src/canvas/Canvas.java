@@ -18,8 +18,9 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import BoardClient.BoardClientController;
-import BoardClient.BoardClientGUI;
+import client.BoardClientController;
+import client.BoardClientGUI;
+
 
 import pixel.Pixel;
 
