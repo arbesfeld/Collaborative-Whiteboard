@@ -20,6 +20,7 @@ import packet.PacketDrawPixel;
 import packet.PacketGameState;
 import packet.PacketHandler;
 import packet.PacketJoinBoard;
+import packet.PacketNewBoard;
 import packet.PacketNewClient;
 import pixel.Pixel;
 import server.BoardServer;
@@ -100,6 +101,14 @@ public class BoardClientController extends PacketHandler implements Runnable {
     protected void receivedNewClientPacket(PacketNewClient packet) {
     	// Only client to server.
     	assert false;
+    }
+    
+    @Override
+    protected void receivedNewBoardPacket(PacketNewBoard packet) {
+        // We are about to receive a GameStatePacket, we should have a null model.
+        assert model == null;
+        assert clientState == ClientState.ClientStateIdle;
+        clientState = ClientState.ClientStateLoading;
     }
     
     @Override
@@ -230,7 +239,12 @@ public class BoardClientController extends PacketHandler implements Runnable {
     /*
      * Methods for sending packets.
      */
-    
+
+	public void generateNewBoard(BoardName boardName, int width, int height) {
+		PacketNewBoard packet = new PacketNewBoard(boardName, user, width, height);
+		sendPacket(packet);
+	}
+	
     public void connectToBoard(BoardName boardName) {
         PacketJoinBoard packet = new PacketJoinBoard(boardName, user);
         sendPacket(packet);
@@ -273,4 +287,5 @@ public class BoardClientController extends PacketHandler implements Runnable {
     		model.setColor(color);
     	}
     }
+
 }

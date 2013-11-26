@@ -40,6 +40,10 @@ public abstract class Packet {
             packet = PacketNewClient.createPacketWithDataInternal(jobject);
             break;
             
+        case PacketTypeNewBoard:
+            packet = PacketNewBoard.createPacketWithDataInternal(jobject);
+            break;
+            
         case PacketTypeJoinBoard:
             packet = PacketJoinBoard.createPacketWithDataInternal(jobject);
             break;

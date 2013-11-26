@@ -19,6 +19,7 @@ import packet.PacketExitBoard;
 import packet.PacketDrawPixel;
 import packet.PacketGameState;
 import packet.PacketJoinBoard;
+import packet.PacketNewBoard;
 import packet.PacketNewClient;
 import packet.PacketHandler;
 import packet.PacketType;
@@ -99,7 +100,6 @@ public class BoardServer extends PacketHandler {
 			for (String line = in.readLine(); line != null; line = in.readLine()) {
 				Packet packet = Packet.createPacketWithData(line);
 				
-				
 				receivedPacket(packet);
 				
 				// Add ourselves to the output stream cache if this is a new client.
@@ -127,23 +127,32 @@ public class BoardServer extends PacketHandler {
     }
     
     @Override
+    protected void receivedNewBoardPacket(PacketNewBoard packet) {
+        User sender = packet.senderName();
+        BoardName boardName = packet.boardName();
+        int width = packet.width();
+        int height = packet.height();
+    	
+        // Create a new model under this boardName.
+        ServerBoardModel model = new ServerBoardModel(boardName, width, height);
+        boards.put(boardName, model);
+        model.addUser(sender);
+        
+        broadcastPacketToAllUsers(constructBoardStatePacket());
+        
+        // Tell the user to start his board.
+        sendPacket(model.constructGameStatePacket(), users.get(sender));
+    }
+    
+    @Override
     protected void receivedJoinBoardPacket(PacketJoinBoard packet) {
         User sender = packet.senderName();
-        
         BoardName boardName = packet.boardName();
         
-        ServerBoardModel model;
+        assert boards.containsKey(boardName);
         
-        // Check if we have created a board with this board name.
-        if (boards.containsKey(boardName)) {
-            // A new client has connected.
-            model = boards.get(boardName);
-        } else {
-            // Create a new model under this boardName.
-            model = new ServerBoardModel(boardName, SIZE, SIZE);
-            boards.put(boardName, model);
-            broadcastPacketToAllUsers(constructBoardStatePacket());
-        }
+        // A new client has connected to the board
+        ServerBoardModel model = boards.get(boardName);
         
         // First send a GameState packet, then start sending the client new pixel locations.
         sendPacket(model.constructGameStatePacket(), users.get(sender));
