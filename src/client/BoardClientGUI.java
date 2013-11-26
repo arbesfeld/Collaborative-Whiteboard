@@ -1,10 +1,14 @@
 package client;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
+import javax.swing.JButton;
+import javax.swing.JColorChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -26,6 +30,7 @@ public class BoardClientGUI extends JFrame{
     
     private final JMenu joinGameSubmenu;
     private final JMenuItem newBoard;
+    private final JButton colorButton;
     
     private BoardName[] boardNames;
     private ClientBoardModel model;
@@ -43,7 +48,8 @@ public class BoardClientGUI extends JFrame{
         this.menuBar = new JMenuBar();
         this.menu = new JMenu("File");
         this.newBoard = new JMenuItem("New Board", KeyEvent.VK_T);
-
+        this.colorButton = new JButton("Color");
+        
         // Join Game submenu.
         this.joinGameSubmenu = new JMenu("Join Game");
         
@@ -70,8 +76,16 @@ public class BoardClientGUI extends JFrame{
             }
         });
         
+        colorButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	setColor(e);
+            }
+        });
+
         menu.add(newBoard);
         menu.add(joinGameSubmenu);
+        menu.add(colorButton);
         setJMenuBar(menuBar);
     }
     
@@ -94,6 +108,12 @@ public class BoardClientGUI extends JFrame{
             
             joinGameSubmenu.add(subMenuItem);
         }
+    }
+    
+    private void setColor(ActionEvent e) {
+        Color color = JColorChooser.showDialog((Component) (e.getSource()),"Color Picker", Color.blue);
+        colorButton.setForeground(color);
+        this.controller.setColor(color);
     }
     
     private void updateContentPane() {

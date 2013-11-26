@@ -41,6 +41,7 @@ public class BoardClientController extends PacketHandler implements Runnable {
     private ClientBoardModel model;
     
     private ClientState clientState;
+    private Color color;
     
     public BoardClientController(String userName, String hostName, int portNumber) throws IOException {
         this.user = new User(Utils.generateId(), userName);
@@ -49,6 +50,9 @@ public class BoardClientController extends PacketHandler implements Runnable {
         this.socket = new Socket(hostName, portNumber);
         this.out = new PrintWriter(socket.getOutputStream(), true);
         this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        
+        // Default color.
+        this.color = Color.BLACK;
         
         // Send a NewClientPacket to announce yourself.
         sendPacket(new PacketNewClient(user));
@@ -181,7 +185,7 @@ public class BoardClientController extends PacketHandler implements Runnable {
         
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                model = new ClientBoardModel(controller, width, height, boardName, clients, pixels);
+                model = new ClientBoardModel(controller, width, height, boardName, clients, pixels, color);
                 view.setModel(model);
                 view.updateUserList();
             }
@@ -260,5 +264,13 @@ public class BoardClientController extends PacketHandler implements Runnable {
     
     public void setView(BoardClientGUI view) {
     	this.view = view;
+    }
+    
+    public void setColor(Color color) {
+    	this.color = color;
+    	
+    	if (model != null) {
+    		model.setColor(color);
+    	}
     }
 }

@@ -1,5 +1,7 @@
 package models;
 
+import java.awt.Color;
+
 import name.BoardName;
 import name.User;
 import client.BoardClientController;
@@ -10,13 +12,15 @@ import pixel.Pixel;
 public class ClientBoardModel extends BoardModel {
     private final Canvas canvas;
     
-    public ClientBoardModel(BoardClientController controller, int width, int height, BoardName boardName, User[] initUsers, Pixel[] initPixels) {
+    public ClientBoardModel(BoardClientController controller, int width, int height, BoardName boardName, User[] initUsers, Pixel[] initPixels, Color color) {
         super(boardName, initUsers);
         canvas = new Canvas(controller, width, height);
         
         for (Pixel initPixel : initPixels) {
             canvas.drawPixel(initPixel);
         }
+        
+        setColor(color);
     }
     
     @Override
@@ -26,5 +30,9 @@ public class ClientBoardModel extends BoardModel {
     
     public Canvas canvas() {
         return canvas;
+    }
+    
+    public void setColor(Color color) {
+    	canvas.setColor(color);
     }
 }

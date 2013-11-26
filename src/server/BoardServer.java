@@ -200,7 +200,10 @@ public class BoardServer extends PacketHandler {
 	private void broadcastPacket(ServerBoardModel model, Packet packet) {
         for (User user : model.users()) {
             PrintWriter out = users.get(user);
-            sendPacket(packet, out);
+            
+            if (out != null) {
+                sendPacket(packet, out);
+            }
         }
 	}
 	

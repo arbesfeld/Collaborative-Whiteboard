@@ -1,12 +1,10 @@
 package canvas;
 
 import java.awt.BasicStroke;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
@@ -14,13 +12,9 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 
-import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
 import client.BoardClientController;
-import client.BoardClientGUI;
-
 
 import pixel.Pixel;
 
@@ -29,13 +23,17 @@ import pixel.Pixel;
  * on it freehand, with the mouse.
  */
 public class Canvas extends JPanel {
-    // image where the user's drawing is stored
+	private static final long serialVersionUID = 1L;
+
+	// image where the user's drawing is stored
     private BufferedImage drawingBuffer;
     
     private final int width;
     private final int height;
     
     private final BoardClientController controller;
+    
+    private Color color;
     
     /**
      * Make a canvas.
@@ -48,9 +46,15 @@ public class Canvas extends JPanel {
         this.controller = controller;
         this.width = width;
         this.height = height;
+        this.color = Color.BLACK;
+        
         // note: we can't call makeDrawingBuffer here, because it only
         // works *after* this canvas has been added to a window.  Have to
         // wait until paintComponent() is first called.
+    }
+    
+    public void setColor(Color color) {
+    	this.color = color;
     }
     
     /**
@@ -188,7 +192,7 @@ public class Canvas extends JPanel {
         public void mouseDragged(MouseEvent e) {
             int x = e.getX();
             int y = e.getY();
-            controller.drawPixel(x, y, Color.BLACK);
+            controller.drawPixel(x, y, color);
         }
 
         // Ignore all these other mouse events.
