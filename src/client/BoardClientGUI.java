@@ -12,6 +12,7 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JDialog;
@@ -20,8 +21,12 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 import javax.swing.colorchooser.AbstractColorChooserPanel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import name.BoardName;
 import models.ClientBoardModel;
@@ -37,6 +42,13 @@ public class BoardClientGUI extends JFrame{
     private final JMenuItem newBoard;
     private ColorIcon icon;
     private final JButton colorButton;
+    private final JMenu strokeMenu;
+    private final JSlider strokeSlider;
+    private final JToggleButton eraseToggle;
+    
+    private final int STROKE_MAX = 10;
+    private final int STROKE_MIN = 1;
+    private final int STROKE_INIT = 5;
     
     private BoardName[] boardNames;
     private ClientBoardModel model;
@@ -55,8 +67,13 @@ public class BoardClientGUI extends JFrame{
         this.menu = new JMenu("File");
         this.newBoard = new JMenuItem("New Board", KeyEvent.VK_T);
         this.colorButton = new JButton(new ColorIcon(10, Color.black));
-        colorButton.setBorder(BorderFactory.createLineBorder(Color.black));
-        colorButton.setFocusPainted(false);
+        this.colorButton.setBorder(BorderFactory.createLineBorder(Color.black));
+        this.colorButton.setFocusPainted(false);
+        this.strokeMenu = new JMenu("Stroke");
+        this.strokeMenu.setIcon(new ColorIcon(STROKE_INIT, Color.black));
+        this.strokeSlider = new JSlider(JSlider.HORIZONTAL, STROKE_MIN, STROKE_MAX, STROKE_INIT);
+        this.eraseToggle = new JToggleButton(new ImageIcon("src/guiResources/eraserIcon.gif"));
+        this.eraseToggle.setFocusPainted(false);
         
         // Join Game submenu.
         this.joinGameSubmenu = new JMenu("Join Game");
@@ -90,10 +107,34 @@ public class BoardClientGUI extends JFrame{
             	setColor(e);
             }
         });
+        
+        strokeSlider.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                setStroke();
+            }
+        });
+        
+        eraseToggle.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (eraseToggle.isSelected()) {
+                    eraseToggle.setFocusPainted(true);
+                    //TODO turn eraser on
+                }
+                else {
+                    eraseToggle.setFocusPainted(false);
+                    //TODO turn eraser off
+                }
+            }
+        });
 
         menu.add(newBoard);
         menu.add(joinGameSubmenu);
+        strokeMenu.add(strokeSlider);
         menuBar.add(colorButton);
+        menuBar.add(eraseToggle);
+        menuBar.add(strokeMenu);
         setJMenuBar(menuBar);
     }
     
@@ -139,6 +180,11 @@ public class BoardClientGUI extends JFrame{
         JDialog dialog = JColorChooser.createDialog((Component) (e.getSource()), "ColorPicker", false, colorChooser, okListener, null);
         dialog.setVisible(true);
         
+    }
+    
+    private void setStroke() {
+        strokeMenu.setIcon(new ColorIcon(strokeSlider.getValue(), Color.black));
+        //TODO edit stroke
     }
     
     private void updateContentPane() {
