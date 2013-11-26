@@ -113,19 +113,23 @@ public class BoardClientController extends PacketHandler implements Runnable {
         User packetUser = packet.user();
         BoardName boardName = packet.boardName();
         
-        
-        // We should never receive our own disconnect client packet.
-        assert !user.equals(packetUser);
-        
         // We should only receive these packets if we have loaded.
         assert clientState == ClientState.ClientStatePlaying;
         
         // We should only receive these packets if the board is our current board.
         assert boardName.equals(model.boardName());
         
-        model.removeUser(packetUser);
-        
-        view.updateUserList();
+        if (user.equals(packetUser)) {
+            // If it is ourselves, we must disconnect ourselves from the game.
+            clientState = ClientState.ClientStateIdle;
+            model = null;
+            
+            view.clearModel();
+        } else {
+            // Otherwise, remove the user and update the user list.
+            model.removeUser(packetUser);
+            view.updateUserList();
+        }
     }
 
     @Override
@@ -195,12 +199,6 @@ public class BoardClientController extends PacketHandler implements Runnable {
         assert clientState == ClientState.ClientStatePlaying;
 
         BoardName boardName = model.boardName();
-        
-        // Disconnect ourselves from the model and wait until we receive a new "game state" packet.
-        clientState = ClientState.ClientStateIdle;
-        model = null;
-        
-        view.clearModel();
 
         sendDisconnectToBoard(boardName);
     }
