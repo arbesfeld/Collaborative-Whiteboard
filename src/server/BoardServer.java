@@ -82,15 +82,18 @@ public class BoardServer extends PacketHandler {
 				PrintWriter out) {
 			// TODO Auto-generated method stub
 			ServerBoardModel currentBoard = boards.get(packet.boardName());
-			PacketGameState game = new PacketGameState (packet.boardName(), currentBoard.users() , currentBoard.getAllPixels());
-
+			PacketGameState game = new PacketGameState (packet.boardName(), 0, 0, currentBoard.users() , currentBoard.getAllPixels());
+			// TODO Change width and height to be appropriate values
+			out.print(game.data());
+			
 		}
 
 		@Override
 		protected void receivedDisconnectClientPacket(
 				PacketDisconnectClient packet, PrintWriter out) {
 			// TODO Auto-generated method stub
-
+			ServerBoardModel currentBoard = boards.get(packet.boardName());
+			
 		}
 
 		@Override
