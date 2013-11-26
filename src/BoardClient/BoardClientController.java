@@ -7,7 +7,10 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 import models.ClientBoardModel;
+import packet.BoardName;
 import packet.Packet;
+import packet.PacketDisconnectClient;
+import packet.PacketNewClient;
 
 public class BoardClientController implements Runnable {
     
@@ -66,7 +69,13 @@ public class BoardClientController implements Runnable {
         out.println(packet.data());
     }
     
-    private void connectToBoard(int boardID) {
-        
+    public void connectToBoard(BoardName boardName) {
+        PacketNewClient packet = new PacketNewClient(client.name(), boardName);
+        sendPacket(packet);
+    }
+    
+    public void disconnectFromBoard(BoardName boardName) {
+        PacketDisconnectClient packet = new PacketDisconnectClient(client.name(), boardName);
+        sendPacket(packet);
     }
 }
