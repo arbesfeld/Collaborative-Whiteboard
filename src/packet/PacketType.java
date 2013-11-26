@@ -11,6 +11,10 @@ enum PacketType {
     // also includes a list of the clients
     PacketTypeGameState, // server to client
         
+    // all the boards in the game
+    PacketTypeBoards, // server to client
+    
+    // all the boards on the server
     // a message to draw on a specific pixel of the board
     PacketTypeDrawPixel, // sever to client and client to server
 }

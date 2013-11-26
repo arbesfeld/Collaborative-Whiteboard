@@ -15,7 +15,9 @@ public final class PacketDrawPixel extends Packet {
      * @return the constructed Packet
      */
     protected static Packet createPacketWithDataInternal(JsonObject data) {
-        int boardID = data.get("boardID").getAsInt();
+        JsonObject board = data.get("boardName").getAsJsonObject();
+        int boardId = board.get("id").getAsInt();
+        String boardName = board.get("name").getAsString();
         
         JsonObject jobject = data.get("pixel").getAsJsonObject();
         int x = jobject.get("x").getAsInt();
@@ -23,11 +25,11 @@ public final class PacketDrawPixel extends Packet {
         int rgb = jobject.get("rgb").getAsInt();
         Pixel pixel = new Pixel(x, y, rgb);
         
-        return new PacketDrawPixel(boardID, pixel);
+        return new PacketDrawPixel(new BoardName(boardId, boardName), pixel);
     }
     
-    public PacketDrawPixel(int boardID, Pixel pixel) {
-        super(PacketType.PacketTypeDrawPixel, boardID);
+    public PacketDrawPixel(BoardName boardName, Pixel pixel) {
+        super(PacketType.PacketTypeDrawPixel, boardName);
         this.pixel = pixel;
     }
     

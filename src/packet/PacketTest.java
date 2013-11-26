@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import pixel.Pixel;
-import user.User;
 import util.Pair;
 
 public class PacketTest {
@@ -15,7 +14,7 @@ public class PacketTest {
         // Create a NewClientPacket, convert it to data, and ensure that
         // the reconstructed packet is identical to the original packet.
         
-        Packet packet = new PacketNewClient(2, new User(3, "name"));
+        Packet packet = new PacketNewClient(new BoardName(2, "myBoard"), new User(3, "name"));
         String data = packet.data();
         PacketNewClient newPacket = (PacketNewClient) Packet.createPacketWithData(data);
         
@@ -24,7 +23,8 @@ public class PacketTest {
         
         assertTrue(newPacket.user().id() == 3);
         assertTrue(newPacket.user().name().equals("name"));
-        assertTrue(newPacket.boardID() == 2);
+        assertTrue(newPacket.boardName().id() == 2);
+        assertTrue(newPacket.boardName().name().equals("myBoard"));
     }
     
     @Test
@@ -32,7 +32,7 @@ public class PacketTest {
         // Create a DisconnectClientPacket, convert it to data, and ensure that
         // the reconstructed packet is identical to the original packet.
         
-        Packet packet = new PacketDisconnectClient(3, new User(20, "name"));
+        Packet packet = new PacketDisconnectClient(new BoardName(4, "board"), new User(20, "name"));
         String data = packet.data();
         PacketDisconnectClient newPacket = (PacketDisconnectClient) Packet.createPacketWithData(data);
         
@@ -41,11 +41,12 @@ public class PacketTest {
         
         assertTrue(newPacket.user().id() == 20);
         assertTrue(newPacket.user().name().equals("name"));
+        assertTrue(newPacket.boardName().id() == 4);
+        assertTrue(newPacket.boardName().name().equals("board"));
     }
     
     @Test
     public void gameStatePacketTest() {
-        @SuppressWarnings("unchecked")
         User[] clients = new User[2];
         
         clients[0] = new User(4, "name1");
@@ -55,12 +56,14 @@ public class PacketTest {
         pixels[0] = new Pixel(0, 0, "white");
         pixels[1] = new Pixel(1, 2, "black");
         
-        Packet packet = new PacketGameState(100, clients, pixels);
+        Packet packet = new PacketGameState(new BoardName(100, "board"), clients, pixels);
         String data = packet.data();
         PacketGameState newPacket = (PacketGameState) Packet.createPacketWithData(data);
         
         assertEquals(packet, newPacket);
         assertEquals(packet.hashCode(), newPacket.hashCode());
+        assertTrue(packet.boardName().id() == 100);
+        assertTrue(packet.boardName().name().equals("board"));
         assertArrayEquals(newPacket.clients(), clients);
         assertArrayEquals(newPacket.pixels(), pixels);
     }
@@ -69,7 +72,7 @@ public class PacketTest {
     public void drawPixelPacketTest() {
         Pixel whitePixel = new Pixel(0, 0, "white");
         
-        Packet packet = new PacketDrawPixel(13, whitePixel);
+        Packet packet = new PacketDrawPixel(new BoardName(13, "BOARD"), whitePixel);
         String data = packet.data();
         PacketDrawPixel newPacket = (PacketDrawPixel) Packet.createPacketWithData(data);
         
@@ -82,9 +85,9 @@ public class PacketTest {
     public void differentPacketTest() {
         // Assert that different packets produce different data.
         
-        Packet packet1 = new PacketNewClient(2, new User(10, "name1"));
-        Packet packet2 = new PacketDisconnectClient(2, new User(10, "name1"));
-        Packet packet3 = new PacketNewClient(2, new User(15, "name2"));
+        Packet packet1 = new PacketNewClient(new BoardName(2, "board"), new User(10, "name1"));
+        Packet packet2 = new PacketDisconnectClient(new BoardName(2, "board"), new User(10, "name1"));
+        Packet packet3 = new PacketNewClient(new BoardName(2, "board"), new User(15, "name2"));
         
         assertFalse(packet1.data().equals(packet2.data()));
         assertFalse(packet1.data().equals(packet3.data()));

@@ -3,7 +3,6 @@ package packet;
 import java.util.HashMap;
 
 import pixel.Pixel;
-import user.User;
 import util.Pair;
 
 import com.google.gson.JsonArray;
@@ -19,7 +18,9 @@ public final class PacketGameState extends Packet {
      * @return the constructed Packet
      */
     protected static Packet createPacketWithDataInternal(JsonObject data) {
-        int boardID = data.get("boardID").getAsInt();
+        JsonObject board = data.get("boardName").getAsJsonObject();
+        int boardId = board.get("id").getAsInt();
+        String boardName = board.get("name").getAsString();
         
         JsonArray jclients = data.get("clients").getAsJsonArray();
         
@@ -45,11 +46,11 @@ public final class PacketGameState extends Packet {
             pixels[i] = new Pixel(x, y, rgb);
         }
         
-        return new PacketGameState(boardID, clients, pixels);
+        return new PacketGameState(new BoardName(boardId, boardName), clients, pixels);
     }
     
-    public PacketGameState(int boardID, User[] clients, Pixel[] pixels) {
-        super(PacketType.PacketTypeGameState, boardID);
+    public PacketGameState(BoardName boardName, User[] clients, Pixel[] pixels) {
+        super(PacketType.PacketTypeGameState, boardName);
         this.clients = clients;
         this.pixels = pixels;
     }

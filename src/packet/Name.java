@@ -1,11 +1,10 @@
-package user;
+package packet;
 
-public class User {
+public class Name {
     private int id;
     private String name;
     
-    public User(int id, String name) {
-        super();
+    protected Name(int id, String name) {
         this.id = id;
         this.name = name;
     }
@@ -35,7 +34,7 @@ public class User {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        User other = (User) obj;
+        Name other = (Name) obj;
         if (id != other.id)
             return false;
         if (name == null) {
@@ -45,5 +44,4 @@ public class User {
             return false;
         return true;
     }
-    
 }

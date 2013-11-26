@@ -2,8 +2,6 @@ package packet;
 
 import java.util.HashMap;
 
-import user.User;
-
 import com.google.gson.JsonObject;
 
 public final class PacketNewClient extends Packet {
@@ -15,15 +13,18 @@ public final class PacketNewClient extends Packet {
      * @return the constructed Packet
      */
     protected static Packet createPacketWithDataInternal(JsonObject data) {
-        int boardID = data.get("boardID").getAsInt();
+        JsonObject board = data.get("boardName").getAsJsonObject();
+        int boardId = board.get("id").getAsInt();
+        String boardName = board.get("name").getAsString();
+        
         JsonObject juser = data.get("user").getAsJsonObject();
         int id = juser.get("id").getAsInt();
         String name = juser.get("name").getAsString();
-        return new PacketNewClient(boardID, new User(id, name));
+        return new PacketNewClient(new BoardName(boardId, boardName), new User(id, name));
     }
     
-    public PacketNewClient(int boardID, User user) {
-        super(PacketType.PacketTypeNewClient, boardID);
+    public PacketNewClient(BoardName boardName, User user) {
+        super(PacketType.PacketTypeNewClient, boardName);
         this.user = user;
     }
     

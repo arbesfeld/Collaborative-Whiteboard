@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import models.ClientBoardModel;
 import packet.Packet;
 
 public class BoardClientController implements Runnable {
@@ -19,10 +20,13 @@ public class BoardClientController implements Runnable {
     // read from the server
     private final BufferedReader in;
     
-    public BoardClientController(String hostName, int portNumber) throws IOException {
-        socket = new Socket(hostName, portNumber);
-        out = new PrintWriter(socket.getOutputStream(), true);
-        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+    private final BoardClient client;
+    
+    public BoardClientController(BoardClient client, String hostName, int portNumber) throws IOException {
+        this.client = client;
+        this.socket = new Socket(hostName, portNumber);
+        this.out = new PrintWriter(socket.getOutputStream(), true);
+        this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
     }
     
     /**
@@ -58,7 +62,11 @@ public class BoardClientController implements Runnable {
         }
     }
     
-    public void sendPacket(Packet packet) {
+    private void sendPacket(Packet packet) {
         out.println(packet.data());
+    }
+    
+    private void connectToBoard(int boardID) {
+        
     }
 }

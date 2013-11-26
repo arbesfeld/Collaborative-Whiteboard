@@ -10,7 +10,7 @@ import com.google.gson.JsonParser;
 public abstract class Packet {
     
     private final PacketType packetType;
-    private final int boardID;
+    private final BoardName boardName;
     
     public static Packet createPacketWithData(String data) {
         // Format of all packets is { "packetType": <Integer>, ... }
@@ -56,13 +56,13 @@ public abstract class Packet {
         return packet;
     }
     
-    protected Packet(PacketType packetType, int boardID) {
-        if (boardID < 0) {
+    protected Packet(PacketType packetType, BoardName boardName) {
+        if (boardName.id() < 0) {
             throw new IllegalArgumentException("BoardID must be non-negative.");
         }
         
         this.packetType = packetType;
-        this.boardID = boardID;
+        this.boardName = boardName;
     }
     
     protected abstract void addPayloadToData(HashMap<Object, Object> data);
@@ -70,7 +70,7 @@ public abstract class Packet {
     public String data() {
         HashMap<Object, Object> data = new HashMap<Object, Object>();
         data.put("packetType", packetType.ordinal());
-        data.put("boardID", boardID);
+        data.put("boardName", boardName);
         addPayloadToData(data);
         
         // Convert data to JSON format.
@@ -82,15 +82,16 @@ public abstract class Packet {
         return packetType;
     }
     
-    public int boardID() {
-        return boardID;
+    public BoardName boardName() {
+        return boardName;
     }
-    
+
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + boardID;
+        result = prime * result
+                + ((boardName == null) ? 0 : boardName.hashCode());
         result = prime * result
                 + ((packetType == null) ? 0 : packetType.hashCode());
         return result;
@@ -105,11 +106,14 @@ public abstract class Packet {
         if (getClass() != obj.getClass())
             return false;
         Packet other = (Packet) obj;
-        if (boardID != other.boardID)
+        if (boardName == null) {
+            if (other.boardName != null)
+                return false;
+        } else if (!boardName.equals(other.boardName))
             return false;
         if (packetType != other.packetType)
             return false;
         return true;
     }
-
+    
 }
