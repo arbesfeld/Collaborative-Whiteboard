@@ -27,12 +27,34 @@ import packet.BoardName;
 
 
 public class BoardClientGUI extends JFrame{
+    private static final long serialVersionUID = 1L;
+    
     private JTextArea output;
     private JScrollPane scrollPane;
     private static JMenuBar menuBar;
     
     private List<String> boardNames = new ArrayList<String>(); 
     private ClientBoardModel model;
+
+    /**
+     * Create the GUI and show it.  For thread safety,
+     * this method should be invoked from the
+     * event-dispatching thread.
+     */
+    public void display() {
+        //Create and set up the window.
+        JFrame frame = new JFrame("MenuLookDemo");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    
+        //Create and set up the content pane.
+        updateMenuBar();
+        frame.setJMenuBar(menuBar);
+        frame.setContentPane(createContentPane());
+    
+        //Display the window.
+        frame.setSize(450, 260);
+        frame.setVisible(true);
+    }
     
     private JMenuBar updateMenuBar() {
         JMenu menu, submenu;
@@ -84,50 +106,18 @@ public class BoardClientGUI extends JFrame{
         return contentPane;
     }
     
-    private static void display() {
-        JTextField name = new JTextField("Default");
-        JPanel panel = new JPanel(new GridLayout(0, 1));
-        panel.add(new JLabel("Name"));
-        panel.add(name);
-        int result = JOptionPane.showConfirmDialog(null, panel, "Create New Board",
-            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-        if (result == JOptionPane.OK_OPTION) {
-            //TODO create board
-            System.out.println(name.getText());
-        } 
-    }
-    
-    
-    /**
-     * Create the GUI and show it.  For thread safety,
-     * this method should be invoked from the
-     * event-dispatching thread.
-     */
-    private static void createAndShowGUI() {
-        //Create and set up the window.
-        JFrame frame = new JFrame("MenuLookDemo");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    
-        //Create and set up the content pane.
-        BoardClientGUI pane = new BoardClientGUI();
-        pane.updateMenuBar();
-        frame.setJMenuBar(menuBar);
-        frame.setContentPane(pane.createContentPane());
-    
-        //Display the window.
-        frame.setSize(450, 260);
-        frame.setVisible(true);
-    }
     
     public static void main(String[] args) {
         //Schedule a job for the event-dispatching thread:
         //creating and showing this application's GUI.
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                createAndShowGUI();
+                BoardClientGUI view = new BoardClientGUI();
+                view.display();
             }
         });
     }
+    
     
     /**
      * Set the current model and allow the user to draw to the screen.

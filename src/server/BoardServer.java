@@ -29,7 +29,7 @@ public class BoardServer extends PacketHandler {
     private final Map<User, PrintWriter> users;
 	private final int SIZE = 256;
 	
-	public BoardServer(int port) throws IOException // TODO add more args here
+	public BoardServer(int port) throws IOException
 	{
 		this.serverSocket = new ServerSocket(port);
 		this.boards = new HashMap<BoardName, ServerBoardModel>();

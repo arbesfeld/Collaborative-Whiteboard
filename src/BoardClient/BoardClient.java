@@ -1,11 +1,23 @@
 package BoardClient;
 
+import java.io.IOException;
+
 public class BoardClient {
-  
+    public BoardClient(String userName, String hostName, int portNumber) throws IOException {
+        BoardClientGUI view = new BoardClientGUI();
+        BoardClientController controller = new BoardClientController(view, userName, hostName, portNumber);
+        new Thread(controller).start();
+        view.display();
+    }
+    
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                PopupGUI.popup();
+                try {
+                    new PopupGUI();
+                } catch (Exception e) {
+                    run();
+                }
             }
         });
     }
