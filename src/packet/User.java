@@ -1,7 +1,12 @@
 package packet;
 
 public class User extends Name {
-    User(int id, String name) {
+    public User(int id, String name) {
         super(id, name);
     }
+    
+    public User clone() {
+        return new User(id(), name());
+    }
+    
 }

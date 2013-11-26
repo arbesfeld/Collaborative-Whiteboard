@@ -56,7 +56,7 @@ public class PacketTest {
         pixels[0] = new Pixel(0, 0, "white");
         pixels[1] = new Pixel(1, 2, "black");
         
-        Packet packet = new PacketGameState(new BoardName(100, "board"), clients, pixels);
+        Packet packet = new PacketGameState(new BoardName(100, "board"), 256, 256, clients, pixels);
         String data = packet.data();
         PacketGameState newPacket = (PacketGameState) Packet.createPacketWithData(data);
         
@@ -66,6 +66,22 @@ public class PacketTest {
         assertTrue(packet.boardName().name().equals("board"));
         assertArrayEquals(newPacket.clients(), clients);
         assertArrayEquals(newPacket.pixels(), pixels);
+    }
+    
+    @Test
+    public void boardStatePacketTest() {
+        BoardName[] boards = new BoardName[2];
+        
+        boards[0] = new BoardName(4, "name1");
+        boards[1] = new BoardName(7, "name2");
+        
+        Packet packet = new PacketBoardState(boards);
+        String data = packet.data();
+        PacketBoardState newPacket = (PacketBoardState) Packet.createPacketWithData(data);
+        
+        assertEquals(packet, newPacket);
+        assertEquals(packet.hashCode(), newPacket.hashCode());
+        assertArrayEquals(newPacket.boards(), boards);
     }
 
     @Test
