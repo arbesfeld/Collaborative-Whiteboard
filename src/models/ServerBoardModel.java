@@ -3,13 +3,17 @@ package models;
 import java.awt.Color;
 
 import packet.BoardName;
+import packet.PacketGameState;
 import pixel.Pixel;
 
 public class ServerBoardModel extends BoardModel {
     private final Color[][] pixels;
+    private final int width, height;
     
     public ServerBoardModel(BoardName boardName, int width, int height) {
         super(boardName);
+        this.width = width;
+        this.height = height;
         pixels = new Color[width][height];
     }
 
@@ -18,15 +22,19 @@ public class ServerBoardModel extends BoardModel {
         pixels[pixel.x()][pixel.y()] = pixel.color();
     }
     
-    public synchronized Pixel[] getAllPixels() {
-        Pixel[] resPixels = new Pixel[pixels.length*pixels[0].length];
+    private synchronized Pixel[] getAllPixels() {
+        Pixel[] resPixels = new Pixel[width*height];
         
-        for (int i = 0; i < pixels.length; i++) {
-            for (int j = 0; j < pixels[0].length; j++) {
-                int count = i*pixels[0].length + j;
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                int count = i*height + j;
                 resPixels[count] = new Pixel(i, j, pixels[i][j]);
             }
         }
         return resPixels;
+    }
+    
+    public synchronized PacketGameState constructGameStatePacket() {
+        return new PacketGameState(boardName(), width, height, users(), getAllPixels());
     }
 }

@@ -1,6 +1,5 @@
 package server;
 
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,111 +9,173 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
-import models.ServerBoardModel;
 import packet.BoardName;
 import packet.Packet;
 import packet.PacketBoardState;
 import packet.PacketDisconnectClient;
 import packet.PacketDrawPixel;
 import packet.PacketGameState;
-import packet.PacketHandler;
 import packet.PacketNewClient;
+import packet.PacketHandler;
+import packet.User;
+import pixel.Pixel;
+
+import models.ServerBoardModel;
 
 
 public class BoardServer extends PacketHandler {
 	private final ServerSocket serverSocket;
 	private final Map<BoardName, ServerBoardModel> boards;
-
-		public BoardServer(int port) throws IOException // TODO add more args here
-		{
-			serverSocket = new ServerSocket(port);
-			this.boards = new HashMap<BoardName, ServerBoardModel>();
-		}
-
-		public void serve() throws IOException {
-			while (true) {
-				final Socket socket = serverSocket.accept();
-
-				//Starting a new thread to handle the connection
-				Thread thread = new Thread(new Runnable() {
-					public void run() {
-						//handle the client
-						try {
-							handleConnection(socket);
-						} catch (IOException e) {
-							e.printStackTrace(); // but don't terminate the serve()
-						} finally {
-							// close the socket at the end
-							if (socket !=null) {
-								try {
-									socket.close();
-								} catch (IOException e) {
-									e.printStackTrace();
-
-								}
+    private final Map<User, PrintWriter> users;
+	private final int SIZE = 256;
+	
+	public BoardServer(int port) throws IOException // TODO add more args here
+	{
+		this.serverSocket = new ServerSocket(port);
+		this.boards = new HashMap<BoardName, ServerBoardModel>();
+        this.users = new HashMap<User, PrintWriter>();
+	}
+	
+	public static void main(String[] args) {
+	    int port = 4444;
+	    
+	    if (args.length > 0)
+	        port = Integer.parseInt(args[0]);
+	    
+	    try {
+            BoardServer server = new BoardServer(port);
+            server.serve();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+	}
+	
+	public void serve() throws IOException {
+		while (true) {
+			final Socket socket = serverSocket.accept();
+			
+			Thread thread = new Thread(new Runnable() {
+				public void run() {
+					//handle the client
+					try {
+						handleConnection(socket);
+					} catch (IOException e) {
+						e.printStackTrace(); // but don't terminate the serve()
+					} finally {
+						// close the socket at the end
+						if (socket !=null) {
+							try {
+								socket.close();
+							} catch (IOException e) {
+								e.printStackTrace();
+							
 							}
 						}
-
 					}
-				});
-				thread.start();
-			}
-		}
-
-		private void handleConnection(Socket socket) throws IOException {
-			BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-
-			try {
-				for (String line = in.readLine(); line != null; line = in.readLine()) {
-					Packet packet = Packet.createPacketWithData(line);
-					receivedPacket(packet, out);
+					
 				}
-			} finally {
-				out.close();
-				in.close();
-
-			}	
+			});
+			thread.start();
 		}
-
-		@Override
-		protected void receivedNewClientPacket(PacketNewClient packet,
-				PrintWriter out) {
-			// TODO Auto-generated method stub
-			ServerBoardModel currentBoard = boards.get(packet.boardName());
-			PacketGameState game = new PacketGameState (packet.boardName(), 0, 0, currentBoard.users() , currentBoard.getAllPixels());
-			// TODO Change width and height to be appropriate values
-			out.print(game.data());
-			
-		}
-
-		@Override
-		protected void receivedDisconnectClientPacket(
-				PacketDisconnectClient packet, PrintWriter out) {
-			// TODO Auto-generated method stub
-			ServerBoardModel currentBoard = boards.get(packet.boardName());
-			
-		}
-
-		@Override
-		protected void receivedGameStatePacket(PacketGameState packet,
-				PrintWriter out) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		protected void receivedBoardStatePacket(PacketBoardState packet,
-				PrintWriter out) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		protected void receivedDrawPixelPacket(PacketDrawPixel packet,
-				PrintWriter out) {
-			// TODO Auto-generated method stub
-
-		}
-
 	}
+	
+	private void handleConnection(Socket socket) throws IOException {
+		BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+		PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+
+		try {
+			for (String line = in.readLine(); line != null; line = in.readLine()) {
+				Packet packet = Packet.createPacketWithData(line);
+				receivedPacket(packet, out);
+			}
+		} finally {
+			out.close();
+			in.close();
+		}	
+	}
+	
+	private void broadcastPacket(ServerBoardModel model, Packet packet) {
+        for (User user : model.users()) {
+            PrintWriter out = users.get(user);
+            sendPacket(packet, out);
+        }
+	}
+	
+    @Override
+    protected void receivedNewClientPacket(PacketNewClient packet,
+            PrintWriter out) {
+        User user = packet.user();
+        
+        // If this is a new user, cache his output stream.
+        if (!users.containsKey(user)) {
+            users.put(user, out);
+        }
+        
+        BoardName boardName = packet.boardName();
+        
+        ServerBoardModel model;
+        
+        // Check if we have created a board with this board name.
+        if (boards.containsKey(boardName)) {
+            // A new client has connected.
+            
+            model = boards.get(boardName);
+            
+            // Tell the other users on the board that a new 
+            // client has joined.
+            broadcastPacket(model, packet);
+        } else {
+            // Create a new model under this boardName.
+            model = new ServerBoardModel(boardName, SIZE, SIZE);
+            boards.put(boardName, model);
+        }
+        
+        sendPacket(model.constructGameStatePacket(), out);
+    }
+
+    @Override
+    protected void receivedDisconnectClientPacket(
+            PacketDisconnectClient packet, PrintWriter out) {
+        BoardName boardName = packet.boardName();
+        
+        // We surely must have already initialized this board.
+        assert boards.containsKey(boardName);
+        
+        ServerBoardModel model = boards.get(boardName);
+        
+        // Broadcast the packet to all the users of the board.
+        broadcastPacket(model, packet);
+    }
+
+    @Override
+    protected void receivedGameStatePacket(PacketGameState packet,
+            PrintWriter out) {
+        // We only send GameStatePackets from the server.
+        assert false;
+    }
+
+    @Override
+    protected void receivedBoardStatePacket(PacketBoardState packet,
+            PrintWriter out) {
+        // We only send BoardStatePackets from the server.
+        assert false;
+    }
+
+    @Override
+    protected void receivedDrawPixelPacket(PacketDrawPixel packet,
+            PrintWriter out) {
+        BoardName boardName = packet.boardName();
+        Pixel pixel = packet.pixel();
+        
+        assert boards.containsKey(boardName);
+        
+        ServerBoardModel model = boards.get(boardName);
+        model.putPixel(pixel);
+        
+        broadcastPacket(model, packet);
+    }
+	
+    private void sendPacket(Packet packet, PrintWriter out) {
+        out.println(packet.data());
+    }
+}
