@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -17,12 +18,15 @@ import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.colorchooser.AbstractColorChooserPanel;
 import javax.swing.event.ChangeEvent;
@@ -30,6 +34,9 @@ import javax.swing.event.ChangeListener;
 
 import name.BoardName;
 import models.ClientBoardModel;
+
+import server.BoardServer;
+
 import util.Utils;
 
 
@@ -199,8 +206,29 @@ public class BoardClientGUI extends JFrame{
     }
     
     private void newBoardAction() {
-        BoardName boardName = new BoardName(Utils.generateId(), Integer.toString(Utils.generateId()));
-        joinBoardAction(boardName);
+        JTextField inputBoardName = new JTextField("Whiteboard");
+        JTextField widthName = new JTextField("256");
+        JTextField heightName = new JTextField("256");
+        JPanel panel = new JPanel(new GridLayout(0, 1));
+        
+        panel.add(new JLabel("Whiteboard Name"));
+        panel.add(inputBoardName);
+        panel.add(new JLabel("Width (px)"));
+        panel.add(widthName);
+        panel.add(new JLabel("Height (px)"));
+        panel.add(heightName);
+        int result = JOptionPane.showConfirmDialog(null, panel, "Connect To Server",
+            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (result == JOptionPane.OK_OPTION) {
+            BoardName boardName = new BoardName(Utils.generateId(), inputBoardName.getText());
+            
+            try {
+                controller.generateNewBoard(boardName, Integer.parseInt(widthName.getText()),
+                							Integer.parseInt(heightName.getText()));
+            } catch (Exception e) {
+            }
+        } 
+        
     }
     
     private void joinBoardAction(BoardName boardName) {
@@ -217,6 +245,7 @@ public class BoardClientGUI extends JFrame{
     public void setModel(ClientBoardModel model) {
         this.model = model;
         updateContentPane();
+        updateUserList();
         pack();
     }
 

@@ -6,7 +6,7 @@ import javax.swing.SwingUtilities;
 
 public class BoardClient {
     
-    public BoardClient(String userName, String hostName, int portNumber) throws IOException {
+    public static void startClient(String userName, String hostName, int portNumber) throws IOException {
         final BoardClientController controller = new BoardClientController(userName, hostName, portNumber);
         new Thread(controller).start();        
         

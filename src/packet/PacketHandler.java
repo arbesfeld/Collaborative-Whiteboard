@@ -14,6 +14,10 @@ abstract public class PacketHandler {
             receivedNewClientPacket((PacketNewClient) packet);
             break;
             
+        case PacketTypeNewBoard:
+        	receivedNewBoardPacket((PacketNewBoard) packet);
+            break;
+            
         case PacketTypeJoinBoard:
         	receivedJoinBoardPacket((PacketJoinBoard) packet);
             break;
@@ -41,6 +45,7 @@ abstract public class PacketHandler {
     }
     
     protected abstract void receivedNewClientPacket(PacketNewClient packet);
+    protected abstract void receivedNewBoardPacket(PacketNewBoard packet);
     protected abstract void receivedJoinBoardPacket(PacketJoinBoard packet);
     protected abstract void receivedExitBoardPacket(PacketExitBoard packet);
     protected abstract void receivedGameStatePacket(PacketGameState packet);

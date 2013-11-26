@@ -32,6 +32,26 @@ public class PacketTest {
     }
     
     @Test
+    public void newBoardPacketTest() {
+        // Create a NewBoard, convert it to data, and ensure that
+        // the reconstructed packet is identical to the original packet.
+        
+        Packet packet = new PacketNewBoard(new BoardName(4, "board"), new User(20, "name"), 256, 512);
+        String data = packet.data();
+        PacketNewBoard newPacket = (PacketNewBoard) Packet.createPacketWithData(data);
+        
+        assertEquals(packet, newPacket);
+        assertEquals(packet.hashCode(), newPacket.hashCode());
+        
+        assertTrue(newPacket.senderName().id() == 20);
+        assertTrue(newPacket.senderName().name().equals("name"));
+        assertTrue(newPacket.boardName().id() == 4);
+        assertTrue(newPacket.boardName().name().equals("board"));
+        assertTrue(newPacket.width() == 256);
+        assertTrue(newPacket.height() == 512);
+    }
+    
+    @Test
     public void joinBoardPacketTest() {
         // Create a JoinBoardPacket, convert it to data, and ensure that
         // the reconstructed packet is identical to the original packet.
