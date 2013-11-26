@@ -2,6 +2,8 @@ package packet;
 
 import static org.junit.Assert.*;
 
+import java.awt.Color;
+
 import org.junit.Test;
 
 import pixel.Pixel;
@@ -95,6 +97,15 @@ public class PacketTest {
         assertEquals(packet, newPacket);
         assertEquals(packet.hashCode(), newPacket.hashCode());
         assertEquals(newPacket.pixel(), whitePixel);
+
+        Pixel rgbPixel = new Pixel(0, 0, new Color(10, 15, 13));
+        packet = new PacketDrawPixel(new BoardName(13, "BOARD"), rgbPixel);
+        data = packet.data();
+        newPacket = (PacketDrawPixel) Packet.createPacketWithData(data);
+        
+        assertEquals(packet, newPacket);
+        assertEquals(packet.hashCode(), newPacket.hashCode());
+        assertEquals(newPacket.pixel(), rgbPixel);
     }
     
     @Test

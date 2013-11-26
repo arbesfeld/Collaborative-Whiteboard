@@ -1,5 +1,6 @@
 package packet;
 
+import java.awt.Color;
 import java.util.HashMap;
 
 import pixel.Pixel;
@@ -22,8 +23,10 @@ public final class PacketDrawPixel extends Packet {
         JsonObject jobject = data.get("pixel").getAsJsonObject();
         int x = jobject.get("x").getAsInt();
         int y = jobject.get("y").getAsInt();
-        int rgb = jobject.get("rgb").getAsInt();
-        Pixel pixel = new Pixel(x, y, rgb);
+        float r = jobject.get("r").getAsInt();
+        float g = jobject.get("g").getAsInt();
+        float b = jobject.get("b").getAsInt();
+        Pixel pixel = new Pixel(x, y, new Color(r/255.0f,g/255.0f,b/255.0f));
         
         return new PacketDrawPixel(new BoardName(boardId, boardName), pixel);
     }

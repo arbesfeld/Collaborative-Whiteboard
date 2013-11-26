@@ -7,7 +7,9 @@ import util.Utils;
 public class Pixel {
     private int x, y;
     private Color color;
-    private int rgb; // used for serialization
+    private int r; // used for serialization
+    private int g; // used for serialization
+    private int b; // used for serialization
     
     public Pixel(int x, int y, Color color) {
         if (this.x < 0 || this.y < 0) {
@@ -17,15 +19,13 @@ public class Pixel {
         this.x = x;
         this.y = y;
         this.color = color;
-        this.rgb = color.getRGB();
+        this.r = color.getRed();
+        this.g = color.getGreen();
+        this.b = color.getBlue();
     }
     
     public Pixel(int x, int y, String colorString) {
         this(x, y, Utils.colorFromString(colorString));
-    }
-    
-    public Pixel(int x, int y, int rgb) {
-        this(x, y, new Color(rgb));
     }
     
     public int x() {
@@ -41,11 +41,19 @@ public class Pixel {
     }
 
     @Override
+    public String toString() {
+        return "Pixel [x=" + x + ", y=" + y + ", color=" + color + ", r=" + r
+                + ", g=" + g + ", b=" + b + "]";
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + b;
         result = prime * result + ((color == null) ? 0 : color.hashCode());
-        result = prime * result + rgb;
+        result = prime * result + g;
+        result = prime * result + r;
         result = prime * result + x;
         result = prime * result + y;
         return result;
@@ -60,12 +68,16 @@ public class Pixel {
         if (getClass() != obj.getClass())
             return false;
         Pixel other = (Pixel) obj;
+        if (b != other.b)
+            return false;
         if (color == null) {
             if (other.color != null)
                 return false;
         } else if (!color.equals(other.color))
             return false;
-        if (rgb != other.rgb)
+        if (g != other.g)
+            return false;
+        if (r != other.r)
             return false;
         if (x != other.x)
             return false;
@@ -73,8 +85,9 @@ public class Pixel {
             return false;
         return true;
     }
-    
+
     public Pixel clone() {
         return new Pixel(x, y, color);
     }
+
 }

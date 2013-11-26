@@ -8,13 +8,16 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import server.BoardServer;
 
-public class PopupGUI extends JFrame{
-    
-    
+
+public class PopupGUI extends JFrame {
+  
+    private static final long serialVersionUID = 1L;
+
     public PopupGUI() throws Exception {
-        JTextField ip = new JTextField("172.0.0.1");
-        JTextField port = new JTextField("4444");
+        JTextField ip = new JTextField("localhost");
+        JTextField port = new JTextField(BoardServer.DEFAULT_PORT);
         JPanel panel = new JPanel(new GridLayout(0, 1));
         panel.add(new JLabel("Server Address"));
         panel.add(ip);

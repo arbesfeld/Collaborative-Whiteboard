@@ -1,5 +1,6 @@
 package models;
 
+import BoardClient.BoardClientController;
 import canvas.Canvas;
 
 import packet.BoardName;
@@ -9,15 +10,21 @@ import pixel.Pixel;
 public class ClientBoardModel extends BoardModel {
     private final Canvas canvas;
     
-    public ClientBoardModel(int width, int height, BoardName boardName, User[] initUsers, Pixel[] initPixels) {
+    public ClientBoardModel(BoardClientController controller, int width, int height, BoardName boardName, User[] initUsers, Pixel[] initPixels) {
         super(boardName, initUsers);
-        canvas = new Canvas(width, height);
+        canvas = new Canvas(controller, width, height);
         
-        // TODO: draw the initial pixels
+        for (Pixel initPixel : initPixels) {
+            canvas.drawPixel(initPixel);
+        }
     }
-
+    
     @Override
     public void putPixel(Pixel pixel) {
-        // TODO
+        canvas.drawPixel(pixel);
+    }
+    
+    public Canvas canvas() {
+        return canvas;
     }
 }

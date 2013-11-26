@@ -12,10 +12,16 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+
+import BoardClient.BoardClientController;
+import BoardClient.BoardClientGUI;
+
+import pixel.Pixel;
 
 /**
  * Canvas represents a drawing surface that allows the user to draw
@@ -23,17 +29,24 @@ import javax.swing.SwingUtilities;
  */
 public class Canvas extends JPanel {
     // image where the user's drawing is stored
-    private Image drawingBuffer;
+    private BufferedImage drawingBuffer;
     
+    private final int width;
+    private final int height;
+    
+    private final BoardClientController controller;
     
     /**
      * Make a canvas.
      * @param width width in pixels
      * @param height height in pixels
      */
-    public Canvas(int width, int height) {
+    public Canvas(BoardClientController controller, int width, int height) {
         this.setPreferredSize(new Dimension(width, height));
         addDrawingController();
+        this.controller = controller;
+        this.width = width;
+        this.height = height;
         // note: we can't call makeDrawingBuffer here, because it only
         // works *after* this canvas has been added to a window.  Have to
         // wait until paintComponent() is first called.
@@ -58,7 +71,7 @@ public class Canvas extends JPanel {
      * Make the drawing buffer and draw some starting content for it.
      */
     private void makeDrawingBuffer() {
-        drawingBuffer = createImage(getWidth(), getHeight());
+        drawingBuffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         fillWithWhite();
         drawSmile();
     }
@@ -70,10 +83,27 @@ public class Canvas extends JPanel {
         final Graphics2D g = (Graphics2D) drawingBuffer.getGraphics();
 
         g.setColor(Color.WHITE);
-        g.fillRect(0,  0,  getWidth(), getHeight());
+        g.fillRect(0,  0,  width, height);
         
         // IMPORTANT!  every time we draw on the internal drawing buffer, we
         // have to notify Swing to repaint this component on the screen.
+        this.repaint();
+    }
+    
+    public void drawPixel(Pixel pixel) {
+        if (drawingBuffer == null) {
+            makeDrawingBuffer();
+        }
+//        drawingBuffer.setRGB(pixel.x(), pixel.y(), pixel.color().getRGB());
+        
+        if (pixel.x() < 0 || pixel.x() >= width || pixel.y() < 0 || pixel.y() > height)
+            return;
+        
+        final Graphics2D g = (Graphics2D) drawingBuffer.getGraphics();
+        
+        g.setColor(pixel.color());
+        g.fillRect(pixel.x(), pixel.y(), 3, 3);
+        
         this.repaint();
     }
     
@@ -157,9 +187,7 @@ public class Canvas extends JPanel {
         public void mouseDragged(MouseEvent e) {
             int x = e.getX();
             int y = e.getY();
-            drawLineSegment(lastX, lastY, x, y);
-            lastX = x;
-            lastY = y;
+            controller.drawPixel(x, y, Color.BLACK);
         }
 
         // Ignore all these other mouse events.
@@ -171,21 +199,21 @@ public class Canvas extends JPanel {
     }
     
     
-    /*
-     * Main program. Make a window containing a Canvas.
-     */
-    public static void main(String[] args) {
-        // set up the UI (on the event-handling thread)
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                JFrame window = new JFrame("Freehand Canvas");
-                window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                window.setLayout(new BorderLayout());
-                Canvas canvas = new Canvas(800, 600);
-                window.add(canvas, BorderLayout.CENTER);
-                window.pack();
-                window.setVisible(true);
-            }
-        });
-    }
+//    /*
+//     * Main program. Make a window containing a Canvas.
+//     */
+//    public static void main(String[] args) {
+//        // set up the UI (on the event-handling thread)
+//        SwingUtilities.invokeLater(new Runnable() {
+//            public void run() {
+//                JFrame window = new JFrame("Freehand Canvas");
+//                window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//                window.setLayout(new BorderLayout());
+//                Canvas canvas = new Canvas(null, 800, 600);
+//                window.add(canvas, BorderLayout.CENTER);
+//                window.pack();
+//                window.setVisible(true);
+//            }
+//        });
+//    }
 }

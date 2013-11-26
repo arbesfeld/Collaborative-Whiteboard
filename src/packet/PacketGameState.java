@@ -1,5 +1,6 @@
 package packet;
 
+import java.awt.Color;
 import java.util.HashMap;
 
 import pixel.Pixel;
@@ -47,8 +48,10 @@ public final class PacketGameState extends Packet {
             JsonObject jobject = jpixels.get(i).getAsJsonObject();
             int x = jobject.get("x").getAsInt();
             int y = jobject.get("y").getAsInt();
-            int rgb = jobject.get("rgb").getAsInt();
-            pixels[i] = new Pixel(x, y, rgb);
+            int r = jobject.get("r").getAsInt();
+            int g = jobject.get("g").getAsInt();
+            int b = jobject.get("b").getAsInt();
+            pixels[i] = new Pixel(x, y, new Color(r/255.0f, g/255.0f, b/255.0f));
         }
         
         return new PacketGameState(new BoardName(boardId, boardName), width, height, clients, pixels);

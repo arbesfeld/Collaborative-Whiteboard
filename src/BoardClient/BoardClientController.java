@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import javax.swing.SwingUtilities;
+
 import models.ClientBoardModel;
 import packet.BoardName;
 import packet.InvalidPacketTypeException;
@@ -86,27 +88,37 @@ public class BoardClientController extends PacketHandler implements Runnable {
 
     @Override
     protected void receivedNewClientPacket(PacketNewClient packet, PrintWriter out) {
+        System.out.println("receieved new client");
         User packetUser = packet.user();
         BoardName boardName = packet.boardName();
         
-        assert model != null;
-        
-        // We should never receive our own new client packet.
-        assert !user.equals(packetUser);
-        
-        // We should only receive these packets if we have loaded.
-        assert clientState == ClientState.ClientStatePlaying;
-        
-        // We should only receive these packets if the board is our current board.
-        assert boardName.equals(model.boardName());
-        
-        model.addUser(packetUser);
-        
-        view.updateUserList();
+        if (user.equals(packetUser)) {
+            // We are about to receive a GameStatePacket, we should have a null model.
+            assert model == null;
+            assert clientState == ClientState.ClientStateIdle;
+            clientState = ClientState.ClientStateLoading;
+        } else {
+            assert model != null;
+            
+            // We should only receive these packets if we have loaded.
+            assert clientState == ClientState.ClientStatePlaying;
+            
+            // We should only receive these packets if the board is our current board.
+            assert boardName.equals(model.boardName());
+            
+            model.addUser(packetUser);
+            
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    view.updateUserList();
+                }
+            });
+        }
     }
 
     @Override
     protected void receivedDisconnectClientPacket(PacketDisconnectClient packet, PrintWriter out) {
+        System.out.println("receieved disconnect client");
         assert model != null;
         assert out == null;
         
@@ -124,16 +136,25 @@ public class BoardClientController extends PacketHandler implements Runnable {
             clientState = ClientState.ClientStateIdle;
             model = null;
             
-            view.clearModel();
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    view.clearModel();
+                }
+            });
         } else {
             // Otherwise, remove the user and update the user list.
             model.removeUser(packetUser);
-            view.updateUserList();
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    view.updateUserList();
+                }
+            });
         }
     }
 
     @Override
     protected void receivedGameStatePacket(PacketGameState packet, PrintWriter out) {
+        System.out.println("Recieve game state");
         assert model == null;
         assert out == null;
         
@@ -147,20 +168,28 @@ public class BoardClientController extends PacketHandler implements Runnable {
         User[] clients = packet.clients();
         Pixel[] pixels = packet.pixels();
         
-        model = new ClientBoardModel(width, height, boardName, clients, pixels);
+        model = new ClientBoardModel(this, width, height, boardName, clients, pixels);
         
-        view.setModel(model);
-        view.updateBoard();
-        view.updateUserList();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                view.setModel(model);
+                view.updateBoard();
+                view.updateUserList();
+            }
+        });
     }
 
     @Override
     protected void receivedBoardStatePacket(PacketBoardState packet, PrintWriter out) {
         assert out == null;
         
-        BoardName[] boards = packet.boards();
+        final BoardName[] boards = packet.boards();
         
-        view.updateBoardList(boards);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                view.updateBoardList(boards);
+            }
+        });
     }
     
     @Override
@@ -185,50 +214,37 @@ public class BoardClientController extends PacketHandler implements Runnable {
      */
     
     public void connectToBoard(BoardName boardName) {
-        // Can only connect to a board if we are disconnected.
-        assert clientState == ClientState.ClientStateIdle;
-        
-        sendConnectToBoard(boardName);
+        System.out.println("Send connect");
+
+        PacketNewClient packet = new PacketNewClient(boardName, user);
+        sendPacket(packet);
     }
     
     /**
      * Disconnect from the current board.
      */
     public void disconnectFromCurrentBoard() {
+        System.out.println("Send disconnect");
         assert model != null;
-        assert clientState == ClientState.ClientStatePlaying;
-
+        
         BoardName boardName = model.boardName();
 
-        sendDisconnectToBoard(boardName);
+        PacketDisconnectClient packet = new PacketDisconnectClient(boardName, user);
+        sendPacket(packet);
     }
     
     public void drawPixel(int x, int y, Color color) {
         assert model != null;
-        assert clientState == ClientState.ClientStatePlaying;
         
         BoardName boardName = model.boardName();
         Pixel pixel = new Pixel(x, y, color);
-        
-        sendDrawPixel(boardName, pixel);
+
+        PacketDrawPixel packet = new PacketDrawPixel(boardName, pixel);
+        sendPacket(packet);
     }
     
     private void sendPacket(Packet packet) {
         out.println(packet.data());
     }
     
-    private void sendConnectToBoard(BoardName boardName) {
-        PacketNewClient packet = new PacketNewClient(boardName, user);
-        sendPacket(packet);
-    }
-    
-    private void sendDisconnectToBoard(BoardName boardName) {
-        PacketDisconnectClient packet = new PacketDisconnectClient(boardName, user);
-        sendPacket(packet);
-    }
-    
-    private void sendDrawPixel(BoardName boardName, Pixel pixel) {
-        PacketDrawPixel packet = new PacketDrawPixel(boardName, pixel);
-        sendPacket(packet);
-    }
 }

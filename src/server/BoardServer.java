@@ -24,6 +24,8 @@ import models.ServerBoardModel;
 
 
 public class BoardServer extends PacketHandler {
+    public static final String DEFAULT_PORT = "4444";
+    
 	private final ServerSocket serverSocket;
 	private final Map<BoardName, ServerBoardModel> boards;
     private final Map<User, PrintWriter> users;
@@ -37,7 +39,7 @@ public class BoardServer extends PacketHandler {
 	}
 	
 	public static void main(String[] args) {
-	    int port = 4444;
+	    int port = Integer.parseInt(DEFAULT_PORT);
 	    
 	    if (args.length > 0)
 	        port = Integer.parseInt(args[0]);
@@ -82,7 +84,10 @@ public class BoardServer extends PacketHandler {
 	private void handleConnection(Socket socket) throws IOException {
 		BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-
+		
+		// Update the new client's list of boards.
+		sendPacket(constructBoardStatePacket(), out);
+		
 		try {
 			for (String line = in.readLine(); line != null; line = in.readLine()) {
 				Packet packet = Packet.createPacketWithData(line);
@@ -94,11 +99,30 @@ public class BoardServer extends PacketHandler {
 		}	
 	}
 	
+	/**
+	 * Broadcast a packet to all the users of a specific model.
+	 * @param model
+	 * @param packet
+	 */
 	private void broadcastPacket(ServerBoardModel model, Packet packet) {
         for (User user : model.users()) {
             PrintWriter out = users.get(user);
             sendPacket(packet, out);
         }
+	}
+	
+	/**
+	 * Broadcast a packet to all users.
+	 * @param packet
+	 */
+	private void broadcastPacketToAllUsers(Packet packet) {
+	    for (PrintWriter out : users.values()) {
+	        sendPacket(packet, out);
+	    }
+	}
+	
+	private PacketBoardState constructBoardStatePacket() {
+	    return new PacketBoardState(boards.keySet().toArray(new BoardName[boards.keySet().size()]));
 	}
 	
     @Override
@@ -118,18 +142,19 @@ public class BoardServer extends PacketHandler {
         // Check if we have created a board with this board name.
         if (boards.containsKey(boardName)) {
             // A new client has connected.
-            
             model = boards.get(boardName);
-            
-            // Tell the other users on the board that a new 
-            // client has joined.
-            broadcastPacket(model, packet);
         } else {
             // Create a new model under this boardName.
             model = new ServerBoardModel(boardName, SIZE, SIZE);
             boards.put(boardName, model);
+            broadcastPacketToAllUsers(constructBoardStatePacket());
         }
+
+        model.addUser(user);
         
+        // Tell the other users on the board that a new 
+        // client has joined.
+        broadcastPacket(model, packet);
         sendPacket(model.constructGameStatePacket(), out);
     }
 

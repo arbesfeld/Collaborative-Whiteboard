@@ -15,10 +15,17 @@ public class ServerBoardModel extends BoardModel {
         this.width = width;
         this.height = height;
         pixels = new Color[width][height];
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                pixels[i][j] = Color.WHITE;
+            }
+        }
     }
 
     @Override
     public synchronized void putPixel(Pixel pixel) {
+        if (pixel.x() < 0 || pixel.x() >= width || pixel.y() < 0 || pixel.y() >= height)
+            return;
         pixels[pixel.x()][pixel.y()] = pixel.color();
     }
     
