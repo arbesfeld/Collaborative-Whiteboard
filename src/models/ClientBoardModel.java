@@ -17,7 +17,8 @@ public class ClientBoardModel extends BoardModel {
         canvas = new Canvas(controller, width, height);
         
         for (Pixel initPixel : initPixels) {
-            canvas.drawPixel(initPixel);
+        	assert !initPixel.color().equals(Color.WHITE);
+        	canvas.drawPixel(initPixel);
         }
         
         setColor(color);

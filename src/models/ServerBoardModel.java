@@ -1,6 +1,8 @@
 package models;
 
 import java.awt.Color;
+import java.util.List;
+import java.util.ArrayList;
 
 import name.BoardName;
 
@@ -32,15 +34,16 @@ public class ServerBoardModel extends BoardModel {
     }
     
     private synchronized Pixel[] getAllPixels() {
-        Pixel[] resPixels = new Pixel[width*height];
+    	List<Pixel> resPixelsList = new ArrayList<Pixel>(width*height);
         
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
-                int count = i*height + j;
-                resPixels[count] = new Pixel(i, j, pixels[i][j]);
+                if (!pixels[i][j].equals(Color.WHITE)) {
+                	resPixelsList.add(new Pixel(i, j, pixels[i][j]));
+                }
             }
         }
-        return resPixels;
+        return resPixelsList.toArray(new Pixel[resPixelsList.size()]);
     }
     
     public synchronized PacketGameState constructGameStatePacket() {
