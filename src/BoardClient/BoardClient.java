@@ -1,9 +1,5 @@
 package BoardClient;
 
-import models.ClientBoardModel;
-import packet.User;
-import util.Utils;
-
 public class BoardClient {
   
     public static void main(String[] args) {
