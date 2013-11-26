@@ -33,7 +33,7 @@ public class PopupGUI extends JFrame {
             String portName = ip.getText();
             int portNumber = Integer.parseInt(port.getText());
             
-            new BoardClient(userName, portName, portNumber);
+            BoardClient.startClient(userName, portName, portNumber);
         } 
     }
 
