@@ -67,6 +67,22 @@ public class PacketTest {
         assertArrayEquals(newPacket.clients(), clients);
         assertArrayEquals(newPacket.pixels(), pixels);
     }
+    
+    @Test
+    public void boardStatePacketTest() {
+        BoardName[] boards = new BoardName[2];
+        
+        boards[0] = new BoardName(4, "name1");
+        boards[1] = new BoardName(7, "name2");
+        
+        Packet packet = new PacketBoardState(boards);
+        String data = packet.data();
+        PacketBoardState newPacket = (PacketBoardState) Packet.createPacketWithData(data);
+        
+        assertEquals(packet, newPacket);
+        assertEquals(packet.hashCode(), newPacket.hashCode());
+        assertArrayEquals(newPacket.boards(), boards);
+    }
 
     @Test
     public void drawPixelPacketTest() {

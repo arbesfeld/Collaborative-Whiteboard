@@ -1,6 +1,6 @@
 package packet;
 
-public class Name {
+public abstract class Name {
     private int id;
     private String name;
     

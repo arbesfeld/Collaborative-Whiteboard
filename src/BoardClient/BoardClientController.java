@@ -10,7 +10,11 @@ import models.ClientBoardModel;
 import packet.BoardName;
 import packet.Packet;
 import packet.PacketDisconnectClient;
+import packet.PacketDrawPixel;
 import packet.PacketNewClient;
+import packet.User;
+import pixel.Pixel;
+import util.Utils;
 
 public class BoardClientController implements Runnable {
     
@@ -24,9 +28,16 @@ public class BoardClientController implements Runnable {
     private final BufferedReader in;
     
     private final BoardClient client;
+    private final BoardClientGUI view;
+    private final User user;
+    private ClientBoardModel model;
     
-    public BoardClientController(BoardClient client, String hostName, int portNumber) throws IOException {
+    public BoardClientController(BoardClientGUI view, BoardClient client, 
+                                 String userName, String hostName, int portNumber) throws IOException {
+        this.view = view;
         this.client = client;
+        this.user = new User(Utils.generateId(), userName);
+        
         this.socket = new Socket(hostName, portNumber);
         this.out = new PrintWriter(socket.getOutputStream(), true);
         this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -70,12 +81,17 @@ public class BoardClientController implements Runnable {
     }
     
     public void connectToBoard(BoardName boardName) {
-        PacketNewClient packet = new PacketNewClient(client.name(), boardName);
+        PacketNewClient packet = new PacketNewClient(boardName, user);
         sendPacket(packet);
     }
     
     public void disconnectFromBoard(BoardName boardName) {
-        PacketDisconnectClient packet = new PacketDisconnectClient(client.name(), boardName);
+        PacketDisconnectClient packet = new PacketDisconnectClient(boardName, user);
+        sendPacket(packet);
+    }
+    
+    public void drawPixel(BoardName boardName, Pixel pixel) {
+        PacketDrawPixel packet = new PacketDrawPixel(boardName, pixel);
         sendPacket(packet);
     }
 }

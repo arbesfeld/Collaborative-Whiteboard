@@ -44,6 +44,10 @@ public abstract class Packet {
             packet = PacketGameState.createPacketWithDataInternal(jobject);
             break;
             
+        case PacketTypeBoardState:
+            packet = PacketBoardState.createPacketWithDataInternal(jobject);
+            break;
+            
         case PacketTypeDrawPixel:
             packet = PacketDrawPixel.createPacketWithDataInternal(jobject);
             break;
@@ -54,6 +58,11 @@ public abstract class Packet {
         }
         
         return packet;
+    }
+    
+    protected Packet(PacketType packetType) {
+        // BoardName is not used
+        this(packetType, new BoardName(0, ""));
     }
     
     protected Packet(PacketType packetType, BoardName boardName) {
