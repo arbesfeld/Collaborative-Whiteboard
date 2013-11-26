@@ -9,6 +9,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 public final class PacketGameState extends Packet {
+    private final int width;
+    private final int height;
     private final User[] clients;
     private final Pixel[] pixels;
     
@@ -18,6 +20,9 @@ public final class PacketGameState extends Packet {
      * @return the constructed Packet
      */
     protected static Packet createPacketWithDataInternal(JsonObject data) {
+        int width = data.get("width").getAsInt();
+        int height = data.get("height").getAsInt();
+        
         JsonObject board = data.get("boardName").getAsJsonObject();
         int boardId = board.get("id").getAsInt();
         String boardName = board.get("name").getAsString();
@@ -46,11 +51,13 @@ public final class PacketGameState extends Packet {
             pixels[i] = new Pixel(x, y, rgb);
         }
         
-        return new PacketGameState(new BoardName(boardId, boardName), clients, pixels);
+        return new PacketGameState(new BoardName(boardId, boardName), width, height, clients, pixels);
     }
     
-    public PacketGameState(BoardName boardName, User[] clients, Pixel[] pixels) {
+    public PacketGameState(BoardName boardName, int width, int height, User[] clients, Pixel[] pixels) {
         super(PacketType.PacketTypeGameState, boardName);
+        this.width = width;
+        this.height = height;
         this.clients = clients;
         this.pixels = pixels;
     }
@@ -60,8 +67,18 @@ public final class PacketGameState extends Packet {
      */
     @Override
     protected void addPayloadToData(HashMap<Object, Object> data) {
+        data.put("width", width);
+        data.put("height", height);
         data.put("clients", clients);
         data.put("pixels", pixels);
+    }
+    
+    public int width() {
+        return width;
+    }
+    
+    public int height() {
+        return height;
     }
     
     public User[] clients() {

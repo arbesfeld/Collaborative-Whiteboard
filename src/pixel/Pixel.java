@@ -9,7 +9,7 @@ public class Pixel {
     private Color color;
     private int rgb; // used for serialization
     
-    private Pixel(int x, int y, Color color) {
+    public Pixel(int x, int y, Color color) {
         if (this.x < 0 || this.y < 0) {
             throw new IllegalArgumentException("Pixels must have positive x and y coordinates. x = "
                                               + x + ", y = " + y + ".");

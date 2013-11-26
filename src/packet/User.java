@@ -8,4 +8,5 @@ public class User extends Name {
     public User clone() {
         return new User(id(), name());
     }
+    
 }

@@ -21,13 +21,19 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
+import models.ClientBoardModel;
+
+import packet.BoardName;
+
 
 public class BoardClientGUI extends JFrame{
-    JTextArea output;
-    JScrollPane scrollPane;
-    static JMenuBar menuBar;
-    List<String> boardNames = new ArrayList<String>(); 
- 
+    private JTextArea output;
+    private JScrollPane scrollPane;
+    private static JMenuBar menuBar;
+    
+    private List<String> boardNames = new ArrayList<String>(); 
+    private ClientBoardModel model;
+    
     private JMenuBar updateMenuBar() {
         JMenu menu, submenu;
         JMenuItem menuItem;
@@ -121,5 +127,48 @@ public class BoardClientGUI extends JFrame{
                 createAndShowGUI();
             }
         });
+    }
+    
+    /**
+     * Set the current model and allow the user to draw to the screen.
+     * @param model
+     */
+    public void setModel(ClientBoardModel model) {
+        this.model = model;
+    }
+
+    /**
+     * Update the list of users from the current model.
+     */
+    public void updateUserList() {
+        assert this.model != null;
+        
+        // TODO
+    }
+
+    /**
+     * Update the board Image from the current model.
+     */
+    public void updateBoard() {
+        assert this.model != null;
+        // TODO
+        
+    }
+
+    /**
+     * Update the list of boards.
+     * @param boards
+     */
+    public void updateBoardList(BoardName[] boards) {
+        // TODO
+    }
+
+    /**
+     * Clear the model and deactivate drawing to the canvas until
+     * setModel() is called.
+     */
+    public void clearModel() {
+        this.model = null;
+        // TODO
     }
 }

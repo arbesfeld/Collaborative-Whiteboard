@@ -56,7 +56,7 @@ public class PacketTest {
         pixels[0] = new Pixel(0, 0, "white");
         pixels[1] = new Pixel(1, 2, "black");
         
-        Packet packet = new PacketGameState(new BoardName(100, "board"), clients, pixels);
+        Packet packet = new PacketGameState(new BoardName(100, "board"), 256, 256, clients, pixels);
         String data = packet.data();
         PacketGameState newPacket = (PacketGameState) Packet.createPacketWithData(data);
         

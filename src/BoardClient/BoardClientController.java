@@ -1,5 +1,6 @@
 package BoardClient;
 
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -8,10 +9,14 @@ import java.net.Socket;
 
 import models.ClientBoardModel;
 import packet.BoardName;
+import packet.InvalidPacketTypeException;
 import packet.Packet;
+import packet.PacketBoardState;
 import packet.PacketDisconnectClient;
 import packet.PacketDrawPixel;
+import packet.PacketGameState;
 import packet.PacketNewClient;
+import packet.PacketType;
 import packet.User;
 import pixel.Pixel;
 import util.Utils;
@@ -27,16 +32,17 @@ public class BoardClientController implements Runnable {
     // read from the server
     private final BufferedReader in;
     
-    private final BoardClient client;
     private final BoardClientGUI view;
     private final User user;
     private ClientBoardModel model;
     
-    public BoardClientController(BoardClientGUI view, BoardClient client, 
-                                 String userName, String hostName, int portNumber) throws IOException {
+    private ClientState clientState;
+    
+    public BoardClientController(BoardClientGUI view, String userName, 
+                                 String hostName, int portNumber) throws IOException {
         this.view = view;
-        this.client = client;
         this.user = new User(Utils.generateId(), userName);
+        this.clientState = ClientState.ClientStateIdle;
         
         this.socket = new Socket(hostName, portNumber);
         this.out = new PrintWriter(socket.getOutputStream(), true);
@@ -69,6 +75,7 @@ public class BoardClientController implements Runnable {
         try {
             for (String line = in.readLine(); line != null; line = in.readLine()) {
                 Packet packet = Packet.createPacketWithData(line);
+                receivedPacket(packet);
             }
         } finally {
             in.close();
@@ -76,21 +83,173 @@ public class BoardClientController implements Runnable {
         }
     }
     
+    /*
+     * Methods for receiving packets.
+     */
+    private void receivedPacket(Packet packet) {
+        PacketType packetType = packet.packetType();
+        
+        switch(packetType) {
+        
+        case PacketTypeNewClient:
+            receivedNewClientPacket((PacketNewClient) packet);
+            break;
+            
+        case PacketTypeDisconnectClient:
+            receivedDisconnectClientPacket((PacketDisconnectClient) packet);
+            break;
+            
+        case PacketTypeGameState:
+            receivedGameStatePacket((PacketGameState) packet);
+            break;
+            
+        case PacketTypeBoardState:
+            receivedBoardStatePacket((PacketBoardState) packet);
+            break;
+            
+        case PacketTypeDrawPixel:
+            receivedDrawPixelPacket((PacketDrawPixel) packet);
+            break;
+            
+        default:
+            throw new InvalidPacketTypeException();
+            
+        }
+    }
+    
+    private void receivedNewClientPacket(PacketNewClient packet) {
+        User packetUser = packet.user();
+        BoardName boardName = packet.boardName();
+        
+        assert model != null;
+        
+        // We should never receive our own new client packet.
+        assert !user.equals(packetUser);
+        
+        // We should only receive these packets if we have loaded.
+        assert clientState == ClientState.ClientStatePlaying;
+        
+        // We should only receive these packets if the board is our current board.
+        assert boardName.equals(model.boardName());
+        
+        model.addUser(packetUser);
+        
+        view.updateUserList();
+    }
+    
+    private void receivedDisconnectClientPacket(PacketDisconnectClient packet) {
+        User packetUser = packet.user();
+        BoardName boardName = packet.boardName();
+        
+        assert model != null;
+        
+        // We should never receive our own disconnect client packet.
+        assert !user.equals(packetUser);
+        
+        // We should only receive these packets if we have loaded.
+        assert clientState == ClientState.ClientStatePlaying;
+        
+        // We should only receive these packets if the board is our current board.
+        assert boardName.equals(model.boardName());
+        
+        model.removeUser(packetUser);
+        
+        view.updateUserList();
+    }
+    
+    private void receivedGameStatePacket(PacketGameState packet) {
+        BoardName boardName = packet.boardName();
+        int width = packet.width();
+        int height = packet.height();
+        User[] clients = packet.clients();
+        Pixel[] pixels = packet.pixels();
+        
+        // We should only receive these packets if are loading
+        assert clientState == ClientState.ClientStateLoading;
+        
+        clientState = ClientState.ClientStatePlaying;
+        
+        assert model == null;
+        model = new ClientBoardModel(width, height, boardName, clients, pixels);
+        
+        view.setModel(model);
+        view.updateBoard();
+        view.updateUserList();
+    }
+    
+    private void receivedBoardStatePacket(PacketBoardState packet) {
+        BoardName[] boards = packet.boards();
+        
+        view.updateBoardList(boards);
+    }
+    
+    private void receivedDrawPixelPacket(PacketDrawPixel packet) {
+        Pixel pixel = packet.pixel();
+        BoardName boardName = packet.boardName();
+        
+        assert model != null;
+        
+        // We should only receive these packets if we have loaded.
+        assert clientState == ClientState.ClientStatePlaying;
+        
+        // We should only receive these packets if the board is our current board.
+        assert boardName.equals(model.boardName());
+        
+        model.putPixel(pixel);
+    }
+    
+    /*
+     * Methods for sending packets.
+     */
+    
+    public void connectToBoard(BoardName boardName) {
+        // Can only connect to a board if we are disconnected.
+        assert clientState == ClientState.ClientStateIdle;
+        
+        sendConnectToBoard(boardName);
+    }
+    
+    /**
+     * Disconnect from the current board.
+     */
+    public void disconnectFromCurrentBoard() {
+        assert model != null;
+        assert clientState == ClientState.ClientStatePlaying;
+
+        BoardName boardName = model.boardName();
+        
+        // Disconnect ourselves from the model and wait until we receive a new "game state" packet.
+        clientState = ClientState.ClientStateIdle;
+        model = null;
+        
+        sendDisconnectToBoard(boardName);
+    }
+    
+    public void drawPixel(int x, int y, Color color) {
+        assert model != null;
+        assert clientState == ClientState.ClientStatePlaying;
+        
+        BoardName boardName = model.boardName();
+        Pixel pixel = new Pixel(x, y, color);
+        
+        sendDrawPixel(boardName, pixel);
+    }
+    
     private void sendPacket(Packet packet) {
         out.println(packet.data());
     }
     
-    public void connectToBoard(BoardName boardName) {
+    private void sendConnectToBoard(BoardName boardName) {
         PacketNewClient packet = new PacketNewClient(boardName, user);
         sendPacket(packet);
     }
     
-    public void disconnectFromBoard(BoardName boardName) {
+    private void sendDisconnectToBoard(BoardName boardName) {
         PacketDisconnectClient packet = new PacketDisconnectClient(boardName, user);
         sendPacket(packet);
     }
     
-    public void drawPixel(BoardName boardName, Pixel pixel) {
+    private void sendDrawPixel(BoardName boardName, Pixel pixel) {
         PacketDrawPixel packet = new PacketDrawPixel(boardName, pixel);
         sendPacket(packet);
     }

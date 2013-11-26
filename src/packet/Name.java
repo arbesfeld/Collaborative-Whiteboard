@@ -1,6 +1,7 @@
 package packet;
 
 public abstract class Name {
+
     private int id;
     private String name;
     
@@ -43,5 +44,10 @@ public abstract class Name {
         } else if (!name.equals(other.name))
             return false;
         return true;
+    }
+    
+    @Override
+    public String toString() {
+        return "Name [id=" + id + ", name=" + name + "]";
     }
 }
