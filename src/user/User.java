@@ -10,6 +10,14 @@ public class User {
         this.name = name;
     }
     
+    public int id() {
+        return id;
+    }
+    
+    public String name() {
+        return name;
+    }
+    
     @Override
     public int hashCode() {
         final int prime = 31;

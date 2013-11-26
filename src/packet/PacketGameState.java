@@ -3,13 +3,14 @@ package packet;
 import java.util.HashMap;
 
 import pixel.Pixel;
+import user.User;
 import util.Pair;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 public final class PacketGameState extends Packet {
-    private final Pair<String, String>[] clients;
+    private final User[] clients;
     private final Pixel[] pixels;
     
     /**
@@ -22,14 +23,15 @@ public final class PacketGameState extends Packet {
         
         JsonArray jclients = data.get("clients").getAsJsonArray();
         
-        @SuppressWarnings("unchecked")
-        Pair<String, String>[] clients = new Pair[jclients.size()];
+        User[] clients = new User[jclients.size()];
         
         for (int i = 0; i < jclients.size(); i++) {
             JsonObject jobject = jclients.get(i).getAsJsonObject();
-            String id = jobject.get("first").getAsString();
-            String name = jobject.get("second").getAsString();
-            clients[i] = new Pair<String, String>(id, name);
+     
+            int id = jobject.get("id").getAsInt();
+            String name = jobject.get("name").getAsString();
+            
+            clients[i] = new User(id, name);
         }
         
         JsonArray jpixels = data.get("pixels").getAsJsonArray();
@@ -46,7 +48,7 @@ public final class PacketGameState extends Packet {
         return new PacketGameState(boardID, clients, pixels);
     }
     
-    public PacketGameState(int boardID, Pair<String, String>[] clients, Pixel[] pixels) {
+    public PacketGameState(int boardID, User[] clients, Pixel[] pixels) {
         super(PacketType.PacketTypeGameState, boardID);
         this.clients = clients;
         this.pixels = pixels;
@@ -61,7 +63,7 @@ public final class PacketGameState extends Packet {
         data.put("pixels", pixels);
     }
     
-    public Pair<String, String>[] clients() {
+    public User[] clients() {
         return clients.clone();
     }
     

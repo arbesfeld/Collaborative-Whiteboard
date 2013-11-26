@@ -2,11 +2,12 @@ package packet;
 
 import java.util.HashMap;
 
+import user.User;
+
 import com.google.gson.JsonObject;
 
 public final class PacketDisconnectClient extends Packet {
-    private final String name;
-    private final String id;
+    private final User user;
     
     /**
      * 
@@ -15,15 +16,15 @@ public final class PacketDisconnectClient extends Packet {
      */
     protected static Packet createPacketWithDataInternal(JsonObject data) {
         int boardID = data.get("boardID").getAsInt();
-        String name = data.get("name").getAsString();
-        String id = data.get("id").getAsString();
-        return new PacketDisconnectClient(boardID, id, name);
+        JsonObject juser = data.get("user").getAsJsonObject();
+        int id = juser.get("id").getAsInt();
+        String name = juser.get("name").getAsString();
+        return new PacketDisconnectClient(boardID, new User(id, name));
     }
     
-    public PacketDisconnectClient(int boardID, String id, String name) {
+    public PacketDisconnectClient(int boardID, User user) {
         super(PacketType.PacketTypeDisconnectClient, boardID);
-        this.id = id;
-        this.name = name;
+        this.user = user;
     }
     
     /**
@@ -31,24 +32,18 @@ public final class PacketDisconnectClient extends Packet {
      */
     @Override
     protected void addPayloadToData(HashMap<Object, Object> data) {
-        data.put("name", name);
-        data.put("id", id);
+        data.put("user", user);
     }
     
-    public String name() {
-        return name;
+    public User user() {
+        return user;
     }
 
-    public String id() {
-        return id;
-    }
-    
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((user == null) ? 0 : user.hashCode());
         return result;
     }
 
@@ -61,15 +56,10 @@ public final class PacketDisconnectClient extends Packet {
         if (getClass() != obj.getClass())
             return false;
         PacketDisconnectClient other = (PacketDisconnectClient) obj;
-        if (id == null) {
-            if (other.id != null)
+        if (user == null) {
+            if (other.user != null)
                 return false;
-        } else if (!id.equals(other.id))
-            return false;
-        if (name == null) {
-            if (other.name != null)
-                return false;
-        } else if (!name.equals(other.name))
+        } else if (!user.equals(other.user))
             return false;
         return true;
     }
