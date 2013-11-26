@@ -1,27 +1,21 @@
 package server;
 
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import packet.BoardName;
-import packet.InvalidPacketTypeException;
 import packet.Packet;
 import packet.PacketBoardState;
 import packet.PacketDisconnectClient;
 import packet.PacketDrawPixel;
 import packet.PacketGameState;
 import packet.PacketNewClient;
-import packet.PacketType;
 import packet.PacketHandler;
 import packet.User;
 import pixel.Pixel;
@@ -37,9 +31,23 @@ public class BoardServer extends PacketHandler {
 	
 	public BoardServer(int port) throws IOException // TODO add more args here
 	{
-		serverSocket = new ServerSocket(port);
+		this.serverSocket = new ServerSocket(port);
 		this.boards = new HashMap<BoardName, ServerBoardModel>();
         this.users = new HashMap<User, PrintWriter>();
+	}
+	
+	public static void main(String[] args) {
+	    int port = 4444;
+	    
+	    if (args.length > 0)
+	        port = Integer.parseInt(args[0]);
+	    
+	    try {
+            BoardServer server = new BoardServer(port);
+            server.serve();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 	}
 	
 	public void serve() throws IOException {
