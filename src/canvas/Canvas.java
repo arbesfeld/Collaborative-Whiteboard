@@ -160,9 +160,9 @@ public class Canvas extends JPanel {
             Vector2 velocity = new Vector2(lastX - x, lastY - y);
             double dist = velocity.abs();
             
-            for (int i = 0; i <= (int)dist; i += 50) {
+            for (int i = 0; i <= (int)dist; i++) {
                 int curX = (int) (lastX*i/dist + x*(dist-i)/dist);
-                int curY = (int) (lastX*i/dist + y*(dist-i)/dist);
+                int curY = (int) (lastY*i/dist + y*(dist-i)/dist);
                 
                 Pixel[] pixels = strokeProperties.paintPoint(curX, curY, velocity);
                 

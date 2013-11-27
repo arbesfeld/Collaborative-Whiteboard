@@ -79,7 +79,7 @@ public class BoardClientGUI extends JFrame{
         this.strokeMenu = new JMenu("Stroke");
         this.strokeMenu.setIcon(new ColorIcon(STROKE_INIT, Color.black));
         this.strokeSlider = new JSlider(JSlider.HORIZONTAL, STROKE_MIN, STROKE_MAX, STROKE_INIT);
-        this.eraseToggle = new JToggleButton(new ImageIcon("src/guiResources/eraserIcon.gif"));
+        this.eraseToggle = new JToggleButton(new ImageIcon("resources/eraserIcon.gif"));
         this.eraseToggle.setFocusPainted(false);
         
         // Join Game submenu.
