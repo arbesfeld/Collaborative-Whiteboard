@@ -19,7 +19,6 @@ import packet.PacketGameState;
 import packet.PacketJoinBoard;
 import packet.PacketNewBoard;
 import packet.PacketNewClient;
-import packet.PacketType;
 import pixel.Pixel;
 
 import models.ServerBoardModel;
@@ -38,8 +37,8 @@ public class BoardServer {
 	
 	public BoardServer(int port) throws IOException {
 		this.serverSocket = new ServerSocket(port);
-		this.boards = new HashMap<BoardName, ServerBoardModel>();
-        this.users = new HashMap<User, PrintWriter>();
+		this.boards = Collections.synchronizedMap(new HashMap<BoardName, ServerBoardModel>());
+        this.users = Collections.synchronizedMap(new HashMap<User, PrintWriter>());
 	}
 	
 	public static void main(String[] args) {
@@ -47,7 +46,6 @@ public class BoardServer {
 	    
 	    if (args.length > 0)
 	        port = Integer.parseInt(args[0]);
-	    
 	    try {
             BoardServer server = new BoardServer(port);
             server.serve();
@@ -59,7 +57,6 @@ public class BoardServer {
 	public void serve() throws IOException {
 		while (true) {
 			final Socket socket = serverSocket.accept();
-			
 			new Thread(new ClientHandler(socket)).start();
 		}
 	}
@@ -193,8 +190,10 @@ public class BoardServer {
      * @param packet
      */
     private void broadcastPacketToAllClients(Packet packet) {
-        for (PrintWriter out : users.values()) {
-            sendPacket(packet, out);
+        synchronized(users) {
+            for (PrintWriter out : users.values()) {
+                sendPacket(packet, out);
+            }
         }
     }
     

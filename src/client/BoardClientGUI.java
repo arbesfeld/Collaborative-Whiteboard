@@ -32,18 +32,15 @@ import javax.swing.colorchooser.AbstractColorChooserPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import canvas.Canvas;
-
 import name.BoardName;
 import models.ClientBoardModel;
 
-import server.BoardServer;
 import stroke.StrokeProperties;
 
 import util.Utils;
 
 
-public class BoardClientGUI extends JFrame{
+class BoardClientGUI extends JFrame{
     private static final long serialVersionUID = 1L;
     private final JMenuBar menuBar;
     private final JMenu menu;
