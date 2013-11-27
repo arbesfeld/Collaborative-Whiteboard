@@ -1,4 +1,4 @@
-package canvas;
+package util;
 
 public class Vector2 {
     private final double x, y;

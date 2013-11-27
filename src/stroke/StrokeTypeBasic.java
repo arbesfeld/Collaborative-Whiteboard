@@ -4,9 +4,9 @@ import java.awt.Color;
 import java.util.LinkedList;
 import java.util.List;
 
-import canvas.Vector2;
 
 import pixel.Pixel;
+import util.Vector2;
 
 public final class StrokeTypeBasic implements StrokeType {
 

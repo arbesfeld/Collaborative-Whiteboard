@@ -2,9 +2,9 @@ package stroke;
 
 import java.awt.Color;
 
-import canvas.Vector2;
 
 import pixel.Pixel;
+import util.Vector2;
 
 public class StrokeProperties {
 

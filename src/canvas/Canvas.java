@@ -18,6 +18,7 @@ import client.BoardClientController;
 
 import pixel.Pixel;
 import stroke.StrokeProperties;
+import util.Vector2;
 
 /**
  * Canvas represents a drawing surface that allows the user to draw
