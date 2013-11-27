@@ -155,6 +155,7 @@ public class Canvas extends JPanel {
                 
                 for (Pixel pixel : pixels) {
                     controller.drawPixel(pixel);
+                    drawPixel(pixel);
                 }
             }
             lastX = x;
