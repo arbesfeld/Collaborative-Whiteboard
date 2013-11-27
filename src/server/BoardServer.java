@@ -142,7 +142,7 @@ public class BoardServer extends PacketHandler {
         model.addUser(sender);
         sendPacket(packet, users.get(sender));
         
-        broadcastPacketToAllUsers(constructBoardStatePacket());
+        broadcastPacketToAllClients(constructBoardStatePacket());
         
         // Tell the user to start his board.
         sendPacket(model.constructGameStatePacket(), users.get(sender));
@@ -161,7 +161,7 @@ public class BoardServer extends PacketHandler {
         model.addUser(sender);
         // Tell the other users on the board that a new 
         // client has joined.
-        broadcastPacket(model, packet);
+        broadcastPacketToBoard(model, packet);
 
         // First send a GameState packet, then start sending the client new pixel locations.
         sendPacket(model.constructGameStatePacket(), users.get(sender));
@@ -177,7 +177,7 @@ public class BoardServer extends PacketHandler {
         ServerBoardModel model = boards.get(boardName);
         
         // Broadcast the packet to all the users of the board.
-        broadcastPacket(model, packet);
+        broadcastPacketToBoard(model, packet);
         model.removeUser(packet.senderName());
     }
 
@@ -201,9 +201,9 @@ public class BoardServer extends PacketHandler {
         assert boards.containsKey(boardName);
         
         ServerBoardModel model = boards.get(boardName);
-        model.putPixel(pixel);
+        model.drawPixel(pixel);
         
-        broadcastPacket(model, packet);
+        broadcastPacketToBoard(model, packet);
     }
     
 	/**
@@ -211,13 +211,10 @@ public class BoardServer extends PacketHandler {
 	 * @param model
 	 * @param packet
 	 */
-	private void broadcastPacket(ServerBoardModel model, Packet packet) {
+	private void broadcastPacketToBoard(ServerBoardModel model, Packet packet) {
         for (User user : model.users()) {
             PrintWriter out = users.get(user);
-            
-            if (out != null) {
-                sendPacket(packet, out);
-            }
+            sendPacket(packet, out);
         }
 	}
 	
@@ -225,7 +222,7 @@ public class BoardServer extends PacketHandler {
 	 * Broadcast a packet to all users.
 	 * @param packet
 	 */
-	private void broadcastPacketToAllUsers(Packet packet) {
+	private void broadcastPacketToAllClients(Packet packet) {
 	    for (PrintWriter out : users.values()) {
 	        sendPacket(packet, out);
 	    }

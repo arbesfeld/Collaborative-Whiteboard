@@ -38,6 +38,7 @@ import name.BoardName;
 import models.ClientBoardModel;
 
 import server.BoardServer;
+import stroke.StrokeProperties;
 
 import util.Utils;
 
@@ -57,7 +58,7 @@ public class BoardClientGUI extends JFrame{
     
     private static final int STROKE_MAX = 10;
     private static final int STROKE_MIN = 1;
-    private static final int STROKE_INIT = Canvas.STROKE_DEFAULT;
+    private static final int STROKE_INIT = StrokeProperties.DEFAULT_STROKE_WIDTH;
     
     private BoardName[] boardNames;
     private ClientBoardModel model;
@@ -225,12 +226,13 @@ public class BoardClientGUI extends JFrame{
             JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             BoardName boardName = new BoardName(Utils.generateId(), inputBoardName.getText());
-            
-            try {
-                controller.generateNewBoard(boardName, Integer.parseInt(widthName.getText()),
-                							Integer.parseInt(heightName.getText()));
-            } catch (Exception e) {
+
+            if (model != null) {
+                controller.disconnectFromCurrentBoard();
             }
+            controller.generateNewBoard(boardName, Integer.parseInt(widthName.getText()),
+                						Integer.parseInt(heightName.getText()));
+
         } 
         
     }

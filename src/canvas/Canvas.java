@@ -26,8 +26,6 @@ import util.Vector2;
  */
 public class Canvas extends JPanel {
 	private static final long serialVersionUID = 1L;
-
-	public static int STROKE_DEFAULT = 3;
 	
 	// image where the user's drawing is stored
     private BufferedImage drawingBuffer;
@@ -168,6 +166,9 @@ public class Canvas extends JPanel {
                 Pixel[] pixels = strokeProperties.paintPoint(curX, curY, velocity);
                 
                 for (Pixel pixel : pixels) {
+                    if (outOfRange(pixel.x(), pixel.y()))
+                        continue;
+                    
                     if (pixel.color().getRGB() == getPixelRGB(pixel.x(), pixel.y())) {
                         continue;
                     }

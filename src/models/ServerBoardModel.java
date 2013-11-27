@@ -1,6 +1,7 @@
 package models;
 
 import java.awt.Color;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -12,12 +13,9 @@ import server.BoardServer;
 
 public class ServerBoardModel extends BoardModel {
     private final Color[][] pixels;
-    private final int width, height;
     
     public ServerBoardModel(BoardName boardName, int width, int height) {
-        super(boardName);
-        this.width = width;
-        this.height = height;
+        super(boardName, width, height);
         pixels = new Color[width][height];
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
@@ -27,12 +25,16 @@ public class ServerBoardModel extends BoardModel {
     }
 
     @Override
-    public synchronized void putPixel(Pixel pixel) {
-        if (pixel.x() < 0 || pixel.x() >= width || pixel.y() < 0 || pixel.y() >= height)
-            return;
-        pixels[pixel.x()][pixel.y()] = pixel.color();
+    public synchronized void drawPixel(Pixel pixel) {
+        if (isValidPixel(pixel))
+            pixels[pixel.x()][pixel.y()] = pixel.color();
     }
-    
+
+    @Override
+    protected boolean isServerBoard() {
+        return true;
+    }
+
     private synchronized Pixel[] getAllPixels() {
     	List<Pixel> resPixelsList = new ArrayList<Pixel>(width*height);
         
@@ -45,8 +47,9 @@ public class ServerBoardModel extends BoardModel {
         }
         return resPixelsList.toArray(new Pixel[resPixelsList.size()]);
     }
-    
+
     public synchronized PacketGameState constructGameStatePacket() {
         return new PacketGameState(boardName(), BoardServer.SERVER_NAME, width, height, users(), getAllPixels());
     }
+    
 }

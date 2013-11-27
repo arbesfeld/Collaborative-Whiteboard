@@ -16,21 +16,28 @@ public class ClientBoardModel extends BoardModel {
     public ClientBoardModel(BoardClientController controller, StrokeProperties strokeProperties,
                             int width, int height, BoardName boardName, 
                             User[] initUsers, Pixel[] initPixels) {
-        super(boardName, initUsers);
+        super(boardName, initUsers, width, height);
         this.canvas = new Canvas(controller, strokeProperties, width, height);
         
         for (Pixel initPixel : initPixels) {
         	assert !initPixel.color().equals(Color.WHITE);
-        	putPixel(initPixel);
+        	drawPixel(initPixel);
         }
     }
     
     @Override
-    public void putPixel(Pixel pixel) {
-        canvas.drawPixel(pixel);
+    public void drawPixel(Pixel pixel) {
+        if (isValidPixel(pixel))
+            canvas.drawPixel(pixel);
+    }
+
+    @Override
+    protected boolean isServerBoard() {
+        return false;
     }
     
     public Canvas canvas() {
         return canvas;
     }
+
 }

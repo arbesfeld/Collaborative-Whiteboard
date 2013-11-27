@@ -59,7 +59,7 @@ public class BoardClientController extends PacketHandler implements Runnable {
         this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         
         // Default stroke.
-        this.strokeProperties = new StrokeProperties(Color.BLACK, Canvas.STROKE_DEFAULT);
+        this.strokeProperties = new StrokeProperties();
         
         // Send a NewClientPacket to announce yourself.
         sendPacket(new PacketNewClient(user));
@@ -201,14 +201,13 @@ public class BoardClientController extends PacketHandler implements Runnable {
         assert clientState == ClientState.ClientStateLoading;
         clientState = ClientState.ClientStatePlaying;
         
-        final BoardName boardName = packet.boardName();
-        final int width = packet.width();
-        final int height = packet.height();
-        final User[] clients = packet.clients();
-        final Pixel[] pixels = packet.pixels();
-        final BoardClientController controller = this;
+        BoardName boardName = packet.boardName();
+        int width = packet.width();
+        int height = packet.height();
+        User[] clients = packet.clients();
+        Pixel[] pixels = packet.pixels();
 
-        model = new ClientBoardModel(controller, strokeProperties, width, height, boardName, clients, pixels);
+        model = new ClientBoardModel(this, strokeProperties, width, height, boardName, clients, pixels);
         
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -247,7 +246,7 @@ public class BoardClientController extends PacketHandler implements Runnable {
         final Pixel pixel = packet.pixel();
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                model.putPixel(pixel);
+                model.drawPixel(pixel);
             }
         });
     }
