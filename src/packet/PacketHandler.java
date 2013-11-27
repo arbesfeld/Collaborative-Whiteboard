@@ -15,11 +15,11 @@ abstract public class PacketHandler {
             break;
             
         case PacketTypeNewBoard:
-        	receivedNewBoardPacket((PacketNewBoard) packet);
+            receivedNewBoardPacket((PacketNewBoard) packet);
             break;
             
         case PacketTypeJoinBoard:
-        	receivedJoinBoardPacket((PacketJoinBoard) packet);
+            receivedJoinBoardPacket((PacketJoinBoard) packet);
             break;
             
         case PacketTypeExitBoard:

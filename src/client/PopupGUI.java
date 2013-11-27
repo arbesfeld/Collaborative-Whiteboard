@@ -18,7 +18,7 @@ public class PopupGUI extends JFrame {
     public PopupGUI() throws Exception {
         JTextField username = new JTextField("Matt");
         JTextField ip = new JTextField("localhost");
-        JTextField port = new JTextField(BoardServer.DEFAULT_PORT);
+        JTextField port = new JTextField(Integer.toString(BoardServer.DEFAULT_PORT));
         JPanel panel = new JPanel(new GridLayout(0, 1));
         panel.add(new JLabel("Username"));
         panel.add(username);

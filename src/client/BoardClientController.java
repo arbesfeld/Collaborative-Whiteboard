@@ -1,48 +1,32 @@
 package client;
 
 import java.awt.Color;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.Socket;
 
 import javax.swing.SwingUtilities;
 
-import canvas.Canvas;
-
 import name.BoardName;
 import name.User;
-
 import models.ClientBoardModel;
 import packet.Packet;
 import packet.PacketBoardState;
 import packet.PacketExitBoard;
 import packet.PacketDrawPixel;
 import packet.PacketGameState;
-import packet.PacketHandler;
 import packet.PacketJoinBoard;
 import packet.PacketNewBoard;
 import packet.PacketNewClient;
 import pixel.Pixel;
 import server.BoardServer;
+import server.SocketHandler;
 import stroke.StrokeProperties;
 import stroke.StrokeType;
 import stroke.StrokeTypeBasic;
 import stroke.StrokeTypeEraser;
 import util.Utils;
 
-public class BoardClientController extends PacketHandler implements Runnable {
-    
-    // Communication.
-    private final Socket socket;
-    
-    // write to the server
-    private final PrintWriter out;
-    
-    // read from the server
-    private final BufferedReader in;
-    
+public class BoardClientController extends SocketHandler {
     private BoardClientGUI view;
     private final User user;
     private ClientBoardModel model;
@@ -51,12 +35,10 @@ public class BoardClientController extends PacketHandler implements Runnable {
     private final StrokeProperties strokeProperties;
     
     public BoardClientController(String userName, String hostName, int portNumber) throws IOException {
+        super(new Socket(hostName, portNumber));
+        
         this.user = new User(Utils.generateId(), userName);
         this.clientState = ClientState.ClientStateLoading;
-        
-        this.socket = new Socket(hostName, portNumber);
-        this.out = new PrintWriter(socket.getOutputStream(), true);
-        this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         
         // Default stroke.
         this.strokeProperties = new StrokeProperties();
@@ -70,34 +52,15 @@ public class BoardClientController extends PacketHandler implements Runnable {
     }
     
     /**
-     * Start the thread.
-     */
-    @Override
-    public void run() {
-        try {
-            handleServerPacket();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                socket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-    
-    /**
      *  Handles the input from the client.
      *  @throws IOException
      */
-    private void handleServerPacket() throws IOException {
+    protected void handleConnection() throws IOException {
         try {
             // Should not receive a packet before setting our view.
             assert view != null;
             
             for (String line = in.readLine(); line != null; line = in.readLine()) {
-            	
                 Packet packet = Packet.createPacketWithData(line);
                 receivedPacket(packet);
             }
