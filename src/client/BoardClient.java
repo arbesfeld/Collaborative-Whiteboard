@@ -31,7 +31,7 @@ public class BoardClient {
                 try {
                     new PopupGUI();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    System.out.println("Connection refused.");
                     run();
                 }
             }

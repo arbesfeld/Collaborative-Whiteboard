@@ -52,7 +52,7 @@ public class BoardClientController extends PacketHandler implements Runnable {
     
     public BoardClientController(String userName, String hostName, int portNumber) throws IOException {
         this.user = new User(Utils.generateId(), userName);
-        this.clientState = ClientState.ClientStateIdle;
+        this.clientState = ClientState.ClientStateLoading;
         
         this.socket = new Socket(hostName, portNumber);
         this.out = new PrintWriter(socket.getOutputStream(), true);
@@ -116,12 +116,8 @@ public class BoardClientController extends PacketHandler implements Runnable {
     
     @Override
     protected void receivedNewBoardPacket(PacketNewBoard packet) {
-        // We are about to receive a GameStatePacket, we should have a null model.
-        assert model == null;
-        assert clientState == ClientState.ClientStateIdle;
-        assert out != null;
-        
-        clientState = ClientState.ClientStateLoading;
+        // Only client to server
+        assert false;
     }
     
     @Override
@@ -131,28 +127,23 @@ public class BoardClientController extends PacketHandler implements Runnable {
         User packetUser = packet.senderName();
         BoardName boardName = packet.boardName();
         
-        if (user.equals(packetUser)) {
-            // We are about to receive a GameStatePacket, we should have a null model.
-            assert model == null;
-            assert clientState == ClientState.ClientStateIdle;
-            clientState = ClientState.ClientStateLoading;
-        } else {
-            assert model != null;
-            
-            // We should only receive these packets if we have loaded.
-            assert clientState == ClientState.ClientStatePlaying;
-            
-            // We should only receive these packets if the board is our current board.
-            assert boardName.equals(model.boardName());
-            
-            model.addUser(packetUser);
-            
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    view.updateUserList();
-                }
-            });
-        }
+        // This must be for another user that has just joined.
+        assert !user.equals(packetUser);
+        assert model != null;
+        
+        // We should only receive these packets if we have loaded.
+        assert clientState == ClientState.ClientStatePlaying;
+        
+        // We should only receive these packets if the board is our current board.
+        assert boardName.equals(model.boardName());
+        
+        model.addUser(packetUser);
+        
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                view.updateUserList();
+            }
+        });
     }
 
     @Override
@@ -164,14 +155,14 @@ public class BoardClientController extends PacketHandler implements Runnable {
         
         // We should only receive these packets if we have loaded.
         assert clientState == ClientState.ClientStatePlaying;
-
+        
         // We should only receive these packets if the board is our current board.
         BoardName boardName = packet.boardName();
         assert boardName.equals(model.boardName());
         
         if (user.equals(packetUser)) {
             // If it is ourselves, we must disconnect ourselves from the game.
-            clientState = ClientState.ClientStateIdle;
+            clientState = ClientState.ClientStateLoading;
             model = null;
             
             SwingUtilities.invokeLater(new Runnable() {
@@ -277,7 +268,7 @@ public class BoardClientController extends PacketHandler implements Runnable {
         sendPacket(packet);
     }
     
-    public void drawPixel(Pixel pixel) {
+    public void sendPixel(Pixel pixel) {
         assert model != null;
         
         BoardName boardName = model.boardName();

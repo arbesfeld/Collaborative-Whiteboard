@@ -2,11 +2,11 @@ package models;
 
 import java.awt.Color;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ArrayList;
 
 import name.BoardName;
-
 import packet.PacketGameState;
 import pixel.Pixel;
 import server.BoardServer;
@@ -29,14 +29,9 @@ public class ServerBoardModel extends BoardModel {
         if (isValidPixel(pixel))
             pixels[pixel.x()][pixel.y()] = pixel.color();
     }
-
-    @Override
-    protected boolean isServerBoard() {
-        return true;
-    }
-
+    
     private synchronized Pixel[] getAllPixels() {
-    	List<Pixel> resPixelsList = new ArrayList<Pixel>(width*height);
+    	List<Pixel> resPixelsList = new LinkedList<Pixel>();
         
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
@@ -50,6 +45,11 @@ public class ServerBoardModel extends BoardModel {
 
     public synchronized PacketGameState constructGameStatePacket() {
         return new PacketGameState(boardName(), BoardServer.SERVER_NAME, width, height, users(), getAllPixels());
+    }
+
+    @Override
+    protected boolean isServerBoard() {
+        return true;
     }
     
 }

@@ -2,11 +2,13 @@ package models;
 
 import java.awt.Color;
 
+import javax.sound.midi.ControllerEventListener;
+import javax.swing.JPanel;
+
 import name.BoardName;
 import name.User;
 import client.BoardClientController;
 import canvas.Canvas;
-
 import pixel.Pixel;
 import stroke.StrokeProperties;
 
@@ -30,13 +32,13 @@ public class ClientBoardModel extends BoardModel {
         if (isValidPixel(pixel))
             canvas.drawPixel(pixel);
     }
-
+    
     @Override
     protected boolean isServerBoard() {
         return false;
     }
     
-    public Canvas canvas() {
+    public JPanel canvas() {
         return canvas;
     }
 

@@ -37,7 +37,6 @@ public class BoardServer extends PacketHandler {
 	private final ServerSocket serverSocket;
 	private final Map<BoardName, ServerBoardModel> boards;
     private final Map<User, PrintWriter> users;
-	private final int SIZE = 512;
 	
 	public BoardServer(int port) throws IOException
 	{
@@ -135,17 +134,18 @@ public class BoardServer extends PacketHandler {
         int width = packet.width();
         int height = packet.height();
     	
+        assert !boards.containsKey(boardName);
+        
         // Create a new model under this boardName.
         ServerBoardModel model = new ServerBoardModel(boardName, width, height);
         boards.put(boardName, model);
         
-        model.addUser(sender);
-        sendPacket(packet, users.get(sender));
-        
-        broadcastPacketToAllClients(constructBoardStatePacket());
-        
         // Tell the user to start his board.
         sendPacket(model.constructGameStatePacket(), users.get(sender));
+        model.addUser(sender);
+        
+        // Announce that a new board has been added.
+        broadcastPacketToAllClients(constructBoardStatePacket());
     }
     
     @Override
@@ -158,13 +158,13 @@ public class BoardServer extends PacketHandler {
         // A new client has connected to the board
         ServerBoardModel model = boards.get(boardName);
 
-        model.addUser(sender);
         // Tell the other users on the board that a new 
         // client has joined.
         broadcastPacketToBoard(model, packet);
-
+        
         // First send a GameState packet, then start sending the client new pixel locations.
         sendPacket(model.constructGameStatePacket(), users.get(sender));
+        model.addUser(sender);
     }
 
     @Override

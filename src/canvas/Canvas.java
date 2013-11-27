@@ -1,12 +1,9 @@
 package canvas;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -32,8 +29,6 @@ public class Canvas extends JPanel {
     
     private final int width;
     private final int height;
-    
-    private final BoardClientController controller;
 
     private final StrokeProperties strokeProperties;
     
@@ -44,8 +39,7 @@ public class Canvas extends JPanel {
      */
     public Canvas(BoardClientController controller, StrokeProperties strokeProperties, int width, int height) {
         this.setPreferredSize(new Dimension(width, height));
-        addDrawingController();
-        this.controller = controller;
+        addDrawingController(controller);
         this.strokeProperties = strokeProperties;
         this.width = width;
         this.height = height;
@@ -125,8 +119,8 @@ public class Canvas extends JPanel {
     /*
      * Add the mouse listener that supports the user's freehand drawing.
      */
-    private void addDrawingController() {
-        DrawingController controller = new DrawingController();
+    private void addDrawingController(BoardClientController clientController) {
+        DrawingController controller = new DrawingController(clientController);
         addMouseListener(controller);
         addMouseMotionListener(controller);
     }
@@ -138,7 +132,13 @@ public class Canvas extends JPanel {
         // store the coordinates of the last mouse event, so we can
         // draw a line segment from that last point to the point of the next mouse event.
         private int lastX, lastY; 
-
+        
+        private final BoardClientController clientController;
+        
+        public DrawingController(BoardClientController clientController) {
+            this.clientController = clientController;
+        }
+        
         /*
          * When mouse button is pressed down, start drawing.
          */
@@ -173,7 +173,7 @@ public class Canvas extends JPanel {
                         continue;
                     }
                     drawPixel(pixel);
-                    controller.drawPixel(pixel);
+                    clientController.sendPixel(pixel);
                 }
             }
             lastX = x;
