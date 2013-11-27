@@ -63,52 +63,33 @@ public class BoardServer {
 			new Thread(new ClientHandler(socket)).start();
 		}
 	}
-	
 
     private class ClientHandler extends SocketHandler  {
         public ClientHandler(Socket socket) throws IOException {
             super(socket);
         }
 
-        protected void handleConnection() throws IOException {
-            try {
-                // Update the new client's list of boards.
-                sendPacket(constructBoardStatePacket(), out);
-                
-                for (String line = in.readLine(); line != null; line = in.readLine()) {
-                    Packet packet = Packet.createPacketWithData(line);
-
-                    // Add ourselves to the output stream cache if this is a new client.
-                    if (packet.packetType() == PacketType.PacketTypeNewClient) {
-                        User senderName = packet.senderName();
-                        
-                        // We shouldn't have cached this user yet.
-                        assert !users.containsKey(senderName);
-                        
-                        users.put(senderName, out);
-                    }
-
-                    // We should have cached this user.
-                    assert users.containsKey(packet.senderName());
-                    
-                    receivedPacket(packet);
-                }
-            }  
-            catch (Exception e) {
-                e.printStackTrace();
-            }
-            finally {
-                // Remove the instance of "out" from our cache.
-                users.values().removeAll(Collections.singleton(out));
-                
-                out.close();
-                in.close();
-            }   
+        @Override
+        protected void beforeConnection() {
+            // Update the new client's list of boards.
+            sendPacket(constructBoardStatePacket(), out);
         }
-
+        
+        @Override
+        protected void afterConnection() {
+            // Remove the instance of "out" from our cache.
+            users.values().removeAll(Collections.singleton(out));
+        }
+        
         @Override
         protected void receivedNewClientPacket(PacketNewClient packet) {
-            // do nothing
+            // Add ourselves to the output stream cache if this is a new client.
+            User senderName = packet.senderName();
+            
+            // We shouldn't have cached this user yet.
+            assert !users.containsKey(senderName);
+            
+            users.put(senderName, out);
         }
         
         @Override
@@ -117,7 +98,8 @@ public class BoardServer {
             BoardName boardName = packet.boardName();
             int width = packet.width();
             int height = packet.height();
-            
+
+            assert users.containsKey(sender);
             assert !boards.containsKey(boardName);
             
             // Create a new model under this boardName.
@@ -136,7 +118,8 @@ public class BoardServer {
         protected void receivedJoinBoardPacket(PacketJoinBoard packet) {
             User sender = packet.senderName();
             BoardName boardName = packet.boardName();
-            
+
+            assert users.containsKey(sender);
             assert boards.containsKey(boardName);
             
             // A new client has connected to the board
@@ -154,7 +137,8 @@ public class BoardServer {
         @Override
         protected void receivedExitBoardPacket(PacketExitBoard packet) {
             BoardName boardName = packet.boardName();
-            
+
+            assert users.containsKey(packet.senderName());
             // We surely must have already initialized this board.
             assert boards.containsKey(boardName);
             
@@ -181,7 +165,8 @@ public class BoardServer {
         protected void receivedDrawPixelPacket(PacketDrawPixel packet) {
             BoardName boardName = packet.boardName();
             Pixel pixel = packet.pixel();
-            
+
+            assert users.containsKey(packet.senderName());
             assert boards.containsKey(boardName);
             
             ServerBoardModel model = boards.get(boardName);

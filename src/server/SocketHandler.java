@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import packet.Packet;
 import packet.PacketHandler;
 
 public abstract class SocketHandler extends PacketHandler implements Runnable {
@@ -24,7 +25,7 @@ public abstract class SocketHandler extends PacketHandler implements Runnable {
     }
     
     @Override
-    public void run() {
+    public final void run() {
         try {
             handleConnection();
         } catch (IOException e) {
@@ -40,6 +41,26 @@ public abstract class SocketHandler extends PacketHandler implements Runnable {
             }
         }
     }
+
+    protected final void handleConnection() throws IOException {
+        try {
+            beforeConnection();
+            for (String line = in.readLine(); line != null; line = in.readLine()) {
+                Packet packet = Packet.createPacketWithData(line);
+                receivedPacket(packet);
+            }
+        }  
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            afterConnection();
+            out.close();
+            in.close();
+        }   
+    }
     
-    protected abstract void handleConnection() throws IOException;
+    // Optional to implement.
+    protected void beforeConnection() { }
+    protected void afterConnection() { }
 }

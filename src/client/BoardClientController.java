@@ -50,26 +50,6 @@ public class BoardClientController extends SocketHandler {
     public void setView(BoardClientGUI view) {
         this.view = view;
     }
-    
-    /**
-     *  Handles the input from the client.
-     *  @throws IOException
-     */
-    protected void handleConnection() throws IOException {
-        try {
-            // Should not receive a packet before setting our view.
-            assert view != null;
-            
-            for (String line = in.readLine(); line != null; line = in.readLine()) {
-                Packet packet = Packet.createPacketWithData(line);
-                receivedPacket(packet);
-            }
-        } finally {
-            in.close();
-            out.close();
-        }
-    }
-
 
     @Override
     protected void receivedNewClientPacket(PacketNewClient packet) {

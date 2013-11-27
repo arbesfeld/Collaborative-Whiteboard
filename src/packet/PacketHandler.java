@@ -5,7 +5,7 @@ abstract public class PacketHandler {
     /*
      * Methods for receiving packets.
      */
-    protected void receivedPacket(Packet packet) {
+    protected final void receivedPacket(Packet packet) {
         PacketType packetType = packet.packetType();
         
         switch(packetType) {
