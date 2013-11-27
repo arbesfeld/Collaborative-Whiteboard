@@ -97,7 +97,7 @@ public class Canvas extends JPanel {
             makeDrawingBuffer();
         }
         
-        if (outOfRange(pixel))
+        if (outOfRange(pixel.x(), pixel.y()))
             return;
         
         final Graphics2D g = (Graphics2D) drawingBuffer.getGraphics();
@@ -108,8 +108,19 @@ public class Canvas extends JPanel {
         this.repaint();
     }
     
-    private boolean outOfRange(Pixel pixel) {
-        return pixel.x() < 0 || pixel.x() >= width || pixel.y() < 0 || pixel.y() > height;
+    public int getPixelRGB(int x, int y) {
+        if (drawingBuffer == null) {
+            makeDrawingBuffer();
+        }
+        
+        if (outOfRange(x, y))
+            return 0;
+        
+        return drawingBuffer.getRGB(x, y);
+    }
+    
+    private boolean outOfRange(int x, int y) {
+        return x < 0 || x >= width || y < 0 || y >= height;
     }
 
     /*
@@ -146,16 +157,21 @@ public class Canvas extends JPanel {
             int y = e.getY();
             
             // draw line (x,y) -> (lastx, lasty)
-            int dist = (x - lastX) * (x-lastX) + (y-lastY)+(y+lastY);
-            for (int i = 0; i <= dist; i += 50) {
-                int curX = (int) ((float) x*i/dist + (float)lastX*(dist-i)/dist);
-                int curY = (int) ((float) y*i/dist + (float)lastY*(dist-i)/dist);
+            Vector2 velocity = new Vector2(lastX - x, lastY - y);
+            double dist = velocity.abs();
+            
+            for (int i = 0; i <= (int)dist; i += 50) {
+                int curX = (int) (lastX*i/dist + x*(dist-i)/dist);
+                int curY = (int) (lastX*i/dist + y*(dist-i)/dist);
                 
-                Pixel[] pixels = strokeProperties.drawPoint(curX, curY);
+                Pixel[] pixels = strokeProperties.paintPoint(curX, curY, velocity);
                 
                 for (Pixel pixel : pixels) {
-                    controller.drawPixel(pixel);
+                    if (pixel.color().getRGB() == getPixelRGB(pixel.x(), pixel.y())) {
+                        continue;
+                    }
                     drawPixel(pixel);
+                    controller.drawPixel(pixel);
                 }
             }
             lastX = x;

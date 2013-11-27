@@ -27,6 +27,9 @@ import packet.PacketNewClient;
 import pixel.Pixel;
 import server.BoardServer;
 import stroke.StrokeProperties;
+import stroke.StrokeType;
+import stroke.StrokeTypeBasic;
+import stroke.StrokeTypeEraser;
 import util.Utils;
 
 public class BoardClientController extends PacketHandler implements Runnable {
@@ -297,7 +300,8 @@ public class BoardClientController extends PacketHandler implements Runnable {
     }
     
     public void setEraserOn(boolean eraserOn) {
-        strokeProperties.setEraserOn(eraserOn);
+        StrokeType newStroke = eraserOn ? new StrokeTypeEraser() : new StrokeTypeBasic();
+        strokeProperties.setStrokeType(newStroke);
     }
 
 }
