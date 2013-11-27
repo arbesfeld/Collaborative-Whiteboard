@@ -111,9 +111,10 @@ public class BoardServer extends PacketHandler {
                 }
                 
 				receivedPacket(packet);
-				
 			}
-		} finally {
+		} catch (Exception e) {
+		}
+		finally {
 			// Remove the instance of "out" from our cache.
 			users.values().removeAll(Collections.singleton(out));
 			

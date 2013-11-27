@@ -131,11 +131,11 @@ public class BoardClientGUI extends JFrame{
             public void actionPerformed(ActionEvent e) {
                 if (eraseToggle.isSelected()) {
                     eraseToggle.setFocusPainted(true);
-                    //TODO turn eraser on
+                    controller.setEraserOn(true);
                 }
                 else {
                     eraseToggle.setFocusPainted(false);
-                    //TODO turn eraser off
+                    controller.setEraserOn(false);
                 }
             }
         });
