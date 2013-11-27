@@ -99,18 +99,19 @@ public class BoardServer extends PacketHandler {
 		try {
 			for (String line = in.readLine(); line != null; line = in.readLine()) {
 				Packet packet = Packet.createPacketWithData(line);
-				
+
+                // Add ourselves to the output stream cache if this is a new client.
+                if (packet.packetType() == PacketType.PacketTypeNewClient) {
+                    User senderName = packet.senderName();
+                    
+                    // We shouldn't have cached this user yet.
+                    assert !users.containsKey(senderName);
+                    
+                    users.put(senderName, out);
+                }
+                
 				receivedPacket(packet);
 				
-				// Add ourselves to the output stream cache if this is a new client.
-				if (packet.packetType() == PacketType.PacketTypeNewClient) {
-					User senderName = packet.senderName();
-					
-					// We shouldn't have cached this user yet.
-					assert !users.containsKey(senderName);
-					
-			        users.put(senderName, out);
-				}
 			}
 		} finally {
 			// Remove the instance of "out" from our cache.
@@ -136,7 +137,9 @@ public class BoardServer extends PacketHandler {
         // Create a new model under this boardName.
         ServerBoardModel model = new ServerBoardModel(boardName, width, height);
         boards.put(boardName, model);
+        
         model.addUser(sender);
+        sendPacket(packet, users.get(sender));
         
         broadcastPacketToAllUsers(constructBoardStatePacket());
         
@@ -153,14 +156,14 @@ public class BoardServer extends PacketHandler {
         
         // A new client has connected to the board
         ServerBoardModel model = boards.get(boardName);
-        
-        // First send a GameState packet, then start sending the client new pixel locations.
-        sendPacket(model.constructGameStatePacket(), users.get(sender));
+
         model.addUser(sender);
-        
         // Tell the other users on the board that a new 
         // client has joined.
         broadcastPacket(model, packet);
+
+        // First send a GameState packet, then start sending the client new pixel locations.
+        sendPacket(model.constructGameStatePacket(), users.get(sender));
     }
 
     @Override
@@ -174,6 +177,7 @@ public class BoardServer extends PacketHandler {
         
         // Broadcast the packet to all the users of the board.
         broadcastPacket(model, packet);
+        model.removeUser(packet.senderName());
     }
 
     @Override

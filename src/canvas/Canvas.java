@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 import client.BoardClientController;
 
 import pixel.Pixel;
+import stroke.StrokeProperties;
 
 /**
  * Canvas represents a drawing surface that allows the user to draw
@@ -25,6 +26,8 @@ import pixel.Pixel;
 public class Canvas extends JPanel {
 	private static final long serialVersionUID = 1L;
 
+	public static int STROKE_DEFAULT = 3;
+	
 	// image where the user's drawing is stored
     private BufferedImage drawingBuffer;
     
@@ -32,29 +35,24 @@ public class Canvas extends JPanel {
     private final int height;
     
     private final BoardClientController controller;
-    
-    private Color color;
+
+    private final StrokeProperties strokeProperties;
     
     /**
      * Make a canvas.
      * @param width width in pixels
      * @param height height in pixels
      */
-    public Canvas(BoardClientController controller, int width, int height) {
+    public Canvas(BoardClientController controller, StrokeProperties strokeProperties, int width, int height) {
         this.setPreferredSize(new Dimension(width, height));
         addDrawingController();
         this.controller = controller;
+        this.strokeProperties = strokeProperties;
         this.width = width;
         this.height = height;
-        this.color = Color.BLACK;
-        
         // note: we can't call makeDrawingBuffer here, because it only
         // works *after* this canvas has been added to a window.  Have to
         // wait until paintComponent() is first called.
-    }
-    
-    public void setColor(Color color) {
-    	this.color = color;
     }
     
     /**
@@ -78,7 +76,6 @@ public class Canvas extends JPanel {
     private void makeDrawingBuffer() {
         drawingBuffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         fillWithWhite();
-        drawSmile();
     }
     
     /*
@@ -99,67 +96,22 @@ public class Canvas extends JPanel {
         if (drawingBuffer == null) {
             makeDrawingBuffer();
         }
-//        drawingBuffer.setRGB(pixel.x(), pixel.y(), pixel.color().getRGB());
         
-        if (pixel.x() < 0 || pixel.x() >= width || pixel.y() < 0 || pixel.y() > height)
+        if (outOfRange(pixel))
             return;
         
         final Graphics2D g = (Graphics2D) drawingBuffer.getGraphics();
-        
-        g.setColor(pixel.color());
-        g.fillRect(pixel.x(), pixel.y(), 3, 3);
-        
-        this.repaint();
-    }
-    
-    /*
-     * Draw a happy smile on the drawing buffer.
-     */
-    private void drawSmile() {
-        final Graphics2D g = (Graphics2D) drawingBuffer.getGraphics();
 
-        // all positions and sizes below are in pixels
-        final Rectangle smileBox = new Rectangle(20, 20, 100, 100); // x, y, width, height
-        final Point smileCenter = new Point(smileBox.x + smileBox.width/2, smileBox.y + smileBox.height/2);
-        final int smileStrokeWidth = 3;
-        final Dimension eyeSize = new Dimension(9, 9);
-        final Dimension eyeOffset = new Dimension(smileBox.width/6, smileBox.height/6);
+        g.setColor(pixel.color());
+        g.fillRect(pixel.x(), pixel.y(), 1, 1);
         
-        g.setColor(Color.BLACK);
-        g.setStroke(new BasicStroke(smileStrokeWidth));
-        
-        // draw the smile -- an arc inscribed in smileBox, starting at -30 degrees (southeast)
-        // and covering 120 degrees
-        g.drawArc(smileBox.x, smileBox.y, smileBox.width, smileBox.height, -30, -120);
-        
-        // draw some eyes to make it look like a smile rather than an arc
-        for (int side: new int[] { -1, 1 }) {
-            g.fillOval(smileCenter.x + side * eyeOffset.width - eyeSize.width/2,
-                       smileCenter.y - eyeOffset.height - eyeSize.width/2,
-                       eyeSize.width,
-                       eyeSize.height);
-        }
-        
-        // IMPORTANT!  every time we draw on the internal drawing buffer, we
-        // have to notify Swing to repaint this component on the screen.
         this.repaint();
     }
     
-    /*
-     * Draw a line between two points (x1, y1) and (x2, y2), specified in
-     * pixels relative to the upper-left corner of the drawing buffer.
-     */
-    private void drawLineSegment(int x1, int y1, int x2, int y2) {
-        Graphics2D g = (Graphics2D) drawingBuffer.getGraphics();
-        
-        g.setColor(Color.BLACK);
-        g.drawLine(x1, y1, x2, y2);
-        
-        // IMPORTANT!  every time we draw on the internal drawing buffer, we
-        // have to notify Swing to repaint this component on the screen.
-        this.repaint();
+    private boolean outOfRange(Pixel pixel) {
+        return pixel.x() < 0 || pixel.x() >= width || pixel.y() < 0 || pixel.y() > height;
     }
-    
+
     /*
      * Add the mouse listener that supports the user's freehand drawing.
      */
@@ -192,7 +144,21 @@ public class Canvas extends JPanel {
         public void mouseDragged(MouseEvent e) {
             int x = e.getX();
             int y = e.getY();
-            controller.drawPixel(x, y, color);
+            
+            // draw line (x,y) -> (lastx, lasty)
+            int dist = (x - lastX) * (x-lastX) + (y-lastY)+(y+lastY);
+            for (int i = 0; i <= dist; i += 50) {
+                int curX = (int) ((float) x*i/dist + (float)lastX*(dist-i)/dist);
+                int curY = (int) ((float) y*i/dist + (float)lastY*(dist-i)/dist);
+                
+                Pixel[] pixels = strokeProperties.drawPoint(curX, curY);
+                
+                for (Pixel pixel : pixels) {
+                    controller.drawPixel(pixel);
+                }
+            }
+            lastX = x;
+            lastY = y;
         }
 
         // Ignore all these other mouse events.
@@ -202,23 +168,4 @@ public class Canvas extends JPanel {
         public void mouseEntered(MouseEvent e) { }
         public void mouseExited(MouseEvent e) { }
     }
-    
-    
-//    /*
-//     * Main program. Make a window containing a Canvas.
-//     */
-//    public static void main(String[] args) {
-//        // set up the UI (on the event-handling thread)
-//        SwingUtilities.invokeLater(new Runnable() {
-//            public void run() {
-//                JFrame window = new JFrame("Freehand Canvas");
-//                window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//                window.setLayout(new BorderLayout());
-//                Canvas canvas = new Canvas(null, 800, 600);
-//                window.add(canvas, BorderLayout.CENTER);
-//                window.pack();
-//                window.setVisible(true);
-//            }
-//        });
-//    }
 }

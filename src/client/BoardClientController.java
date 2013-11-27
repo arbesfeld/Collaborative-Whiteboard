@@ -9,6 +9,8 @@ import java.net.Socket;
 
 import javax.swing.SwingUtilities;
 
+import canvas.Canvas;
+
 import name.BoardName;
 import name.User;
 
@@ -24,6 +26,7 @@ import packet.PacketNewBoard;
 import packet.PacketNewClient;
 import pixel.Pixel;
 import server.BoardServer;
+import stroke.StrokeProperties;
 import util.Utils;
 
 public class BoardClientController extends PacketHandler implements Runnable {
@@ -42,7 +45,7 @@ public class BoardClientController extends PacketHandler implements Runnable {
     private ClientBoardModel model;
     
     private ClientState clientState;
-    private Color color;
+    private final StrokeProperties strokeProperties;
     
     public BoardClientController(String userName, String hostName, int portNumber) throws IOException {
         this.user = new User(Utils.generateId(), userName);
@@ -52,11 +55,15 @@ public class BoardClientController extends PacketHandler implements Runnable {
         this.out = new PrintWriter(socket.getOutputStream(), true);
         this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         
-        // Default color.
-        this.color = Color.BLACK;
+        // Default stroke.
+        this.strokeProperties = new StrokeProperties(Color.BLACK, Canvas.STROKE_DEFAULT);
         
         // Send a NewClientPacket to announce yourself.
         sendPacket(new PacketNewClient(user));
+    }
+    
+    public void setView(BoardClientGUI view) {
+        this.view = view;
     }
     
     /**
@@ -83,9 +90,10 @@ public class BoardClientController extends PacketHandler implements Runnable {
      */
     private void handleServerPacket() throws IOException {
         try {
+            // Should not receive a packet before setting our view.
+            assert view != null;
+            
             for (String line = in.readLine(); line != null; line = in.readLine()) {
-            	// Should not receive a packet before setting our view.
-            	assert view != null;
             	
                 Packet packet = Packet.createPacketWithData(line);
                 receivedPacket(packet);
@@ -108,11 +116,15 @@ public class BoardClientController extends PacketHandler implements Runnable {
         // We are about to receive a GameStatePacket, we should have a null model.
         assert model == null;
         assert clientState == ClientState.ClientStateIdle;
+        assert out != null;
+        
         clientState = ClientState.ClientStateLoading;
     }
     
     @Override
     protected void receivedJoinBoardPacket(PacketJoinBoard packet) {
+        assert out != null;
+        
         User packetUser = packet.senderName();
         BoardName boardName = packet.boardName();
         
@@ -143,7 +155,7 @@ public class BoardClientController extends PacketHandler implements Runnable {
     @Override
     protected void receivedExitBoardPacket(PacketExitBoard packet) {
         assert model != null;
-        assert out == null;
+        assert out != null;
         
         final User packetUser = packet.senderName();
         
@@ -157,18 +169,19 @@ public class BoardClientController extends PacketHandler implements Runnable {
         if (user.equals(packetUser)) {
             // If it is ourselves, we must disconnect ourselves from the game.
             clientState = ClientState.ClientStateIdle;
+            model = null;
             
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    model = null;
                     view.setModel(null);
                 }
             });
         } else {
             // Otherwise, remove the user and update the user list.
+            model.removeUser(packetUser);
+            
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    model.removeUser(packetUser);
                     view.updateUserList();
                 }
             });
@@ -178,7 +191,7 @@ public class BoardClientController extends PacketHandler implements Runnable {
     @Override
     protected void receivedGameStatePacket(PacketGameState packet) {
         assert model == null;
-        assert out == null;
+        assert out != null;
         assert packet.senderName().equals(BoardServer.SERVER_NAME);
         
         // We should only receive these packets if are loading
@@ -191,10 +204,11 @@ public class BoardClientController extends PacketHandler implements Runnable {
         final User[] clients = packet.clients();
         final Pixel[] pixels = packet.pixels();
         final BoardClientController controller = this;
+
+        model = new ClientBoardModel(controller, strokeProperties, width, height, boardName, clients, pixels);
         
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                model = new ClientBoardModel(controller, width, height, boardName, clients, pixels, color);
                 view.setModel(model);
                 view.updateUserList();
             }
@@ -203,7 +217,7 @@ public class BoardClientController extends PacketHandler implements Runnable {
 
     @Override
     protected void receivedBoardStatePacket(PacketBoardState packet) {
-        assert out == null;
+        assert out != null;
         
         final BoardName[] boards = packet.boards();
         
@@ -217,8 +231,7 @@ public class BoardClientController extends PacketHandler implements Runnable {
     @Override
     protected void receivedDrawPixelPacket(PacketDrawPixel packet) {
         assert model != null;
-        assert out == null;
-        assert packet.senderName().equals(BoardServer.SERVER_NAME);
+        assert out != null;
         
         // We should only receive these packets if we have loaded.
         assert clientState == ClientState.ClientStatePlaying;
@@ -262,11 +275,10 @@ public class BoardClientController extends PacketHandler implements Runnable {
         sendPacket(packet);
     }
     
-    public void drawPixel(int x, int y, Color color) {
+    public void drawPixel(Pixel pixel) {
         assert model != null;
         
         BoardName boardName = model.boardName();
-        Pixel pixel = new Pixel(x, y, color);
 
         PacketDrawPixel packet = new PacketDrawPixel(boardName, user, pixel);
         sendPacket(packet);
@@ -276,16 +288,16 @@ public class BoardClientController extends PacketHandler implements Runnable {
         out.println(packet.data());
     }
     
-    public void setView(BoardClientGUI view) {
-    	this.view = view;
+    public void setStrokeColor(Color strokeColor) {
+    	strokeProperties.setStrokeColor(strokeColor);
     }
     
-    public void setColor(Color color) {
-    	this.color = color;
-    	
-    	if (model != null) {
-    		model.setColor(color);
-    	}
+    public void setStrokeWidth(int strokeWidth) {
+        strokeProperties.setStrokeWidth(strokeWidth);
+    }
+    
+    public void setEraserOn(boolean eraserOn) {
+        strokeProperties.setEraserOn(eraserOn);
     }
 
 }

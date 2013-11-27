@@ -32,6 +32,8 @@ import javax.swing.colorchooser.AbstractColorChooserPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import canvas.Canvas;
+
 import name.BoardName;
 import models.ClientBoardModel;
 
@@ -53,22 +55,20 @@ public class BoardClientGUI extends JFrame{
     private final JSlider strokeSlider;
     private final JToggleButton eraseToggle;
     
-    private final int STROKE_MAX = 10;
-    private final int STROKE_MIN = 1;
-    private final int STROKE_INIT = 5;
+    private static final int STROKE_MAX = 10;
+    private static final int STROKE_MIN = 1;
+    private static final int STROKE_INIT = Canvas.STROKE_DEFAULT;
     
     private BoardName[] boardNames;
     private ClientBoardModel model;
-    private final BoardClientController controller;
+    private BoardClientController controller;
     
     /**
      * Create the GUI and show it.  For thread safety,
      * this method should be invoked from the
      * event-dispatching thread.
      */
-    public BoardClientGUI(BoardClientController controller) {
-        this.controller = controller;
-
+    public BoardClientGUI() {
         // Create the menu bar.
         this.menuBar = new JMenuBar();
         this.menu = new JMenu("File");
@@ -91,6 +91,10 @@ public class BoardClientGUI extends JFrame{
         //Create and set up the content pane.
         setMenuBar();
         updateContentPane();
+    }
+
+    public void setController(BoardClientController controller) {
+        this.controller = controller;
     }
     
     private void setMenuBar() {
@@ -180,7 +184,7 @@ public class BoardClientGUI extends JFrame{
             public void actionPerformed(ActionEvent evt) {
                 Color color = colorChooser.getColor();
                 colorButton.setIcon(new ColorIcon(10, color));
-                controller.setColor(color);
+                controller.setStrokeColor(color);
             }
           };
         
@@ -191,7 +195,7 @@ public class BoardClientGUI extends JFrame{
     
     private void setStroke() {
         strokeMenu.setIcon(new ColorIcon(strokeSlider.getValue(), Color.black));
-        //TODO edit stroke
+        controller.setStrokeWidth(strokeSlider.getValue());
     }
     
     private void updateContentPane() {
@@ -253,7 +257,6 @@ public class BoardClientGUI extends JFrame{
      * Update the list of users from the current model.
      */
     public void updateUserList() {
-        assert this.model != null;
         // TODO
     }
     

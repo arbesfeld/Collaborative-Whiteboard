@@ -7,15 +7,18 @@ import javax.swing.SwingUtilities;
 public class BoardClient {
     
     public static void startClient(String userName, String hostName, int portNumber) throws IOException {
+
         final BoardClientController controller = new BoardClientController(userName, hostName, portNumber);
-        new Thread(controller).start();        
         
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                final BoardClientGUI view = new BoardClientGUI(controller);
+                BoardClientGUI view = new BoardClientGUI();
+                view.setController(controller);
                 controller.setView(view);
                 
-                //Display the window.
+                new Thread(controller).start();    
+                
+                // Display the window.
                 view.setSize(450, 260);
                 view.setVisible(true);
             }
