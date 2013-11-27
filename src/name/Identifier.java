@@ -1,11 +1,11 @@
 package name;
 
-public abstract class Name implements Identifiable {
+public abstract class Identifier implements Identifiable {
 
     private int id;
     private String name;
     
-    protected Name(int id, String name) {
+    public Identifier(int id, String name) {
         this.id = id;
         this.name = name;
     }
@@ -19,7 +19,7 @@ public abstract class Name implements Identifiable {
     }
     
     @Override
-    public Name identifier() {
+    public Identifier identifier() {
         return this;
     }
     
@@ -40,7 +40,7 @@ public abstract class Name implements Identifiable {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Name other = (Name) obj;
+        Identifier other = (Identifier) obj;
         if (id != other.id)
             return false;
         if (name == null) {

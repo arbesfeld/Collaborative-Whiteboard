@@ -1,7 +1,6 @@
 package server;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Collections;
@@ -10,166 +9,58 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import canvas.DrawableServer;
-import canvas.Pixel;
-import name.BoardName;
-import name.Name;
-import name.User;
+import models.BoardModel;
+import name.BoardIdentifier;
+import name.ClientIdentifier;
+import name.Identifiable;
+import name.Identifier;
 import packet.Packet;
-import packet.PacketBoardState;
-import packet.PacketExitBoard;
+import packet.PacketBoardIdentifierList;
+import packet.PacketBoardModel;
 import packet.PacketDrawPixel;
-import packet.PacketGameState;
+import packet.PacketExitBoard;
 import packet.PacketJoinBoard;
 import packet.PacketNewBoard;
-import packet.PacketNewClient;
-import models.BoardModel;
+import canvas.DrawableServer;
 
-public class BoardServer {
+public class BoardServer implements Identifiable {
     public static final int DEFAULT_PORT = 4444;
     
     // The name used by the server for constructing packets.
-    public static final User SERVER_NAME = new User(0, "server");
+    public static final ClientIdentifier SERVER_NAME = new ClientIdentifier(0, "server");
     
-	private final ServerSocket serverSocket;
-	
-	private class ServerModel extends BoardModel<ClientHandler, DrawableServer> {
-        public ServerModel(BoardName boardName, DrawableServer canvas) {
-            super(boardName, canvas);
-        } 
-    };
+	private final ServerSocket serverSocket; 
 
-	private final Map<BoardName, ServerModel> boards;
+	private final Map<BoardIdentifier, BoardModel> boards;
     private final Set<ClientHandler> clients;
 	
 	public BoardServer(int port) throws IOException {
 		this.serverSocket = new ServerSocket(port);
-		this.boards = Collections.synchronizedMap(new HashMap<BoardName, ServerModel>());
+		this.boards = Collections.synchronizedMap(new HashMap<BoardIdentifier, BoardModel>());
         this.clients = Collections.synchronizedSet(new HashSet<ClientHandler>());
 	}
 	
 	public void serve() throws IOException {
 		while (true) {
 			final Socket socket = serverSocket.accept();
-			new Thread(new ClientHandler(socket)).start();
+			ClientHandler handler = new ClientHandler(socket, this);
+            
+            new Thread(handler).start();
+            
+            // Update the new client's list of boards.
+            clients.add(handler);
+            handler.sendPacket(constructBoardIdentifierListPacket());
+	      
 		}
 	}
 
-    private class ClientHandler extends SocketHandler {
-        public ClientHandler(Socket socket) throws IOException {
-            super(socket);
-        }
+    public void removeClient(ClientHandler handler) {
+        clients.remove(handler);
+    }
 
-        @Override
-        protected void beforeConnection() {
-            assert !clients.contains(this);
-            clients.add(this);
-            
-            // Update the new client's list of boards.
-            sendPacket(constructBoardStatePacket());
-        }
-        
-        @Override
-        protected void afterConnection() {
-            assert clients.contains(this);
-            
-            // Remove the instance of "out" from our cache.
-            clients.remove(this);
-        }
-        
-        @Override
-        protected void receivedNewClientPacket(PacketNewClient packet) {
-            User senderName = packet.senderName();
-
-            assert this.user == null;
-            this.user = senderName;
-        }
-        
-        @Override
-        protected void receivedNewBoardPacket(PacketNewBoard packet) {
-            User sender = packet.senderName();
-            BoardName boardName = packet.boardName();
-            int width = packet.width();
-            int height = packet.height();
-
-            assert sender.equals(this.user);
-            assert !boards.containsKey(boardName);
-            
-            // Create a new model under this boardName.
-            DrawableServer drawable = new DrawableServer(width, height);
-            ServerModel model = 
-                    new ServerModel(boardName, drawable);
-            boards.put(boardName, model);
-            
-            // Tell the user to start his board.
-            sendPacket(model.constructGameStatePacket());
-            model.addUser(this);
-            
-            // Announce that a new board has been added.
-            broadcastPacketToAllClients(constructBoardStatePacket());
-        }
-        
-        @Override
-        protected void receivedJoinBoardPacket(PacketJoinBoard packet) {
-            User sender = packet.senderName();
-            BoardName boardName = packet.boardName();
-
-            assert sender.equals(this.user);
-            assert boards.containsKey(boardName);
-            
-            // A new client has connected to the board
-            ServerModel model = boards.get(boardName);
-
-            // Tell the other clients on the board that a new 
-            // client has joined.
-            broadcastPacketToBoard(model, packet);
-            
-            // First send a GameState packet, then start sending the client new pixel locations.
-            sendPacket(model.constructGameStatePacket());
-            model.addUser(this);
-        }
-
-        @Override
-        protected void receivedExitBoardPacket(PacketExitBoard packet) {
-            BoardName boardName = packet.boardName();
-
-            assert packet.senderName().equals(this.user);
-            
-            // We surely must have already initialized this board.
-            assert boards.containsKey(boardName);
-            
-            ServerModel model = boards.get(boardName);
-            
-            // Broadcast the packet to all the clients of the board.
-            broadcastPacketToBoard(model, packet);
-            model.removeUser(this);
-        }
-
-        @Override
-        protected void receivedGameStatePacket(PacketGameState packet) {
-            // We only send GameStatePackets from the server.
-            assert false;
-        }
-
-        @Override
-        protected void receivedBoardStatePacket(PacketBoardState packet) {
-            // We only send BoardStatePackets from the server.
-            assert false;
-        }
-
-        @Override
-        protected void receivedDrawPixelPacket(PacketDrawPixel packet) {
-            BoardName boardName = packet.boardName();
-            Pixel pixel = packet.pixel();
-
-            assert packet.senderName().equals(this.user);
-            assert boards.containsKey(boardName);
-            
-            ServerModel model = boards.get(boardName);
-            model.drawPixel(pixel);
-            
-            broadcastPacketToBoard(model, packet);
-        }
+    private void addBoard(BoardIdentifier boardName, BoardModel model) {
+        assert !boards.containsKey(boardName);
+        boards.put(boardName, model);
     }
     
     /**
@@ -177,9 +68,10 @@ public class BoardServer {
      * @param model
      * @param packet
      */
-    private void broadcastPacketToBoard(ServerModel model, Packet packet) {
-        for (ClientHandler handler : model.users()) {
-            handler.sendPacket(packet);
+    private void broadcastPacketToBoard(BoardIdentifier boardName, Packet packet) {
+        for (Identifiable handler : boards.get(boardName).users()) {
+            assert clients.contains(handler);
+            ((ClientHandler) handler).sendPacket(packet);
         }
     }
     
@@ -195,8 +87,67 @@ public class BoardServer {
         }
     }
     
-    private PacketBoardState constructBoardStatePacket() {
-        return new PacketBoardState(boards.keySet().toArray(new BoardName[boards.keySet().size()]), SERVER_NAME);
+    private PacketBoardIdentifierList constructBoardIdentifierListPacket() {
+        return new PacketBoardIdentifierList(boards.keySet().toArray(new BoardIdentifier[boards.keySet().size()]), SERVER_NAME);
+    }
+
+    private void notifyBoardListChanged() {
+        broadcastPacketToAllClients(constructBoardIdentifierListPacket());
+    }
+
+    public void newBoard(ClientHandler handler, PacketNewBoard packet) {
+        BoardIdentifier boardName = packet.boardName();
+        int width = packet.width();
+        int height = packet.height();
+        
+        // Create a new model under this boardName.
+        DrawableServer drawable = new DrawableServer(width, height);
+        BoardModel model = new BoardModel(boardName, drawable);
+        addBoard(boardName, model);
+        
+        // Tell the user to start his board.
+        handler.sendPacket(new PacketBoardModel(model, SERVER_NAME));
+        model.addUser(handler);
+        
+        // Announce that a new board has been added.
+        notifyBoardListChanged();
+    }
+    
+    public void joinBoard(ClientHandler handler, PacketJoinBoard packet) {
+        BoardIdentifier boardName = packet.boardName();
+        
+        BoardModel model = boards.get(boardName);
+        handler.sendPacket(new PacketBoardModel(model, SERVER_NAME));
+
+        // Tell the other clients on the board that a new 
+        // client has joined.
+        broadcastPacketToBoard(boardName, packet);
+
+        model.addUser(handler);
+    }
+
+    public void exitBoard(ClientHandler handler, PacketExitBoard packet) {  
+        BoardIdentifier boardName = packet.boardName();
+        
+        // Broadcast the packet to all the clients of the board.
+        broadcastPacketToBoard(boardName, packet);
+        boards.get(boardName).removeUser(handler);
+    }
+
+    public void drawPixel(PacketDrawPixel packet) {
+        BoardIdentifier boardName = packet.boardName();
+        
+        assert boards.containsKey(boardName);
+        
+        BoardModel model = boards.get(boardName);
+        model.drawPixel(packet.pixel());
+        
+        broadcastPacketToBoard(boardName, packet);
+    }
+
+    @Override
+    public Identifier identifier() {
+        return SERVER_NAME;
     }
 
     public static void main(String[] args) {

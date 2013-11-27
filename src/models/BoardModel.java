@@ -7,49 +7,53 @@ import java.util.Set;
 
 import javax.swing.JPanel;
 
-import packet.PacketGameState;
-import server.BoardServer;
+import name.BoardIdentifier;
+import name.Identifiable;
+import name.Identifier;
 import canvas.Drawable;
 import canvas.DrawableBase;
 import canvas.Pixel;
-import name.BoardName;
-import name.Identifiable;
-import name.Name;
 
-public class BoardModel<U extends Identifiable, C extends DrawableBase> implements Drawable {
-    private final BoardName boardName;
+public class BoardModel implements Drawable, Identifiable {
+    private final BoardIdentifier boardName;
 
-    private final C canvas;
-    private final Set<U> users;
+    private final DrawableBase canvas;
+    private final Set<Identifiable> users;
     
-    public BoardModel(BoardName boardName, C canvas) {
+    public BoardModel(BoardIdentifier boardName, DrawableBase canvas) {
         this.boardName = boardName;
         this.canvas = canvas;
-        this.users = Collections.synchronizedSet(new HashSet<U>());
+        this.users = Collections.synchronizedSet(new HashSet<Identifiable>());
     }
     
-    public BoardModel(BoardName boardName, C canvas, U[] initUsers) {
+    public BoardModel(BoardIdentifier boardName, DrawableBase canvas, Identifiable[] initUsers) {
         this.boardName = boardName;
         this.canvas = canvas;
-        this.users = Collections.synchronizedSet(new HashSet<U>(Arrays.asList(initUsers)));
+        this.users = Collections.synchronizedSet(new HashSet<Identifiable>(Arrays.asList(initUsers)));
     }
     
-    public void addUser(U user) {
+    public void addUser(Identifiable user) {
+        assert !users.contains(user);
         users.add(user);
     }
     
-    public void removeUser(U user) {
+    public void removeUser(Identifiable user) {
         users.remove(user);
     }
     
-    public BoardName boardName() {
-        return boardName;
-    }
-    
-    public Set<U> users() {
-        return users;
+    public Identifiable[] users() {
+        return users.toArray(new Identifiable[users.size()]).clone();
     }
 
+    public Identifier[] userIdentifiers() {
+        Identifier[] result = new Identifier[users.size()];
+        int i = 0;
+        for (Identifiable user : users) {
+            result[i] = user.identifier();
+        }
+        return result;
+    }
+    
     @Override
     public void drawPixel(Pixel pixel) {
         canvas.drawPixel(pixel);
@@ -60,20 +64,22 @@ public class BoardModel<U extends Identifiable, C extends DrawableBase> implemen
         return canvas.getAllPixels();
     }
 
-    public PacketGameState constructGameStatePacket() {
-        synchronized(users) {
-            Name[] result = new Name[users.size()];
-            int i = 0;
-            for (U user : users) {
-                result[i] = user.identifier();
-                i++;
-            }
-            return new PacketGameState(boardName(), BoardServer.SERVER_NAME, 
-                    canvas.width(), canvas.height(), result, getAllPixels());
-        }
+    @Override
+    public int width() {
+        return canvas.width();
     }
-
+    
+    @Override
+    public int height() {
+        return canvas.height();
+    }
+    
     public JPanel panel() {
         return canvas;
+    }
+    
+    @Override
+    public BoardIdentifier identifier() {
+        return boardName;
     }
 }

@@ -3,14 +3,14 @@ package packet;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import name.BoardName;
-import name.User;
+import name.BoardIdentifier;
+import name.ClientIdentifier;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-public final class PacketBoardState extends Packet {
-    private final BoardName[] boards;
+public final class PacketBoardIdentifierList extends Packet {
+    private final BoardIdentifier[] boards;
     
     /**
      * 
@@ -20,25 +20,25 @@ public final class PacketBoardState extends Packet {
     protected static Packet createPacketWithDataInternal(JsonObject data) {
         JsonArray jboards = data.get("boards").getAsJsonArray();
         
-        BoardName[] boards = new BoardName[jboards.size()];
+        BoardIdentifier[] boards = new BoardIdentifier[jboards.size()];
         
         for (int i = 0; i < jboards.size(); i++) {
             JsonObject jobject = jboards.get(i).getAsJsonObject();
 
             int boardId = jobject.get("id").getAsInt();
             String boardName = jobject.get("name").getAsString();
-            boards[i] = new BoardName(boardId, boardName);
+            boards[i] = new BoardIdentifier(boardId, boardName);
         }
 
-        BoardName boardName = getBoardName(data);
-        assert boardName.equals(BoardName.NULL_BOARD);
+        BoardIdentifier boardName = getBoardName(data);
+        assert boardName.equals(BoardIdentifier.NULL_BOARD);
         
-        User senderName = getSenderName(data);
-        return new PacketBoardState(boards, senderName);
+        ClientIdentifier senderName = getSenderName(data);
+        return new PacketBoardIdentifierList(boards, senderName);
     }
     
-    public PacketBoardState(BoardName[] boards, User senderName) {
-        super(PacketType.PacketTypeBoardState, senderName);
+    public PacketBoardIdentifierList(BoardIdentifier[] boards, ClientIdentifier senderName) {
+        super(PacketType.PacketTypeBoardIdentifierList, senderName);
         this.boards = boards;
     }
     
@@ -50,7 +50,7 @@ public final class PacketBoardState extends Packet {
         data.put("boards", boards);
     }
     
-    public BoardName[] boards() {
+    public BoardIdentifier[] boards() {
         return boards.clone();
     }
 
@@ -70,7 +70,7 @@ public final class PacketBoardState extends Packet {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		PacketBoardState other = (PacketBoardState) obj;
+		PacketBoardIdentifierList other = (PacketBoardIdentifierList) obj;
 		if (!Arrays.equals(boards, other.boards))
 			return false;
 		return true;

@@ -1,13 +1,12 @@
 package packet;
 
-import java.io.PrintWriter;
 
 abstract public class PacketHandler {
     
     /*
      * Methods for receiving packets.
      */
-    protected final void receivedPacket(Packet packet) {
+    protected void receivedPacket(Packet packet) {
         PacketType packetType = packet.packetType();
         
         switch(packetType) {
@@ -28,12 +27,12 @@ abstract public class PacketHandler {
             receivedExitBoardPacket((PacketExitBoard) packet);
             break;
             
-        case PacketTypeGameState:
-            receivedGameStatePacket((PacketGameState) packet);
+        case PacketTypeBoardModel:
+            receivedBoardModelPacket((PacketBoardModel) packet);
             break;
             
-        case PacketTypeBoardState:
-            receivedBoardStatePacket((PacketBoardState) packet);
+        case PacketTypeBoardIdentifierList:
+            receivedBoardIdentifierListPacket((PacketBoardIdentifierList) packet);
             break;
             
         case PacketTypeDrawPixel:
@@ -50,7 +49,7 @@ abstract public class PacketHandler {
     protected abstract void receivedNewBoardPacket(PacketNewBoard packet);
     protected abstract void receivedJoinBoardPacket(PacketJoinBoard packet);
     protected abstract void receivedExitBoardPacket(PacketExitBoard packet);
-    protected abstract void receivedGameStatePacket(PacketGameState packet);
-    protected abstract void receivedBoardStatePacket(PacketBoardState packet);
+    protected abstract void receivedBoardModelPacket(PacketBoardModel packet);
+    protected abstract void receivedBoardIdentifierListPacket(PacketBoardIdentifierList packet);
     protected abstract void receivedDrawPixelPacket(PacketDrawPixel packet);
 }

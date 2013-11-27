@@ -7,8 +7,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 import name.Identifiable;
-import name.Name;
-import name.User;
+import name.Identifier;
 import packet.Packet;
 import packet.PacketHandler;
 
@@ -18,7 +17,7 @@ public abstract class SocketHandler extends PacketHandler implements Runnable, I
     protected final PrintWriter out;
     protected final BufferedReader in;
     
-    protected User user;
+    protected Identifier identifier;
     
     protected SocketHandler(Socket socket) throws IOException {
         this.socket = socket;
@@ -46,7 +45,6 @@ public abstract class SocketHandler extends PacketHandler implements Runnable, I
 
     protected final void handleConnection() throws IOException {
         try {
-            beforeConnection();
             for (String line = in.readLine(); line != null; line = in.readLine()) {
                 Packet packet = Packet.createPacketWithData(line);
                 receivedPacket(packet);
@@ -56,22 +54,20 @@ public abstract class SocketHandler extends PacketHandler implements Runnable, I
             e.printStackTrace();
         }
         finally {
-            afterConnection();
+            connectionClosed();
             out.close();
             in.close();
         }   
     }
 
-    protected void sendPacket(Packet packet) {
+    protected void connectionClosed() { }
+
+    public void sendPacket(Packet packet) {
         out.println(packet.data());
     }
     
-    // Optional to implement.
-    protected void beforeConnection() { }
-    protected void afterConnection() { }
-    
     @Override
-    public Name identifier() {
-        return user;
+    public Identifier identifier() {
+        return identifier;
     }
 }

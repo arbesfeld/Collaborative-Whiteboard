@@ -2,8 +2,8 @@ package packet;
 
 import java.util.HashMap;
 
-import name.BoardName;
-import name.User;
+import name.BoardIdentifier;
+import name.ClientIdentifier;
 
 import com.google.gson.JsonObject;
 
@@ -20,13 +20,13 @@ public final class PacketNewBoard extends Packet {
         int width = data.get("width").getAsInt();
         int height = data.get("height").getAsInt();
         
-        BoardName boardName = getBoardName(data);
-        User senderName = getSenderName(data);
+        BoardIdentifier boardName = getBoardName(data);
+        ClientIdentifier senderName = getSenderName(data);
         
         return new PacketNewBoard(boardName, senderName, width, height);
     }
     
-    public PacketNewBoard(BoardName boardName, User senderName, int width, int height) {
+    public PacketNewBoard(BoardIdentifier boardName, ClientIdentifier senderName, int width, int height) {
         super(PacketType.PacketTypeNewBoard, boardName, senderName);
         this.width = width;
         this.height = height;

@@ -15,10 +15,10 @@ public enum PacketType {
     
     // the entire board sent from the server to the client
     // also includes a list of the clients
-    PacketTypeGameState, // server to client
+    PacketTypeBoardModel, // server to client
     
     // all the boards in the game
-    PacketTypeBoardState, // server to client
+    PacketTypeBoardIdentifierList, // server to client
     
     // all the boards on the server
     // a message to draw on a specific pixel of the board

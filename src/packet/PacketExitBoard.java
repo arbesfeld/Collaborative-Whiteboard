@@ -2,8 +2,8 @@ package packet;
 
 import java.util.HashMap;
 
-import name.BoardName;
-import name.User;
+import name.BoardIdentifier;
+import name.ClientIdentifier;
 
 import com.google.gson.JsonObject;
 
@@ -15,13 +15,13 @@ public final class PacketExitBoard extends Packet {
      * @return the constructed Packet
      */
     protected static Packet createPacketWithDataInternal(JsonObject data) {
-    	BoardName boardName = getBoardName(data);
-        User senderName = getSenderName(data);
+    	BoardIdentifier boardName = getBoardName(data);
+        ClientIdentifier senderName = getSenderName(data);
         
         return new PacketExitBoard(boardName, senderName);
     }
     
-    public PacketExitBoard(BoardName boardName, User senderName) {
+    public PacketExitBoard(BoardIdentifier boardName, ClientIdentifier senderName) {
         super(PacketType.PacketTypeExitBoard, boardName, senderName);
     }
     

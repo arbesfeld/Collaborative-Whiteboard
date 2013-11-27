@@ -2,8 +2,8 @@ package packet;
 
 import java.util.HashMap;
 
-import name.BoardName;
-import name.User;
+import name.BoardIdentifier;
+import name.ClientIdentifier;
 
 import com.google.gson.JsonObject;
 
@@ -14,13 +14,13 @@ public final class PacketJoinBoard extends Packet {
      * @return the constructed Packet
      */
     protected static Packet createPacketWithDataInternal(JsonObject data) {
-	    BoardName boardName = getBoardName(data);
-	    User senderName = getSenderName(data);
+	    BoardIdentifier boardName = getBoardName(data);
+	    ClientIdentifier senderName = getSenderName(data);
 	    
         return new PacketJoinBoard(boardName, senderName);
     }
     
-    public PacketJoinBoard(BoardName boardName, User senderName) {
+    public PacketJoinBoard(BoardIdentifier boardName, ClientIdentifier senderName) {
         super(PacketType.PacketTypeJoinBoard, boardName, senderName);
     }
     

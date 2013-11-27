@@ -5,8 +5,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.GridLayout;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -25,18 +25,15 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
-import javax.swing.JToggleButton;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 import javax.swing.colorchooser.AbstractColorChooserPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import canvas.DrawableClient;
-import name.BoardName;
-import name.Name;
-import name.User;
 import models.BoardModel;
+import name.BoardIdentifier;
 import stroke.StrokeProperties;
 import util.Utils;
 
@@ -48,7 +45,6 @@ class BoardClientGUI extends JFrame{
     
     private final JMenu joinGameSubmenu;
     private final JMenuItem newBoard;
-    private ColorIcon icon;
     private final JButton colorButton;
     private final JMenu strokeMenu;
     private final JSlider strokeSlider;
@@ -58,8 +54,8 @@ class BoardClientGUI extends JFrame{
     private static final int STROKE_MIN = 1;
     private static final int STROKE_INIT = StrokeProperties.DEFAULT_STROKE_WIDTH;
     
-    private BoardName[] boardNames;
-    private BoardModel<Name, DrawableClient> model;
+    private BoardIdentifier[] boardNames;
+    private BoardModel model;
     private BoardClientController controller;
     
     /**
@@ -155,7 +151,7 @@ class BoardClientGUI extends JFrame{
         	return;
         }
         
-        for (final BoardName boardName : boardNames) {
+        for (final BoardIdentifier boardName : boardNames) {
             JMenuItem subMenuItem = new JMenuItem(boardName.name());        
 
             subMenuItem.addActionListener(new ActionListener() {
@@ -223,7 +219,7 @@ class BoardClientGUI extends JFrame{
         int result = JOptionPane.showConfirmDialog(null, panel, "Connect To Server",
             JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
-            BoardName boardName = new BoardName(Utils.generateId(), inputBoardName.getText());
+            BoardIdentifier boardName = new BoardIdentifier(Utils.generateId(), inputBoardName.getText());
 
             if (model != null) {
                 controller.disconnectFromCurrentBoard();
@@ -235,7 +231,7 @@ class BoardClientGUI extends JFrame{
         
     }
     
-    private void joinBoardAction(BoardName boardName) {
+    private void joinBoardAction(BoardIdentifier boardName) {
         if (model != null) {
             controller.disconnectFromCurrentBoard();
         }
@@ -246,7 +242,7 @@ class BoardClientGUI extends JFrame{
      * Set the current model and allow the user to draw to the screen.
      * @param model
      */
-    public void setModel(BoardModel<Name, DrawableClient> model) {
+    public void setModel(BoardModel model) {
         this.model = model;
         updateContentPane();
         updateUserList();
@@ -264,7 +260,7 @@ class BoardClientGUI extends JFrame{
      * Update the list of boards.
      * @param boards
      */
-    public void updateBoardList(BoardName[] boards) {
+    public void updateBoardList(BoardIdentifier[] boards) {
         this.boardNames = boards;
         updateMenuBar();
     }

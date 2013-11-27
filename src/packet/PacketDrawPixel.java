@@ -3,8 +3,8 @@ package packet;
 import java.awt.Color;
 import java.util.HashMap;
 
-import name.BoardName;
-import name.User;
+import name.BoardIdentifier;
+import name.ClientIdentifier;
 import canvas.Pixel;
 
 import com.google.gson.JsonObject;
@@ -18,8 +18,8 @@ public final class PacketDrawPixel extends Packet {
      * @return the constructed Packet
      */
     protected static Packet createPacketWithDataInternal(JsonObject data) {
-        BoardName boardName = getBoardName(data);
-        User senderName = getSenderName(data);
+        BoardIdentifier boardName = getBoardName(data);
+        ClientIdentifier senderName = getSenderName(data);
         
         JsonObject jobject = data.get("pixel").getAsJsonObject();
         int x = jobject.get("x").getAsInt();
@@ -32,7 +32,7 @@ public final class PacketDrawPixel extends Packet {
         return new PacketDrawPixel(boardName, senderName, pixel);
     }
     
-    public PacketDrawPixel(BoardName boardName, User senderName, Pixel pixel) {
+    public PacketDrawPixel(BoardIdentifier boardName, ClientIdentifier senderName, Pixel pixel) {
         super(PacketType.PacketTypeDrawPixel, boardName, senderName);
         this.pixel = pixel;
     }

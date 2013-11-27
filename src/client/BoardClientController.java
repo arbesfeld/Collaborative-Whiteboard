@@ -6,17 +6,14 @@ import java.net.Socket;
 
 import javax.swing.SwingUtilities;
 
-import canvas.DrawableClient;
-import canvas.Pixel;
-import name.BoardName;
-import name.Name;
-import name.User;
 import models.BoardModel;
-import packet.Packet;
-import packet.PacketBoardState;
-import packet.PacketExitBoard;
+import name.BoardIdentifier;
+import name.ClientIdentifier;
+import name.Identifiable;
+import packet.PacketBoardIdentifierList;
+import packet.PacketBoardModel;
 import packet.PacketDrawPixel;
-import packet.PacketGameState;
+import packet.PacketExitBoard;
 import packet.PacketJoinBoard;
 import packet.PacketNewBoard;
 import packet.PacketNewClient;
@@ -27,11 +24,13 @@ import stroke.StrokeType;
 import stroke.StrokeTypeBasic;
 import stroke.StrokeTypeEraser;
 import util.Utils;
+import canvas.DrawableClient;
+import canvas.Pixel;
 
 public class BoardClientController extends SocketHandler {
     private BoardClientGUI view;
-    private final User user;
-    private BoardModel<Name, DrawableClient> model;
+    private final ClientIdentifier user;
+    private BoardModel model;
     
     private ClientState clientState;
     private final StrokeProperties strokeProperties;
@@ -39,7 +38,7 @@ public class BoardClientController extends SocketHandler {
     public BoardClientController(String userName, String hostName, int portNumber) throws IOException {
         super(new Socket(hostName, portNumber));
         
-        this.user = new User(Utils.generateId(), userName);
+        this.user = new ClientIdentifier(Utils.generateId(), userName);
         this.clientState = ClientState.ClientStateLoading;
         
         // Default stroke.
@@ -71,8 +70,8 @@ public class BoardClientController extends SocketHandler {
     protected void receivedJoinBoardPacket(PacketJoinBoard packet) {
         assert out != null;
         
-        User packetUser = packet.senderName();
-        BoardName boardName = packet.boardName();
+        ClientIdentifier packetUser = packet.senderName();
+        BoardIdentifier boardName = packet.boardName();
         
         // This must be for another user that has just joined.
         assert !user.equals(packetUser);
@@ -82,7 +81,7 @@ public class BoardClientController extends SocketHandler {
         assert clientState == ClientState.ClientStatePlaying;
         
         // We should only receive these packets if the board is our current board.
-        assert boardName.equals(model.boardName());
+        assert boardName.equals(model.identifier());
         
         model.addUser(packetUser);
         
@@ -98,14 +97,14 @@ public class BoardClientController extends SocketHandler {
         assert model != null;
         assert out != null;
         
-        final User packetUser = packet.senderName();
+        final ClientIdentifier packetUser = packet.senderName();
         
         // We should only receive these packets if we have loaded.
         assert clientState == ClientState.ClientStatePlaying;
         
         // We should only receive these packets if the board is our current board.
-        BoardName boardName = packet.boardName();
-        assert boardName.equals(model.boardName());
+        BoardIdentifier boardName = packet.boardName();
+        assert boardName.equals(model.identifier());
         
         if (user.equals(packetUser)) {
             // If it is ourselves, we must disconnect ourselves from the game.
@@ -130,7 +129,7 @@ public class BoardClientController extends SocketHandler {
     }
 
     @Override
-    protected void receivedGameStatePacket(PacketGameState packet) {
+    protected void receivedBoardModelPacket(PacketBoardModel packet) {
         assert model == null;
         assert out != null;
         assert packet.senderName().equals(BoardServer.SERVER_NAME);
@@ -139,15 +138,15 @@ public class BoardClientController extends SocketHandler {
         assert clientState == ClientState.ClientStateLoading;
         clientState = ClientState.ClientStatePlaying;
         
-        BoardName boardName = packet.boardName();
+        BoardIdentifier boardName = packet.boardName();
         int width = packet.width();
         int height = packet.height();
-        Name[] clients = packet.clients();
+        Identifiable[] clients = packet.clients();
         Pixel[] pixels = packet.pixels();
 
         DrawableClient drawable = new DrawableClient(this, strokeProperties, width, height, pixels);
         
-        model = new BoardModel<Name, DrawableClient>(boardName, drawable, clients);
+        model = new BoardModel(boardName, drawable, clients);
         
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -158,10 +157,10 @@ public class BoardClientController extends SocketHandler {
     }
 
     @Override
-    protected void receivedBoardStatePacket(PacketBoardState packet) {
+    protected void receivedBoardIdentifierListPacket(PacketBoardIdentifierList packet) {
         assert out != null;
         
-        final BoardName[] boards = packet.boards();
+        final BoardIdentifier[] boards = packet.boards();
         
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -178,10 +177,10 @@ public class BoardClientController extends SocketHandler {
         // We should only receive these packets if we have loaded.
         assert clientState == ClientState.ClientStatePlaying;
 
-        BoardName boardName = packet.boardName();
+        BoardIdentifier boardName = packet.boardName();
 
         // We should only receive these packets if the board is our current board.
-        assert boardName.equals(model.boardName());
+        assert boardName.equals(model.identifier());
 
         final Pixel pixel = packet.pixel();
         SwingUtilities.invokeLater(new Runnable() {
@@ -195,12 +194,12 @@ public class BoardClientController extends SocketHandler {
      * Methods for sending packets.
      */
 
-	public void generateNewBoard(BoardName boardName, int width, int height) {
+	public void generateNewBoard(BoardIdentifier boardName, int width, int height) {
 		PacketNewBoard packet = new PacketNewBoard(boardName, user, width, height);
 		sendPacket(packet);
 	}
 	
-    public void connectToBoard(BoardName boardName) {
+    public void connectToBoard(BoardIdentifier boardName) {
         PacketJoinBoard packet = new PacketJoinBoard(boardName, user);
         sendPacket(packet);
     }
@@ -211,7 +210,7 @@ public class BoardClientController extends SocketHandler {
     public void disconnectFromCurrentBoard() {
         assert model != null;
         
-        BoardName boardName = model.boardName();
+        BoardIdentifier boardName = model.identifier();
 
         PacketExitBoard packet = new PacketExitBoard(boardName, user);
         sendPacket(packet);
@@ -220,7 +219,7 @@ public class BoardClientController extends SocketHandler {
     public void sendPixel(Pixel pixel) {
         assert model != null;
         
-        BoardName boardName = model.boardName();
+        BoardIdentifier boardName = model.identifier();
 
         PacketDrawPixel packet = new PacketDrawPixel(boardName, user, pixel);
         sendPacket(packet);

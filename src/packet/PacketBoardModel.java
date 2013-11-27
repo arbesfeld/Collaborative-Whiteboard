@@ -4,18 +4,20 @@ import java.awt.Color;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import name.BoardName;
-import name.Name;
-import name.User;
+import models.BoardModel;
+import name.BoardIdentifier;
+import name.ClientIdentifier;
+import name.Identifiable;
+import name.Identifier;
 import canvas.Pixel;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-public final class PacketGameState extends Packet {
+public final class PacketBoardModel extends Packet {
     private final int width;
     private final int height;
-    private final Name[] clients;
+    private final Identifier[] clients;
     private final Pixel[] pixels;
     
     /**
@@ -27,12 +29,12 @@ public final class PacketGameState extends Packet {
         int width = data.get("width").getAsInt();
         int height = data.get("height").getAsInt();
         
-        BoardName boardName = getBoardName(data);
-        User senderName = getSenderName(data);
+        BoardIdentifier boardName = getBoardName(data);
+        ClientIdentifier senderName = getSenderName(data);
         
         JsonArray jclients = data.get("clients").getAsJsonArray();
         
-        User[] clients = new User[jclients.size()];
+        ClientIdentifier[] clients = new ClientIdentifier[jclients.size()];
         
         for (int i = 0; i < jclients.size(); i++) {
             JsonObject jobject = jclients.get(i).getAsJsonObject();
@@ -40,7 +42,7 @@ public final class PacketGameState extends Packet {
             int id = jobject.get("id").getAsInt();
             String name = jobject.get("name").getAsString();
             
-            clients[i] = new User(id, name);
+            clients[i] = new ClientIdentifier(id, name);
         }
         
         JsonArray jpixels = data.get("pixels").getAsJsonArray();
@@ -56,15 +58,19 @@ public final class PacketGameState extends Packet {
             pixels[i] = new Pixel(x, y, new Color(r/255.0f, g/255.0f, b/255.0f));
         }
         
-        return new PacketGameState(boardName, senderName, width, height, clients, pixels);
+        return new PacketBoardModel(boardName, senderName, width, height, clients, pixels);
     }
     
-    public PacketGameState(BoardName boardName, User senderName, int width, int height, Name[] clients, Pixel[] pixels) {
-        super(PacketType.PacketTypeGameState, boardName, senderName);
+    private PacketBoardModel(BoardIdentifier boardName, ClientIdentifier senderName, int width, int height, Identifier[] clients, Pixel[] pixels) {
+        super(PacketType.PacketTypeBoardModel, boardName, senderName);
         this.width = width;
         this.height = height;
         this.clients = clients;
         this.pixels = pixels;
+    }
+    
+    public PacketBoardModel(BoardModel model, ClientIdentifier senderName) {
+        this(model.identifier(), senderName, model.width(), model.height(), model.userIdentifiers(), model.getAllPixels());
     }
     
     /**
@@ -86,7 +92,7 @@ public final class PacketGameState extends Packet {
         return height;
     }
     
-    public Name[] clients() {
+    public Identifiable[] clients() {
         return clients.clone();
     }
     
@@ -113,7 +119,7 @@ public final class PacketGameState extends Packet {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		PacketGameState other = (PacketGameState) obj;
+		PacketBoardModel other = (PacketBoardModel) obj;
 		if (!Arrays.equals(clients, other.clients))
 			return false;
 		if (height != other.height)

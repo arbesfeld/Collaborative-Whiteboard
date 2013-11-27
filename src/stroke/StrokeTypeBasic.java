@@ -4,10 +4,8 @@ import java.awt.Color;
 import java.util.LinkedList;
 import java.util.List;
 
-
-
-import canvas.Pixel;
 import util.Vector2;
+import canvas.Pixel;
 
 public final class StrokeTypeBasic implements StrokeType {
 

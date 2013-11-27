@@ -2,8 +2,8 @@ package packet;
 
 import java.util.HashMap;
 
-import name.BoardName;
-import name.User;
+import name.BoardIdentifier;
+import name.ClientIdentifier;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -13,8 +13,8 @@ import com.google.gson.JsonParser;
 public abstract class Packet {
     
     private final PacketType packetType;
-    private final BoardName boardName;
-    private final User senderName;
+    private final BoardIdentifier boardName;
+    private final ClientIdentifier senderName;
     
     public static Packet createPacketWithData(String data) {
         // Format of all packets is { "packetType": <Integer>, ... }
@@ -52,12 +52,12 @@ public abstract class Packet {
             packet = PacketExitBoard.createPacketWithDataInternal(jobject);
             break;
             
-        case PacketTypeGameState:
-            packet = PacketGameState.createPacketWithDataInternal(jobject);
+        case PacketTypeBoardModel:
+            packet = PacketBoardModel.createPacketWithDataInternal(jobject);
             break;
             
-        case PacketTypeBoardState:
-            packet = PacketBoardState.createPacketWithDataInternal(jobject);
+        case PacketTypeBoardIdentifierList:
+            packet = PacketBoardIdentifierList.createPacketWithDataInternal(jobject);
             break;
             
         case PacketTypeDrawPixel:
@@ -72,12 +72,12 @@ public abstract class Packet {
         return packet;
     }
     
-    protected Packet(PacketType packetType, User senderName) {
+    protected Packet(PacketType packetType, ClientIdentifier senderName) {
         // BoardName is not used
-        this(packetType, BoardName.NULL_BOARD, senderName);
+        this(packetType, BoardIdentifier.NULL_BOARD, senderName);
     }
     
-    protected Packet(PacketType packetType, BoardName boardName, User senderName) {
+    protected Packet(PacketType packetType, BoardIdentifier boardName, ClientIdentifier senderName) {
         if (boardName.id() < 0) {
             throw new IllegalArgumentException("BoardID must be non-negative.");
         }
@@ -105,26 +105,26 @@ public abstract class Packet {
         return packetType;
     }
     
-    public BoardName boardName() {
+    public BoardIdentifier boardName() {
         return boardName;
     }
     
-    public User senderName() {
-    	return senderName;
+    public ClientIdentifier senderName() {
+        return senderName;
     }
-
-    protected static BoardName getBoardName(JsonObject data) {
+    
+    protected static BoardIdentifier getBoardName(JsonObject data) {
         JsonObject board = data.get("boardName").getAsJsonObject();
         int boardId = board.get("id").getAsInt();
         String boardName = board.get("name").getAsString();
-        return new BoardName(boardId, boardName);
+        return new BoardIdentifier(boardId, boardName);
     }
 
-    protected static User getSenderName(JsonObject data) {
+    protected static ClientIdentifier getSenderName(JsonObject data) {
         JsonObject sender = data.get("senderName").getAsJsonObject();
         int senderId = sender.get("id").getAsInt();
         String senderName = sender.get("name").getAsString();
-        return new User(senderId, senderName);
+        return new ClientIdentifier(senderId, senderName);
     }
 
 	@Override
