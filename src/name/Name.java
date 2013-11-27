@@ -1,6 +1,6 @@
 package name;
 
-public abstract class Name {
+public abstract class Name implements Identifiable {
 
     private int id;
     private String name;
@@ -16,6 +16,11 @@ public abstract class Name {
     
     public String name() {
         return name;
+    }
+    
+    @Override
+    public Name identifier() {
+        return this;
     }
     
     @Override

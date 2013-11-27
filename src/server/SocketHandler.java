@@ -6,17 +6,19 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import name.Identifiable;
+import name.Name;
+import name.User;
 import packet.Packet;
 import packet.PacketHandler;
 
-public abstract class SocketHandler extends PacketHandler implements Runnable {
+public abstract class SocketHandler extends PacketHandler implements Runnable, Identifiable {
     private final Socket socket;
 
-    // write to the server
     protected final PrintWriter out;
-    
-    // read from the server
     protected final BufferedReader in;
+    
+    protected User user;
     
     protected SocketHandler(Socket socket) throws IOException {
         this.socket = socket;
@@ -59,8 +61,17 @@ public abstract class SocketHandler extends PacketHandler implements Runnable {
             in.close();
         }   
     }
+
+    protected void sendPacket(Packet packet) {
+        out.println(packet.data());
+    }
     
     // Optional to implement.
     protected void beforeConnection() { }
     protected void afterConnection() { }
+    
+    @Override
+    public Name identifier() {
+        return user;
+    }
 }

@@ -5,7 +5,7 @@ import java.awt.Color;
 import canvas.Canvas;
 
 
-import pixel.Pixel;
+import canvas.Pixel;
 import util.Vector2;
 
 public class StrokeProperties {

@@ -6,9 +6,12 @@ import java.net.Socket;
 
 import javax.swing.SwingUtilities;
 
+import canvas.DrawableClient;
+import canvas.Pixel;
 import name.BoardName;
+import name.Name;
 import name.User;
-import models.ClientBoardModel;
+import models.BoardModel;
 import packet.Packet;
 import packet.PacketBoardState;
 import packet.PacketExitBoard;
@@ -17,7 +20,6 @@ import packet.PacketGameState;
 import packet.PacketJoinBoard;
 import packet.PacketNewBoard;
 import packet.PacketNewClient;
-import pixel.Pixel;
 import server.BoardServer;
 import server.SocketHandler;
 import stroke.StrokeProperties;
@@ -29,7 +31,7 @@ import util.Utils;
 public class BoardClientController extends SocketHandler {
     private BoardClientGUI view;
     private final User user;
-    private ClientBoardModel model;
+    private BoardModel<Name, DrawableClient> model;
     
     private ClientState clientState;
     private final StrokeProperties strokeProperties;
@@ -48,6 +50,8 @@ public class BoardClientController extends SocketHandler {
     }
     
     public void setView(BoardClientGUI view) {
+        assert this.view == null;
+        
         this.view = view;
     }
 
@@ -138,10 +142,12 @@ public class BoardClientController extends SocketHandler {
         BoardName boardName = packet.boardName();
         int width = packet.width();
         int height = packet.height();
-        User[] clients = packet.clients();
+        Name[] clients = packet.clients();
         Pixel[] pixels = packet.pixels();
 
-        model = new ClientBoardModel(this, strokeProperties, width, height, boardName, clients, pixels);
+        DrawableClient drawable = new DrawableClient(this, strokeProperties, width, height, pixels);
+        
+        model = new BoardModel<Name, DrawableClient>(boardName, drawable, clients);
         
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -218,10 +224,6 @@ public class BoardClientController extends SocketHandler {
 
         PacketDrawPixel packet = new PacketDrawPixel(boardName, user, pixel);
         sendPacket(packet);
-    }
-    
-    private void sendPacket(Packet packet) {
-        out.println(packet.data());
     }
     
     public void setStrokeColor(Color strokeColor) {

@@ -3,7 +3,8 @@ package stroke;
 import java.awt.Color;
 
 
-import pixel.Pixel;
+
+import canvas.Pixel;
 import util.Vector2;
 
 public interface StrokeType {

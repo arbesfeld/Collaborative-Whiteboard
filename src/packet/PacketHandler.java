@@ -1,5 +1,7 @@
 package packet;
 
+import java.io.PrintWriter;
+
 abstract public class PacketHandler {
     
     /*

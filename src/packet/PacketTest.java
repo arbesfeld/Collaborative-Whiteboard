@@ -9,27 +9,9 @@ import name.User;
 
 import org.junit.Test;
 
-import pixel.Pixel;
+import canvas.Pixel;
 
 public class PacketTest {
-    
-    @Test
-    public void newClientPacketTest() {
-        // Create a NewClientPacket, convert it to data, and ensure that
-        // the reconstructed packet is identical to the original packet.
-        
-        Packet packet = new PacketNewClient(new User(3, "name"));
-        String data = packet.data();
-        PacketNewClient newPacket = (PacketNewClient) Packet.createPacketWithData(data);
-        
-        assertEquals(packet, newPacket);
-        assertEquals(packet.hashCode(), newPacket.hashCode());
-        
-        assertTrue(newPacket.senderName().id() == 3);
-        assertTrue(newPacket.senderName().name().equals("name"));
-        assertTrue(newPacket.boardName().id() == 0);
-        assertTrue(newPacket.boardName().name().equals(""));
-    }
     
     @Test
     public void newBoardPacketTest() {
@@ -153,10 +135,10 @@ public class PacketTest {
     @Test
     public void differentPacketTest() {
         // Assert that different packets produce different data.
-        
-        Packet packet1 = new PacketNewClient(new User(10, "name1"));
-        Packet packet2 = new PacketExitBoard(new BoardName(2, "board"), new User(10, "name1"));
-        Packet packet3 = new PacketNewClient(new User(15, "name2"));
+
+        Packet packet1 = new PacketExitBoard(new BoardName(2, "board"), new User(10, "name1"));
+        Packet packet2 = new PacketExitBoard(new BoardName(2, "board"), new User(10, "name2"));
+        Packet packet3 = new PacketExitBoard(new BoardName(5, "board"), new User(10, "name1"));
         
         assertFalse(packet1.data().equals(packet2.data()));
         assertFalse(packet1.data().equals(packet3.data()));

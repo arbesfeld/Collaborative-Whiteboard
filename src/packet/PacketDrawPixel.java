@@ -5,8 +5,7 @@ import java.util.HashMap;
 
 import name.BoardName;
 import name.User;
-
-import pixel.Pixel;
+import canvas.Pixel;
 
 import com.google.gson.JsonObject;
 

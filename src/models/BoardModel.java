@@ -1,96 +1,79 @@
 package models;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 
+import javax.swing.JPanel;
+
+import packet.PacketGameState;
+import server.BoardServer;
+import canvas.Drawable;
+import canvas.DrawableBase;
+import canvas.Pixel;
 import name.BoardName;
-import name.User;
+import name.Identifiable;
+import name.Name;
 
-import pixel.Pixel;
-
-public abstract class BoardModel {
+public class BoardModel<U extends Identifiable, C extends DrawableBase> implements Drawable {
     private final BoardName boardName;
-    private final HashSet<User> users;
-    protected final int width, height;
+
+    private final C canvas;
+    private final Set<U> users;
     
-    protected BoardModel(BoardName boardName, int width, int height) {
-        this(boardName, new User[0], width, height);
-    }
-    
-    protected BoardModel(BoardName boardName, User[] initUsers, int width, int height) {
+    public BoardModel(BoardName boardName, C canvas) {
         this.boardName = boardName;
-        this.width = width;
-        this.height = height;
-        
-        // A server should always have not initial users.
-        
-        if (isServerBoard())
-            assert initUsers.length == 0;
-        
-        this.users = new HashSet<User>(Arrays.asList(initUsers));
+        this.canvas = canvas;
+        this.users = Collections.synchronizedSet(new HashSet<U>());
     }
     
-    public synchronized void addUser(User user) {
-        this.users.add(user);
+    public BoardModel(BoardName boardName, C canvas, U[] initUsers) {
+        this.boardName = boardName;
+        this.canvas = canvas;
+        this.users = Collections.synchronizedSet(new HashSet<U>(Arrays.asList(initUsers)));
     }
     
-    public synchronized void removeUser(User user) {
-        if (!this.users.contains(user))
-            throw new IllegalArgumentException("User " + user.toString() + " does not exist.");
-        this.users.remove(user);
+    public void addUser(U user) {
+        users.add(user);
+    }
+    
+    public void removeUser(U user) {
+        users.remove(user);
     }
     
     public BoardName boardName() {
         return boardName;
     }
     
-    public synchronized User[] users() {
-        return users.toArray(new User[users.size()]);
+    public Set<U> users() {
+        return users;
     }
 
-    protected boolean isValidPixel(Pixel pixel) {
-        return pixel.x() >= 0 && pixel.x() < width || pixel.y() >= 0 || pixel.y() < height;
+    @Override
+    public void drawPixel(Pixel pixel) {
+        canvas.drawPixel(pixel);
     }
-
-    public abstract void drawPixel(Pixel pixel);
-    protected abstract boolean isServerBoard();
     
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result
-                + ((boardName == null) ? 0 : boardName.hashCode());
-        result = prime * result + height;
-        result = prime * result + ((users == null) ? 0 : users.hashCode());
-        result = prime * result + width;
-        return result;
+    public Pixel[] getAllPixels() {
+        return canvas.getAllPixels();
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        BoardModel other = (BoardModel) obj;
-        if (boardName == null) {
-            if (other.boardName != null)
-                return false;
-        } else if (!boardName.equals(other.boardName))
-            return false;
-        if (height != other.height)
-            return false;
-        if (users == null) {
-            if (other.users != null)
-                return false;
-        } else if (!users.equals(other.users))
-            return false;
-        if (width != other.width)
-            return false;
-        return true;
+    public PacketGameState constructGameStatePacket() {
+        synchronized(users) {
+            Name[] result = new Name[users.size()];
+            int i = 0;
+            for (U user : users) {
+                result[i] = user.identifier();
+                i++;
+            }
+            return new PacketGameState(boardName(), BoardServer.SERVER_NAME, 
+                    canvas.width(), canvas.height(), result, getAllPixels());
+        }
     }
 
+    public JPanel panel() {
+        return canvas;
+    }
 }

@@ -32,11 +32,12 @@ import javax.swing.colorchooser.AbstractColorChooserPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import canvas.DrawableClient;
 import name.BoardName;
-import models.ClientBoardModel;
-
+import name.Name;
+import name.User;
+import models.BoardModel;
 import stroke.StrokeProperties;
-
 import util.Utils;
 
 
@@ -58,7 +59,7 @@ class BoardClientGUI extends JFrame{
     private static final int STROKE_INIT = StrokeProperties.DEFAULT_STROKE_WIDTH;
     
     private BoardName[] boardNames;
-    private ClientBoardModel model;
+    private BoardModel<Name, DrawableClient> model;
     private BoardClientController controller;
     
     /**
@@ -92,6 +93,7 @@ class BoardClientGUI extends JFrame{
     }
 
     public void setController(BoardClientController controller) {
+        assert this.controller == null;
         this.controller = controller;
     }
     
@@ -153,14 +155,13 @@ class BoardClientGUI extends JFrame{
         	return;
         }
         
-        for (BoardName boardName : boardNames) {
+        for (final BoardName boardName : boardNames) {
             JMenuItem subMenuItem = new JMenuItem(boardName.name());        
 
-            final BoardName boardNameF = boardName;
             subMenuItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    joinBoardAction(boardNameF);
+                    joinBoardAction(boardName);
                 }
             });
             
@@ -201,7 +202,7 @@ class BoardClientGUI extends JFrame{
         if (model == null) {
             contentPane = new JPanel(new BorderLayout());
         } else {
-            contentPane = model.canvas();
+            contentPane = model.panel();
         }
         contentPane.setVisible(true);
         setContentPane(contentPane);
@@ -245,7 +246,7 @@ class BoardClientGUI extends JFrame{
      * Set the current model and allow the user to draw to the screen.
      * @param model
      */
-    public void setModel(ClientBoardModel model) {
+    public void setModel(BoardModel<Name, DrawableClient> model) {
         this.model = model;
         updateContentPane();
         updateUserList();

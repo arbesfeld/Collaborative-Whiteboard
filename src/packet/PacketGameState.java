@@ -5,9 +5,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import name.BoardName;
+import name.Name;
 import name.User;
-
-import pixel.Pixel;
+import canvas.Pixel;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -15,7 +15,7 @@ import com.google.gson.JsonObject;
 public final class PacketGameState extends Packet {
     private final int width;
     private final int height;
-    private final User[] clients;
+    private final Name[] clients;
     private final Pixel[] pixels;
     
     /**
@@ -59,7 +59,7 @@ public final class PacketGameState extends Packet {
         return new PacketGameState(boardName, senderName, width, height, clients, pixels);
     }
     
-    public PacketGameState(BoardName boardName, User senderName, int width, int height, User[] clients, Pixel[] pixels) {
+    public PacketGameState(BoardName boardName, User senderName, int width, int height, Name[] clients, Pixel[] pixels) {
         super(PacketType.PacketTypeGameState, boardName, senderName);
         this.width = width;
         this.height = height;
@@ -86,7 +86,7 @@ public final class PacketGameState extends Packet {
         return height;
     }
     
-    public User[] clients() {
+    public Name[] clients() {
         return clients.clone();
     }
     

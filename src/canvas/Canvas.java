@@ -12,8 +12,6 @@ import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
 
 import client.BoardClientController;
-
-import pixel.Pixel;
 import stroke.StrokeProperties;
 import util.Vector2;
 
@@ -21,7 +19,7 @@ import util.Vector2;
  * Canvas represents a drawing surface that allows the user to draw
  * on it freehand, with the mouse.
  */
-public class Canvas extends JPanel {
+public class Canvas extends JPanel implements Drawable {
 	private static final long serialVersionUID = 1L;
 	
 	// image where the user's drawing is stored
@@ -85,6 +83,7 @@ public class Canvas extends JPanel {
         this.repaint();
     }
     
+    @Override
     public void drawPixel(Pixel pixel) {
         if (drawingBuffer == null) {
             makeDrawingBuffer();
@@ -186,5 +185,10 @@ public class Canvas extends JPanel {
         public void mouseReleased(MouseEvent e) { }
         public void mouseEntered(MouseEvent e) { }
         public void mouseExited(MouseEvent e) { }
+    }
+
+    @Override
+    public Pixel[] getAllPixels() {
+        throw new UnsupportedOperationException();
     }
 }

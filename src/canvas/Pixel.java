@@ -1,4 +1,4 @@
-package pixel;
+package canvas;
 
 import java.awt.Color;
 
