@@ -1,17 +1,28 @@
 package client;
 
 import java.awt.BorderLayout;
+
+import static javax.swing.GroupLayout.Alignment.BASELINE;
+import static javax.swing.GroupLayout.Alignment.LEADING;
+
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.GroupLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -24,10 +35,12 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
+import javax.swing.GroupLayout.Group;
 import javax.swing.colorchooser.AbstractColorChooserPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -43,12 +56,19 @@ class BoardClientGUI extends JFrame{
     private final JMenuBar menuBar;
     private final JMenu menu;
     
+    private final Container container;
+    private final GroupLayout layout;
+    private JPanel canvas;
+    
     private final JMenu joinGameSubmenu;
     private final JMenuItem newBoard;
     private final JButton colorButton;
-    private final JMenu strokeMenu;
+    private final JButton strokeButton;
     private final JSlider strokeSlider;
     private final JToggleButton eraseToggle;
+    
+    private final JPanel sidebar;
+    
     
     private static final int STROKE_MAX = 10;
     private static final int STROKE_MIN = 1;
@@ -64,15 +84,25 @@ class BoardClientGUI extends JFrame{
      * event-dispatching thread.
      */
     public BoardClientGUI() {
+        setResizable(false);
+        this.container = this.getContentPane();
+        this.layout = new GroupLayout(container);
+        container.setLayout(layout);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        
+        
         // Create the menu bar.
         this.menuBar = new JMenuBar();
         this.menu = new JMenu("File");
         this.newBoard = new JMenuItem("New Board", KeyEvent.VK_T);
-        this.colorButton = new JButton(new ColorIcon(10, Color.black));
-        this.colorButton.setBorder(BorderFactory.createLineBorder(Color.black));
+        this.colorButton = new JButton("Color");
+        this.colorButton.setIcon(new ColorIcon(10, Color.black));
+        //this.colorButton.setBorder(BorderFactory.createLineBorder(Color.black));
         this.colorButton.setFocusPainted(false);
-        this.strokeMenu = new JMenu("Stroke");
-        this.strokeMenu.setIcon(new ColorIcon(STROKE_INIT, Color.black));
+        this.strokeButton = new JButton("Stroke");
+        this.strokeButton.setFocusPainted(false);
+        this.strokeButton.setIcon(new ColorIcon(STROKE_INIT, Color.black));
         this.strokeSlider = new JSlider(JSlider.HORIZONTAL, STROKE_MIN, STROKE_MAX, STROKE_INIT);
         this.eraseToggle = new JToggleButton(new ImageIcon("resources/eraserIcon.gif"));
         this.eraseToggle.setFocusPainted(false);
@@ -83,9 +113,15 @@ class BoardClientGUI extends JFrame{
         //Create and set up the window.
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     
+        //Build Sidebar
+        this.sidebar = new JPanel();
+        sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
+        setSideBar();
+        
         //Create and set up the content pane.
         setMenuBar();
         updateContentPane();
+        
     }
 
     public void setController(BoardClientController controller) {
@@ -93,25 +129,32 @@ class BoardClientGUI extends JFrame{
         this.controller = controller;
     }
     
-    private void setMenuBar() {
-        // Build the first menu.
-        menu.setMnemonic(KeyEvent.VK_F);
-        menuBar.add(menu);
-    
-        newBoard.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
-        newBoard.getAccessibleContext().setAccessibleDescription("Create a new Board");
-        
-        newBoard.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                newBoardAction();
-            }
-        });
+    private void setSideBar() {
         
         colorButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	setColor(e);
+                setColor(e);
+            }
+        });
+
+        strokeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JPopupMenu popup = new JPopupMenu();
+                popup.add(strokeSlider);
+                popup.pack();
+                Point pos = new Point();
+                // get the preferred size of the menu...
+                Dimension size = popup.getPreferredSize();
+                // Adjust the x position so that the left side of the popup
+                // appears at the center of  the component
+                pos.x = (strokeButton.getWidth()/2 - size.width/2);
+                // Adjust the y position so that the y postion (top corner)
+                // is positioned so that the bottom of the popup
+                // appears in the center
+                pos.y = (strokeButton.getHeight());
+                popup.show(strokeButton, pos.x, pos.y);
             }
         });
         
@@ -135,13 +178,31 @@ class BoardClientGUI extends JFrame{
                 }
             }
         });
+                
+        sidebar.add(strokeButton);
+        sidebar.add(colorButton);
+        sidebar.add(eraseToggle);
+        
+    }
+    
+    private void setMenuBar() {
+        // Build the first menu.
+        menu.setMnemonic(KeyEvent.VK_F);
+        menuBar.add(menu);
+    
+        newBoard.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
+        newBoard.getAccessibleContext().setAccessibleDescription("Create a new Board");
+        
+        newBoard.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                newBoardAction();
+            }
+        });
+
 
         menu.add(newBoard);
         menu.add(joinGameSubmenu);
-        strokeMenu.add(strokeSlider);
-        menuBar.add(colorButton);
-        menuBar.add(eraseToggle);
-        menuBar.add(strokeMenu);
         setJMenuBar(menuBar);
     }
     
@@ -189,19 +250,32 @@ class BoardClientGUI extends JFrame{
     }
     
     private void setStroke() {
-        strokeMenu.setIcon(new ColorIcon(strokeSlider.getValue(), Color.black));
+        strokeButton.setIcon(new ColorIcon(strokeSlider.getValue(), Color.black));
         controller.setStrokeWidth(strokeSlider.getValue());
     }
     
     private void updateContentPane() {
-    	JPanel contentPane;
         if (model == null) {
-            contentPane = new JPanel(new BorderLayout());
+            canvas = new JPanel(new BorderLayout());
         } else {
-            contentPane = model.panel();
+            canvas = model.panel();
         }
-        contentPane.setVisible(true);
-        setContentPane(contentPane);
+        
+        canvas.setVisible(true);
+        canvas.revalidate();
+        Group horizontal = layout.createSequentialGroup();
+        horizontal.addGroup(layout.createParallelGroup(LEADING)
+                .addGroup(layout.createSequentialGroup()
+                        .addComponent(canvas)
+                        .addComponent(sidebar)));
+        layout.setHorizontalGroup(horizontal);
+        
+        Group vertical = layout.createSequentialGroup();
+        vertical.addGroup(layout.createParallelGroup(BASELINE)
+                .addComponent(canvas)
+                .addComponent(sidebar));
+        layout.setVerticalGroup(vertical);
+        this.pack();
     }
     
     private void newBoardAction() {
@@ -284,8 +358,10 @@ class BoardClientGUI extends JFrame{
             g2d.setRenderingHint(
                 RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
-            g2d.setColor(color);
+            g2d.setColor(Color.black);
             g2d.fillRect(x, y, size, size);
+            g2d.setColor(color);
+            g2d.fillRect(x+1, y+1, size - 2, size -2);
         }
 
         @Override
