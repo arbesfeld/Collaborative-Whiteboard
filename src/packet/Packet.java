@@ -6,8 +6,9 @@ import name.BoardIdentifier;
 import name.ClientIdentifier;
 
 public abstract class Packet implements Serializable {
-    
-    private final PacketType packetType;
+	private static final long serialVersionUID = -2598835099616000879L;
+	
+	private final PacketType packetType;
     private final BoardIdentifier boardName;
     private final ClientIdentifier senderName;
     

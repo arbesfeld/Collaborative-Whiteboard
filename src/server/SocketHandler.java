@@ -1,24 +1,27 @@
 package server;
 
-import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.Serializable;
+import java.net.SocketException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.net.Socket;
+
+import javax.imageio.ImageIO;
 
 import name.Identifiable;
 import name.Identifier;
 import packet.Packet;
 import packet.PacketHandler;
 
-public abstract class SocketHandler extends PacketHandler implements Runnable, Identifiable {
-    private final Socket socket;
+public abstract class SocketHandler extends PacketHandler implements Runnable, Identifiable, Serializable {
+	private static final long serialVersionUID = -2411978741777099054L;
 
-    protected final ObjectOutputStream out;
-    protected final ObjectInputStream in;
+	private transient final Socket socket;
+
+    protected transient final ObjectOutputStream out;
+    protected transient final ObjectInputStream in;
     
     protected Identifier identifier;
     
@@ -52,12 +55,9 @@ public abstract class SocketHandler extends PacketHandler implements Runnable, I
             for (Object obj = in.readObject(); obj != null; obj = in.readObject()) {
                 receivedPacket((Packet)obj);
             }
-        }  
-        catch (EOFException e) {
-            // do nothing.
-        }
+        } 
         catch (Exception e) {
-            e.printStackTrace();
+            connectionClosed();
         }
         finally {
             connectionClosed();

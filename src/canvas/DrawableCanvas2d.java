@@ -9,21 +9,21 @@ import java.awt.event.MouseMotionListener;
 import stroke.StrokeProperties;
 import util.Vector2;
 import canvas.command.DrawCommandPixel;
-import client.BoardClientController;
+import client.ClientController;
 
 /**
  * Canvas represents a drawing surface that allows the user to draw
  * on it freehand, with the mouse.
  */
-public class DrawableCanvas2d extends DrawableBase implements Drawable {
+public class DrawableCanvas2d extends DrawableBase {
     private static final long serialVersionUID = -7112257891818505133L;
+
+    private final ClientController clientController;
+    private final StrokeProperties strokeProperties;
 
     private final Canvas2d canvas;
     
-    private final BoardClientController clientController;
-    private final StrokeProperties strokeProperties;
-    
-    public DrawableCanvas2d(StrokeProperties strokeProperties, BoardClientController clientController, Canvas2d canvas) {
+    public DrawableCanvas2d(StrokeProperties strokeProperties, ClientController clientController, Canvas2d canvas) {
         super(canvas.width(), canvas.height());
         
         this.setPreferredSize(new Dimension(width(), height()));
@@ -46,7 +46,7 @@ public class DrawableCanvas2d extends DrawableBase implements Drawable {
      */
     @Override
     public void paintComponent(Graphics g) {
-        g.drawImage(canvas.drawingBuffer(), 0, 0, null);
+    	canvas.paintComponent(g);
     }
     
     /*
@@ -56,7 +56,6 @@ public class DrawableCanvas2d extends DrawableBase implements Drawable {
         // store the coordinates of the last mouse event, so we can
         // draw a line segment from that last point to the point of the next mouse event.
         private int lastX, lastY; 
-        
         
         /*
          * When mouse button is pressed down, start drawing.
@@ -79,18 +78,19 @@ public class DrawableCanvas2d extends DrawableBase implements Drawable {
             double dist = velocity.abs();
             
             for (int i = 0; i <= (int)dist; i++) {
-                int curX = (int) (lastX*i/dist + x*(dist-i)/dist);
-                int curY = (int) (lastY*i/dist + y*(dist-i)/dist);
+                int curX = (int) (x*i/dist + lastX*(dist-i)/dist);
+                int curY = (int) (y*i/dist + lastY*(dist-i)/dist);
 
                 Pixel[] pixels = strokeProperties.paintPoint(curX, curY, velocity);
                 for (Pixel pixel : pixels) {
-                    drawPixel(pixel);
-                    clientController.sendDrawCommand(new DrawCommandPixel(pixel));
+                	if (!canvas.getPixelColor(pixel).equals(pixel.color())) {
+                        canvas.drawPixel(pixel);
+                        clientController.sendDrawCommand(new DrawCommandPixel(pixel));
+                	}
                 }
             }
             lastX = x;
             lastY = y;
-            repaint();
         }
 
         // Ignore all these other mouse events.
@@ -100,15 +100,13 @@ public class DrawableCanvas2d extends DrawableBase implements Drawable {
         public void mouseEntered(MouseEvent e) { }
         public void mouseExited(MouseEvent e) { }
     }
-
-    @Override
-    public int width() {
-        return canvas.width();
-    }
     
-    @Override
-    public int height() {
-        return canvas.height();
+    @Override 
+    public void repaint() {
+    	if (canvas != null) {
+    		canvas.repaint();
+    	}
+    	super.repaint();
     }
     
     @Override

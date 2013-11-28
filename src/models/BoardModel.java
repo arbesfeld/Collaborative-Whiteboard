@@ -10,12 +10,16 @@ import javax.swing.JPanel;
 
 import name.BoardIdentifier;
 import name.Identifiable;
+import canvas.Canvas2d;
 import canvas.Drawable;
 import canvas.DrawableBase;
+import canvas.DrawableCanvas2d;
 import canvas.Pixel;
 
 public class BoardModel implements Drawable, Identifiable, Serializable {
-    private final BoardIdentifier boardName;
+	private static final long serialVersionUID = -7812022750931126889L;
+
+	private final BoardIdentifier boardName;
 
     private final DrawableBase canvas;
     private final Set<Identifiable> users;
@@ -60,7 +64,7 @@ public class BoardModel implements Drawable, Identifiable, Serializable {
         return canvas.height();
     }
     
-    public DrawableBase panel() {
+    public DrawableBase canvas() {
         return canvas;
     }
     

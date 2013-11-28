@@ -9,7 +9,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import server.BoardServer;
+import server.Server;
 
 
 public class PopupGUI extends JFrame {
@@ -19,7 +19,7 @@ public class PopupGUI extends JFrame {
     public PopupGUI(Boolean incorrectServer) throws Exception {
         JTextField username = new JTextField("Matt");
         JTextField ip = new JTextField("localhost");
-        JTextField port = new JTextField(Integer.toString(BoardServer.DEFAULT_PORT));
+        JTextField port = new JTextField(Integer.toString(Server.DEFAULT_PORT));
         JPanel panel = new JPanel(new GridLayout(0, 1));
         panel.add(new JLabel("Username"));
         panel.add(username);
@@ -39,7 +39,7 @@ public class PopupGUI extends JFrame {
             String portName = ip.getText();
             int portNumber = Integer.parseInt(port.getText());
             
-            BoardClient.startClient(userName, portName, portNumber);
+            Client.startClient(userName, portName, portNumber);
         } 
     }
 

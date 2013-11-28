@@ -12,10 +12,12 @@ import packet.PacketJoinBoard;
 import packet.PacketNewBoard;
 import packet.PacketNewClient;
 
-public class ClientHandler extends SocketHandler {
-    final BoardServer server;
+public class ServerSocketHandler extends SocketHandler {
+	private static final long serialVersionUID = 5321337579877366643L;
+	
+	final transient Server server;
     
-    public ClientHandler(Socket socket, BoardServer server) throws IOException {
+    public ServerSocketHandler(Socket socket, Server server) throws IOException {
         super(socket);
         this.server = server;
     }

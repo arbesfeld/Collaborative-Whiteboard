@@ -10,7 +10,6 @@ public class Pixel implements Serializable {
     
     private final int x, y;
     private Color color;
-    private int rgb;
     
     public Pixel(int x, int y, Color color) {
         if (this.x < 0 || this.y < 0) {
@@ -20,20 +19,10 @@ public class Pixel implements Serializable {
         this.x = x;
         this.y = y;
         this.color = color;
-        this.rgb = color.getRGB();
     }
     
     public Pixel(int x, int y, String colorString) {
         this(x, y, Utils.colorFromString(colorString));
-    }
-    
-    @SuppressWarnings("null")
-    public Pixel() {
-        // Used for deserialize.
-        this.x = (Integer) null;
-        this.y = (Integer) null;
-        this.color = null;
-        this.rgb = (Integer) null;
     }
 
     public int x() {
@@ -57,7 +46,6 @@ public class Pixel implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((color == null) ? 0 : color.hashCode());
-        result = prime * result + rgb;
         result = prime * result + x;
         result = prime * result + y;
         return result;
@@ -76,8 +64,6 @@ public class Pixel implements Serializable {
             if (other.color != null)
                 return false;
         } else if (!color.equals(other.color))
-            return false;
-        if (rgb != other.rgb)
             return false;
         if (x != other.x)
             return false;

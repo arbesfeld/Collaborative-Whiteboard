@@ -1,21 +1,24 @@
 package canvas;
 
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.io.Serializable;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
-import javax.swing.ImageIcon;
+import javax.imageio.ImageIO;
 
 import stroke.StrokeProperties;
-import util.Vector2;
+import client.ClientController;
 
-public class Canvas2d extends DrawableBase implements Drawable, Serializable {
+public class Canvas2d extends DrawableBase {
     private static final long serialVersionUID = -6329493755553689791L;
 
     // image where the user's drawing is stored
-    private ImageIcon drawingBuffer;
+    private transient BufferedImage image;
     
     /**
      * Make a canvas.
@@ -24,8 +27,9 @@ public class Canvas2d extends DrawableBase implements Drawable, Serializable {
      */
     public Canvas2d(int width, int height) {
         super(width, height);
-        
-        // note: we can't call makeDrawingBuffer here, because it only
+
+        this.setPreferredSize(new Dimension(width, height));
+        // note: we can't call makeImage here, because it only
         // works *after* this canvas has been added to a window.  Have to
         // wait until paintComponent() is first called.
     }
@@ -33,8 +37,8 @@ public class Canvas2d extends DrawableBase implements Drawable, Serializable {
     /*
      * Make the drawing buffer and draw some starting content for it.
      */
-    private void makeDrawingBuffer() {
-        drawingBuffer = new ImageIcon(new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB));
+    private void makeImage() {
+        image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         fillWithWhite();
     }
     
@@ -42,33 +46,64 @@ public class Canvas2d extends DrawableBase implements Drawable, Serializable {
      * Make the drawing buffer entirely white.
      */
     private void fillWithWhite() {
-        final Graphics2D g = (Graphics2D) drawingBuffer.getImage().getGraphics();
+        final Graphics2D g = (Graphics2D) image.getGraphics();
 
         g.setColor(Color.WHITE);
-        g.fillRect(0,  0,  width, height);
+        g.fillRect(0, 0, width, height);
+        repaint();
     }
     
     @Override
     public void drawPixel(Pixel pixel) {
-        if (drawingBuffer == null) {
-            makeDrawingBuffer();
+        if (image == null) {
+        	makeImage();
         }
         
         if (!isValidPixel(pixel)) {
             return;
         }
         
-        final Graphics2D g = (Graphics2D) drawingBuffer.getImage().getGraphics();
-
-        g.setColor(pixel.color());
-        g.fillRect(pixel.x(), pixel.y(), 1, 1);
+        image.setRGB(pixel.x(), pixel.y(), pixel.color().getRGB());
+        repaint();
     }
 
-    public Image drawingBuffer() {
-        if (drawingBuffer == null) {
-            makeDrawingBuffer();
-        }
-        return drawingBuffer.getImage();
+	public Color getPixelColor(Pixel pixel) {
+		if (image == null) {
+			makeImage();
+		}
+		
+		return new Color(image.getRGB(pixel.x(), pixel.y()));
+	}
+
+    /**
+     * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
+     */
+    @Override
+    public void paintComponent(Graphics g) {
+    	if (image == null) {
+    		makeImage();
+    	}
+    	
+        g.drawImage(image, 0, 0, null);
+    }
+    
+    private void writeObject(ObjectOutputStream out) throws IOException {
+    	if (image == null) {
+    		makeImage();
+    	}
+    	
+        out.defaultWriteObject();
+        ImageIO.write(image, "png", out); 
     }
 
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        image = ImageIO.read(in);
+        
+        assert image != null;
+    }
+    
+    public DrawableCanvas2d makeDrawable(StrokeProperties strokeProperties, ClientController clientController) {
+    	return new DrawableCanvas2d(strokeProperties, clientController, this);
+    }
 }
