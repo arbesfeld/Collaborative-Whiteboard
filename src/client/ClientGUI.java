@@ -42,6 +42,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
 import javax.swing.colorchooser.AbstractColorChooserPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -111,10 +112,14 @@ class ClientGUI extends JFrame{
         this.colorButton = new JButton("Color");
         this.colorButton.setIcon(new ColorIcon(10, Color.black));
         this.colorButton.setFocusPainted(false);
+        this.colorButton.setPreferredSize(new Dimension(70,20));
+        this.colorButton.setHorizontalAlignment(SwingConstants.LEFT);
         this.colorChooser = new JColorChooser();
         this.strokeButton = new JButton("Stroke");
         this.strokeButton.setFocusPainted(false);
         this.strokeButton.setIcon(new ColorIcon(STROKE_INIT, Color.black));
+        this.strokeButton.setPreferredSize(new Dimension(70, 20));
+        this.strokeButton.setHorizontalAlignment(SwingConstants.LEFT);
         this.strokeSlider = new JSlider(JSlider.HORIZONTAL, STROKE_MIN, STROKE_MAX, STROKE_INIT);
         this.eraseToggle = new JToggleButton(new ImageIcon("resources/eraserIcon.gif"));
         this.eraseToggle.setFocusPainted(false);
@@ -413,11 +418,13 @@ class ClientGUI extends JFrame{
     private static class ColorIcon implements Icon {
 
         private int size;
+        private int forcedSize;
         private Color color;
 
         public ColorIcon(int size, Color color) {
             this.size = size;
             this.color = color;
+            this.forcedSize = 10;
         }
 
         @Override
@@ -427,19 +434,19 @@ class ClientGUI extends JFrame{
                 RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
             g2d.setColor(Color.black);
-            g2d.fillRect(x, y, size, size);
+            g2d.fillRect(x + (forcedSize - size) / 2, y + (forcedSize - size) / 2, size, size);
             g2d.setColor(color);
-            g2d.fillRect(x+1, y+1, size - 2, size -2);
+            g2d.fillRect(x + (forcedSize - size) / 2, y + (forcedSize - size) / 2, size - 2, size -2);
         }
 
         @Override
         public int getIconWidth() {
-            return size;
+            return forcedSize;
         }
 
         @Override
         public int getIconHeight() {
-            return size;
+            return forcedSize;
         }
     }
 }
