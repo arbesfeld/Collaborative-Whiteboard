@@ -1,17 +1,32 @@
 package client;
 
 import java.awt.BorderLayout;
+
+import static javax.swing.GroupLayout.Alignment.BASELINE;
+import static javax.swing.GroupLayout.Alignment.LEADING;
+
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
+import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.GroupLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -24,10 +39,13 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JSlider;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
+import javax.swing.GroupLayout.Group;
 import javax.swing.colorchooser.AbstractColorChooserPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -43,12 +61,25 @@ class BoardClientGUI extends JFrame{
     private final JMenuBar menuBar;
     private final JMenu menu;
     
+    private final Container container;
+    private final GroupLayout layout;
+    private JPanel canvas;
+    
     private final JMenu joinGameSubmenu;
     private final JMenuItem newBoard;
     private final JButton colorButton;
-    private final JMenu strokeMenu;
+    private final JColorChooser colorChooser;
+    private final JButton strokeButton;
     private final JSlider strokeSlider;
     private final JToggleButton eraseToggle;
+    
+    private Cursor brushCursor;
+    private final Image iconImage;
+    
+    private final JPanel sidebar;
+    private final JPanel chatBar;
+    
+    private final JTextArea chatText;
     
     private static final int STROKE_MAX = 10;
     private static final int STROKE_MIN = 1;
@@ -64,15 +95,30 @@ class BoardClientGUI extends JFrame{
      * event-dispatching thread.
      */
     public BoardClientGUI() {
+        setResizable(false);
+        this.container = this.getContentPane();
+        this.layout = new GroupLayout(container);
+        container.setLayout(layout);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        
+        // Create Cursor
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        this.iconImage = toolkit.getImage("resources/cursor.gif");
+        Point hotSpot = new Point(16,16);
+        this.brushCursor = toolkit.createCustomCursor(iconImage, hotSpot, "circleBrush");
+        
         // Create the menu bar.
         this.menuBar = new JMenuBar();
         this.menu = new JMenu("File");
         this.newBoard = new JMenuItem("New Board", KeyEvent.VK_T);
-        this.colorButton = new JButton(new ColorIcon(10, Color.black));
-        this.colorButton.setBorder(BorderFactory.createLineBorder(Color.black));
+        this.colorButton = new JButton("Color");
+        this.colorButton.setIcon(new ColorIcon(10, Color.black));
         this.colorButton.setFocusPainted(false);
-        this.strokeMenu = new JMenu("Stroke");
-        this.strokeMenu.setIcon(new ColorIcon(STROKE_INIT, Color.black));
+        this.colorChooser = new JColorChooser();
+        this.strokeButton = new JButton("Stroke");
+        this.strokeButton.setFocusPainted(false);
+        this.strokeButton.setIcon(new ColorIcon(STROKE_INIT, Color.black));
         this.strokeSlider = new JSlider(JSlider.HORIZONTAL, STROKE_MIN, STROKE_MAX, STROKE_INIT);
         this.eraseToggle = new JToggleButton(new ImageIcon("resources/eraserIcon.gif"));
         this.eraseToggle.setFocusPainted(false);
@@ -83,9 +129,17 @@ class BoardClientGUI extends JFrame{
         //Create and set up the window.
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     
+        //Build Sidebar
+        this.sidebar = new JPanel();
+        this.chatBar = new JPanel();
+        this.chatText = new JTextArea();
+        this.chatText.setEditable(false);
+        setSideBar();
+        
         //Create and set up the content pane.
         setMenuBar();
         updateContentPane();
+        
     }
 
     public void setController(BoardClientController controller) {
@@ -93,31 +147,53 @@ class BoardClientGUI extends JFrame{
         this.controller = controller;
     }
     
-    private void setMenuBar() {
-        // Build the first menu.
-        menu.setMnemonic(KeyEvent.VK_F);
-        menuBar.add(menu);
-    
-        newBoard.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
-        newBoard.getAccessibleContext().setAccessibleDescription("Create a new Board");
+    private void setSideBar() {
         
-        newBoard.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                newBoardAction();
-            }
-        });
+        sidebar.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        //c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridx = 0;
+        c.gridy = 0;
+        sidebar.add(strokeButton, c);
+        
+        c.gridx = 0;
+        c.gridy = 1;
+        sidebar.add(colorButton, c);
+        
+        c.gridx = 0;
+        c.gridy = 2;
+        sidebar.add(eraseToggle, c);
+        setChatClient();
+        
+        c.gridx = 0;
+        c.gridy = 3;
+        sidebar.add(chatBar, c);
         
         colorButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	setColor(e);
+                setColor(e);
+            }
+        });
+
+        strokeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JPopupMenu popup = new JPopupMenu();
+                popup.add(strokeSlider);
+                popup.pack();
+                Point pos = new Point();
+                Dimension size = popup.getPreferredSize();
+                pos.x = (strokeButton.getWidth()/2 - size.width/2);
+                pos.y = (strokeButton.getHeight());
+                popup.show(strokeButton, pos.x, pos.y);
             }
         });
         
         strokeSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
+                updateCursor();
                 setStroke();
             }
         });
@@ -135,13 +211,58 @@ class BoardClientGUI extends JFrame{
                 }
             }
         });
+                
+    }
+       
+    private void setChatClient() {
+        chatBar.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        JTextField inputTextField = new JTextField();
+        JButton sendButton = new JButton("Send");
+        chatText.append("\n \n \n \n");
+        
+        chatBar.setLayout(new GridBagLayout());
+        
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridx = 0;
+        c.gridy = 1;
+        chatBar.add(inputTextField, c);
+     
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 0.2;
+        c.gridx = 2;
+        c.gridy = 1;
+        chatBar.add(sendButton, c);
+        
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(10,0,0,0);
+        c.weightx = 0.0;
+        c.gridwidth = 3;
+        c.gridx = 0;
+        c.gridy = 0;
+        chatBar.add(chatText, c);
+        
+        
+    }
+    
+    private void setMenuBar() {
+        // Build the first menu.
+        menu.setMnemonic(KeyEvent.VK_F);
+        menuBar.add(menu);
+    
+        newBoard.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
+        newBoard.getAccessibleContext().setAccessibleDescription("Create a new Board");
+        
+        newBoard.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                newBoardAction();
+            }
+        });
+
 
         menu.add(newBoard);
         menu.add(joinGameSubmenu);
-        strokeMenu.add(strokeSlider);
-        menuBar.add(colorButton);
-        menuBar.add(eraseToggle);
-        menuBar.add(strokeMenu);
         setJMenuBar(menuBar);
     }
     
@@ -166,7 +287,6 @@ class BoardClientGUI extends JFrame{
     }
     
     private void setColor(ActionEvent e) {
-        final JColorChooser colorChooser = new JColorChooser();
         colorChooser.setPreviewPanel(new JPanel());
         AbstractColorChooserPanel[] oldPanels = colorChooser.getChooserPanels();
         for (int i = 0; i < oldPanels.length; i++) {
@@ -183,25 +303,48 @@ class BoardClientGUI extends JFrame{
             }
           };
         
-        JDialog dialog = JColorChooser.createDialog((Component) (e.getSource()), "ColorPicker", false, colorChooser, okListener, null);
+        JDialog dialog = JColorChooser.createDialog((Component) (e.getSource()), "Color Picker", false, colorChooser, okListener, null);
         dialog.setVisible(true);
         
     }
     
     private void setStroke() {
-        strokeMenu.setIcon(new ColorIcon(strokeSlider.getValue(), Color.black));
+        strokeButton.setIcon(new ColorIcon(strokeSlider.getValue(), Color.black));
         controller.setStrokeWidth(strokeSlider.getValue());
     }
     
     private void updateContentPane() {
-    	JPanel contentPane;
         if (model == null) {
-            contentPane = new JPanel(new BorderLayout());
+            this.canvas = new JPanel();
         } else {
-            contentPane = model.panel();
+            this.canvas = model.panel();
+            this.canvas.setVisible(true);
+            this.canvas.revalidate();
         }
-        contentPane.setVisible(true);
-        setContentPane(contentPane);
+        
+        
+        Group horizontal = layout.createSequentialGroup();
+        horizontal.addGroup(layout.createParallelGroup(LEADING)
+                .addGroup(layout.createSequentialGroup()
+                        .addComponent(canvas)
+                        .addComponent(sidebar)));
+        layout.setHorizontalGroup(horizontal);
+        
+        Group vertical = layout.createSequentialGroup();
+        vertical.addGroup(layout.createParallelGroup(BASELINE)
+                .addComponent(canvas)
+                .addComponent(sidebar));
+        layout.setVerticalGroup(vertical);
+        this.pack();
+    }
+    
+    private void updateCursor() {
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        int strokeWidth = strokeSlider.getValue();
+        Image scaledIcon = iconImage.getScaledInstance(5, 5, Image.SCALE_DEFAULT);
+        Point hotSpot = new Point(strokeWidth/2, strokeWidth/2);
+        brushCursor = toolkit.createCustomCursor(scaledIcon, hotSpot, "circleBrush");
+        this.canvas.setCursor(brushCursor);
     }
     
     private void newBoardAction() {
@@ -266,6 +409,14 @@ class BoardClientGUI extends JFrame{
     }
     
     /**
+     * Add new chat message
+     * @param string
+     */
+    public void addChatLine(String string) {
+        this.chatText.append("\n" + string);
+    }
+    
+    /**
      * Creates icon for color button
      */
     private static class ColorIcon implements Icon {
@@ -284,8 +435,10 @@ class BoardClientGUI extends JFrame{
             g2d.setRenderingHint(
                 RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
-            g2d.setColor(color);
+            g2d.setColor(Color.black);
             g2d.fillRect(x, y, size, size);
+            g2d.setColor(color);
+            g2d.fillRect(x+1, y+1, size - 2, size -2);
         }
 
         @Override

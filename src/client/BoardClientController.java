@@ -22,6 +22,7 @@ import stroke.StrokeProperties;
 import stroke.StrokeType;
 import stroke.StrokeTypeBasic;
 import stroke.StrokeTypeEraser;
+import stroke.StrokeProperties;
 import util.Utils;
 import canvas.Canvas2d;
 import canvas.DrawableBase;
