@@ -38,6 +38,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSlider;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
@@ -49,6 +50,7 @@ import javax.swing.event.ChangeListener;
 
 import models.BoardModel;
 import name.BoardIdentifier;
+import name.Identifiable;
 import stroke.StrokeProperties;
 import util.Utils;
 
@@ -76,6 +78,7 @@ class ClientGUI extends JFrame{
     private final JPanel sidebar;
     private final JPanel chatBar;
     
+    private final JTable userTable;
     private final JTextArea chatText;
     
     private static final int STROKE_MAX = 10;
@@ -135,6 +138,15 @@ class ClientGUI extends JFrame{
         this.chatBar = new JPanel();
         this.chatText = new JTextArea();
         this.chatText.setEditable(false);
+        String[] colNames = {"Users"};
+        Object[][] data = {
+                {"Kathy"},
+                {"John"},
+                {"Sue"},
+                {"Jane"},
+                {"Joe",}
+            };
+        this.userTable = new JTable(data, colNames);
         setSideBar();
         
         //Create and set up the content pane.
@@ -152,7 +164,6 @@ class ClientGUI extends JFrame{
         
         sidebar.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
-        //c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 0;
         sidebar.add(strokeButton, c);
@@ -225,14 +236,24 @@ class ClientGUI extends JFrame{
         chatBar.setLayout(new GridBagLayout());
         
         c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(10,0,0,0);
+        c.weightx = 0.0;
+        c.gridwidth = 3;
         c.gridx = 0;
-        c.gridy = 1;
+        c.gridy = 0;
+        chatBar.add(userTable, c);
+        
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(5,0,0,0);
+        c.gridx = 0;
+        c.gridy = 2;
         chatBar.add(inputTextField, c);
      
         c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(0,0,0,0);
         c.weightx = 0.2;
-        c.gridx = 2;
-        c.gridy = 1;
+        c.gridx = 0;
+        c.gridy = 3;
         chatBar.add(sendButton, c);
         
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -240,7 +261,7 @@ class ClientGUI extends JFrame{
         c.weightx = 0.0;
         c.gridwidth = 3;
         c.gridx = 0;
-        c.gridy = 0;
+        c.gridy = 1;
         chatBar.add(chatText, c);
         
         
@@ -392,7 +413,7 @@ class ClientGUI extends JFrame{
      * Update the list of users from the current model.
      */
     public void updateUserList() {
-        // TODO
+        //TODO
     }
     
     /**
