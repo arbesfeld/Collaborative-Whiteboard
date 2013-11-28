@@ -21,6 +21,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.Vector;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
@@ -51,6 +52,7 @@ import javax.swing.event.ChangeListener;
 import models.BoardModel;
 import name.BoardIdentifier;
 import name.Identifiable;
+import name.Identifier;
 import stroke.StrokeProperties;
 import util.Utils;
 
@@ -79,6 +81,7 @@ class ClientGUI extends JFrame{
     private final JPanel chatBar;
     
     private final JTable userTable;
+    private Object[][] tableData;
     private final JTextArea chatText;
     
     private static final int STROKE_MAX = 10;
@@ -138,15 +141,9 @@ class ClientGUI extends JFrame{
         this.chatBar = new JPanel();
         this.chatText = new JTextArea();
         this.chatText.setEditable(false);
-        String[] colNames = {"Users"};
-        Object[][] data = {
-                {"Kathy"},
-                {"John"},
-                {"Sue"},
-                {"Jane"},
-                {"Joe",}
-            };
-        this.userTable = new JTable(data, colNames);
+        String[] colNames = {"names"};
+        this.tableData = new Object[0][1];
+        this.userTable = new JTable(tableData, colNames);
         setSideBar();
         
         //Create and set up the content pane.
@@ -413,7 +410,12 @@ class ClientGUI extends JFrame{
      * Update the list of users from the current model.
      */
     public void updateUserList() {
-        //TODO
+        //this.users = new Vector<Vector<Object>>();
+        Object[][] tableData = new Object[model.users().length][1];
+        for (int i = 0; i < model.users().length; i++) {
+            tableData[i][1] = model.users()[i].identifier().name();
+        }
+        this.userTable.validate();
     }
     
     /**
