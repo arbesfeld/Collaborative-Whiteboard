@@ -9,10 +9,9 @@ import javax.swing.SwingUtilities;
 import models.BoardModel;
 import name.BoardIdentifier;
 import name.ClientIdentifier;
-import name.Identifiable;
 import packet.PacketBoardIdentifierList;
 import packet.PacketBoardModel;
-import packet.PacketDrawPixel;
+import packet.PacketDrawCommand;
 import packet.PacketExitBoard;
 import packet.PacketJoinBoard;
 import packet.PacketNewBoard;
@@ -24,8 +23,10 @@ import stroke.StrokeType;
 import stroke.StrokeTypeBasic;
 import stroke.StrokeTypeEraser;
 import util.Utils;
-import canvas.DrawableClient;
-import canvas.Pixel;
+import canvas.Canvas2d;
+import canvas.DrawableBase;
+import canvas.DrawableCanvas2d;
+import canvas.command.DrawCommand;
 
 public class BoardClientController extends SocketHandler {
     private BoardClientGUI view;
@@ -138,19 +139,12 @@ public class BoardClientController extends SocketHandler {
         assert clientState == ClientState.ClientStateLoading;
         clientState = ClientState.ClientStatePlaying;
         
-        BoardIdentifier boardName = packet.boardName();
-        int width = packet.width();
-        int height = packet.height();
-        Identifiable[] clients = packet.clients();
-        Pixel[] pixels = packet.pixels();
-
-        DrawableClient drawable = new DrawableClient(this, strokeProperties, width, height, pixels);
-        
-        model = new BoardModel(boardName, drawable, clients);
-        
+        DrawableBase drawableCanvas = new DrawableCanvas2d(strokeProperties, this, (Canvas2d) packet.boardModel().panel());
+        BoardModel oldModel = packet.boardModel();
+        final BoardModel newModel = new BoardModel(oldModel.identifier(), drawableCanvas, oldModel.users());
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                view.setModel(model);
+                view.setModel(newModel);
                 view.updateUserList();
             }
         });
@@ -170,7 +164,7 @@ public class BoardClientController extends SocketHandler {
     }
     
     @Override
-    protected void receivedDrawPixelPacket(PacketDrawPixel packet) {
+    protected void receivedDrawCommandPacket(PacketDrawCommand packet) {
         assert model != null;
         assert out != null;
         
@@ -182,10 +176,10 @@ public class BoardClientController extends SocketHandler {
         // We should only receive these packets if the board is our current board.
         assert boardName.equals(model.identifier());
 
-        final Pixel pixel = packet.pixel();
+        final DrawCommand drawCommand = packet.drawCommand();
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                model.drawPixel(pixel);
+                drawCommand.drawOn(model);
             }
         });
     }
@@ -216,12 +210,12 @@ public class BoardClientController extends SocketHandler {
         sendPacket(packet);
     }
     
-    public void sendPixel(Pixel pixel) {
+    public void sendDrawCommand(DrawCommand drawCommand) {
         assert model != null;
         
         BoardIdentifier boardName = model.identifier();
 
-        PacketDrawPixel packet = new PacketDrawPixel(boardName, user, pixel);
+        PacketDrawCommand packet = new PacketDrawCommand(boardName, user, drawCommand);
         sendPacket(packet);
     }
     

@@ -1,8 +1,11 @@
 package server;
 
 import java.io.BufferedReader;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
@@ -14,15 +17,16 @@ import packet.PacketHandler;
 public abstract class SocketHandler extends PacketHandler implements Runnable, Identifiable {
     private final Socket socket;
 
-    protected final PrintWriter out;
-    protected final BufferedReader in;
+    protected final ObjectOutputStream out;
+    protected final ObjectInputStream in;
     
     protected Identifier identifier;
     
     protected SocketHandler(Socket socket) throws IOException {
         this.socket = socket;
-        this.out = new PrintWriter(socket.getOutputStream(), true);
-        this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        
+        out = new ObjectOutputStream(socket.getOutputStream());
+        in = new ObjectInputStream(socket.getInputStream());
     }
     
     @Override
@@ -45,11 +49,13 @@ public abstract class SocketHandler extends PacketHandler implements Runnable, I
 
     protected final void handleConnection() throws IOException {
         try {
-            for (String line = in.readLine(); line != null; line = in.readLine()) {
-                Packet packet = Packet.createPacketWithData(line);
-                receivedPacket(packet);
+            for (Object obj = in.readObject(); obj != null; obj = in.readObject()) {
+                receivedPacket((Packet)obj);
             }
         }  
+        catch (EOFException e) {
+            // do nothing.
+        }
         catch (Exception e) {
             e.printStackTrace();
         }
@@ -63,7 +69,11 @@ public abstract class SocketHandler extends PacketHandler implements Runnable, I
     protected void connectionClosed() { }
 
     public void sendPacket(Packet packet) {
-        out.println(packet.data());
+        try {
+            out.writeObject(packet);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     
     @Override

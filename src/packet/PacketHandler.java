@@ -35,8 +35,8 @@ abstract public class PacketHandler {
             receivedBoardIdentifierListPacket((PacketBoardIdentifierList) packet);
             break;
             
-        case PacketTypeDrawPixel:
-            receivedDrawPixelPacket((PacketDrawPixel) packet);
+        case PacketTypeDrawCommand:
+            receivedDrawCommandPacket((PacketDrawCommand) packet);
             break;
             
         default:
@@ -51,5 +51,5 @@ abstract public class PacketHandler {
     protected abstract void receivedExitBoardPacket(PacketExitBoard packet);
     protected abstract void receivedBoardModelPacket(PacketBoardModel packet);
     protected abstract void receivedBoardIdentifierListPacket(PacketBoardIdentifierList packet);
-    protected abstract void receivedDrawPixelPacket(PacketDrawPixel packet);
+    protected abstract void receivedDrawCommandPacket(PacketDrawCommand packet);
 }

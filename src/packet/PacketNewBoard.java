@@ -1,44 +1,18 @@
 package packet;
 
-import java.util.HashMap;
-
 import name.BoardIdentifier;
 import name.ClientIdentifier;
 
-import com.google.gson.JsonObject;
 
 public final class PacketNewBoard extends Packet {
+    private static final long serialVersionUID = -3720287069109037134L;
     private final int width;
     private final int height;
-    
-    /**
-     * 
-     * @param data JSON representation of the data.
-     * @return the constructed Packet
-     */
-    protected static Packet createPacketWithDataInternal(JsonObject data) {
-        int width = data.get("width").getAsInt();
-        int height = data.get("height").getAsInt();
-        
-        BoardIdentifier boardName = getBoardName(data);
-        ClientIdentifier senderName = getSenderName(data);
-        
-        return new PacketNewBoard(boardName, senderName, width, height);
-    }
     
     public PacketNewBoard(BoardIdentifier boardName, ClientIdentifier senderName, int width, int height) {
         super(PacketType.PacketTypeNewBoard, boardName, senderName);
         this.width = width;
         this.height = height;
-    }
-    
-    /**
-     * See specification in superclass Packet.
-     */
-    @Override
-    protected void addPayloadToData(HashMap<Object, Object> data) {
-        data.put("width", width);
-        data.put("height", height);
     }
     
     public int width() {

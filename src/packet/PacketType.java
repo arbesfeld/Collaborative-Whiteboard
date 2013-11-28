@@ -21,6 +21,6 @@ public enum PacketType {
     PacketTypeBoardIdentifierList, // server to client
     
     // all the boards on the server
-    // a message to draw on a specific pixel of the board
-    PacketTypeDrawPixel, // sever to client and client to server
+    // a message to draw something on a board
+    PacketTypeDrawCommand, // sever to client and client to server
 }

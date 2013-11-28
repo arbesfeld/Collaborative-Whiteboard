@@ -17,11 +17,13 @@ import name.Identifier;
 import packet.Packet;
 import packet.PacketBoardIdentifierList;
 import packet.PacketBoardModel;
-import packet.PacketDrawPixel;
+import packet.PacketDrawCommand;
 import packet.PacketExitBoard;
 import packet.PacketJoinBoard;
 import packet.PacketNewBoard;
-import canvas.DrawableServer;
+import canvas.Canvas2d;
+import canvas.DrawableBase;
+import canvas.command.DrawCommand;
 
 public class BoardServer implements Identifiable {
     public static final int DEFAULT_PORT = 4444;
@@ -101,8 +103,8 @@ public class BoardServer implements Identifiable {
         int height = packet.height();
         
         // Create a new model under this boardName.
-        DrawableServer drawable = new DrawableServer(width, height);
-        BoardModel model = new BoardModel(boardName, drawable);
+        DrawableBase canvas = new Canvas2d(width, height);
+        BoardModel model = new BoardModel(boardName, canvas);
         addBoard(boardName, model);
         
         // Tell the user to start his board.
@@ -134,13 +136,18 @@ public class BoardServer implements Identifiable {
         boards.get(boardName).removeUser(handler);
     }
 
-    public void drawPixel(PacketDrawPixel packet) {
+    public void drawCommand(PacketDrawCommand packet) {
         BoardIdentifier boardName = packet.boardName();
         
         assert boards.containsKey(boardName);
         
         BoardModel model = boards.get(boardName);
-        model.drawPixel(packet.pixel());
+        
+        assert model != null;
+        
+        DrawCommand command = packet.drawCommand();
+        assert command != null;
+        command.drawOn(model);
         
         broadcastPacketToBoard(boardName, packet);
     }

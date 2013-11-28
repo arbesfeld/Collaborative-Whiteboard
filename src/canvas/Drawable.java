@@ -5,5 +5,4 @@ public interface Drawable {
     public int height();
     
     public void drawPixel(Pixel pixel);
-    public Pixel[] getAllPixels();
 }

@@ -6,7 +6,7 @@ import java.net.Socket;
 import packet.Packet;
 import packet.PacketBoardIdentifierList;
 import packet.PacketBoardModel;
-import packet.PacketDrawPixel;
+import packet.PacketDrawCommand;
 import packet.PacketExitBoard;
 import packet.PacketJoinBoard;
 import packet.PacketNewBoard;
@@ -66,7 +66,7 @@ public class ClientHandler extends SocketHandler {
     }
 
     @Override
-    protected void receivedDrawPixelPacket(PacketDrawPixel packet) {
-        server.drawPixel(packet);
+    protected void receivedDrawCommandPacket(PacketDrawCommand packet) {
+        server.drawCommand(packet);
     }
 }

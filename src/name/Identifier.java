@@ -1,7 +1,10 @@
 package name;
 
-public abstract class Identifier implements Identifiable {
+import java.io.Serializable;
 
+public abstract class Identifier implements Identifiable, Serializable {
+    private static final long serialVersionUID = 1611778700707259153L;
+    
     private int id;
     private String name;
     
