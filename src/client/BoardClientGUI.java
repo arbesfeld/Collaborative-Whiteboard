@@ -37,6 +37,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSlider;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
@@ -68,7 +69,9 @@ class BoardClientGUI extends JFrame{
     private final JToggleButton eraseToggle;
     
     private final JPanel sidebar;
+    private final JPanel chatBar;
     
+    private final JTextArea chatText;
     
     private static final int STROKE_MAX = 10;
     private static final int STROKE_MIN = 1;
@@ -115,6 +118,8 @@ class BoardClientGUI extends JFrame{
     
         //Build Sidebar
         this.sidebar = new JPanel();
+        this.chatBar = new JPanel();
+        this.chatText = new JTextArea();
         sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
         setSideBar();
         
@@ -145,14 +150,8 @@ class BoardClientGUI extends JFrame{
                 popup.add(strokeSlider);
                 popup.pack();
                 Point pos = new Point();
-                // get the preferred size of the menu...
                 Dimension size = popup.getPreferredSize();
-                // Adjust the x position so that the left side of the popup
-                // appears at the center of  the component
                 pos.x = (strokeButton.getWidth()/2 - size.width/2);
-                // Adjust the y position so that the y postion (top corner)
-                // is positioned so that the bottom of the popup
-                // appears in the center
                 pos.y = (strokeButton.getHeight());
                 popup.show(strokeButton, pos.x, pos.y);
             }
@@ -182,6 +181,38 @@ class BoardClientGUI extends JFrame{
         sidebar.add(strokeButton);
         sidebar.add(colorButton);
         sidebar.add(eraseToggle);
+        setChatClient();
+        sidebar.add(chatBar);
+    }
+    
+    private void setChatClient() {
+        chatBar.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        JTextField inputTextField = new JTextField();
+        JButton sendButton = new JButton("Send");
+        chatText.append("\n \n \n \n");
+        
+        
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 0.0;
+        c.gridwidth = 3;
+        c.gridx = 0;
+        c.gridy = 0;
+        chatBar.add(chatText, c);
+        
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 0.5;
+        c.gridwidth = 2;
+        c.gridx = 0;
+        c.gridy = 1;
+        chatBar.add(inputTextField, c);
+        
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 0.5;
+        c.gridwidth = 1;
+        c.gridx = 1;
+        c.gridy = 1;
+        chatBar.add(sendButton, c);
         
     }
     
@@ -278,6 +309,7 @@ class BoardClientGUI extends JFrame{
         this.pack();
     }
     
+    
     private void newBoardAction() {
         JTextField inputBoardName = new JTextField("Whiteboard");
         JTextField widthName = new JTextField("256");
@@ -337,6 +369,14 @@ class BoardClientGUI extends JFrame{
     public void updateBoardList(BoardIdentifier[] boards) {
         this.boardNames = boards;
         updateMenuBar();
+    }
+    
+    /**
+     * Add new chat message
+     * @param string
+     */
+    public void addChatLine(String string) {
+        this.chatText.append("\n" + string);
     }
     
     /**
