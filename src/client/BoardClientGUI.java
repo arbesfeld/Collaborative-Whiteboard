@@ -8,14 +8,18 @@ import static javax.swing.GroupLayout.Alignment.LEADING;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -64,9 +68,13 @@ class BoardClientGUI extends JFrame{
     private final JMenu joinGameSubmenu;
     private final JMenuItem newBoard;
     private final JButton colorButton;
+    private final JColorChooser colorChooser;
     private final JButton strokeButton;
     private final JSlider strokeSlider;
     private final JToggleButton eraseToggle;
+    
+    private Cursor brushCursor;
+    private final Image iconImage;
     
     private final JPanel sidebar;
     private final JPanel chatBar;
@@ -94,6 +102,11 @@ class BoardClientGUI extends JFrame{
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
         
+        // Create Cursor
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        this.iconImage = toolkit.getImage("resources/cursor.gif");
+        Point hotSpot = new Point(16,16);
+        this.brushCursor = toolkit.createCustomCursor(iconImage, hotSpot, "circleBrush");
         
         // Create the menu bar.
         this.menuBar = new JMenuBar();
@@ -101,8 +114,8 @@ class BoardClientGUI extends JFrame{
         this.newBoard = new JMenuItem("New Board", KeyEvent.VK_T);
         this.colorButton = new JButton("Color");
         this.colorButton.setIcon(new ColorIcon(10, Color.black));
-        //this.colorButton.setBorder(BorderFactory.createLineBorder(Color.black));
         this.colorButton.setFocusPainted(false);
+        this.colorChooser = new JColorChooser();
         this.strokeButton = new JButton("Stroke");
         this.strokeButton.setFocusPainted(false);
         this.strokeButton.setIcon(new ColorIcon(STROKE_INIT, Color.black));
@@ -120,7 +133,7 @@ class BoardClientGUI extends JFrame{
         this.sidebar = new JPanel();
         this.chatBar = new JPanel();
         this.chatText = new JTextArea();
-        sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
+        this.chatText.setEditable(false);
         setSideBar();
         
         //Create and set up the content pane.
@@ -135,6 +148,26 @@ class BoardClientGUI extends JFrame{
     }
     
     private void setSideBar() {
+        
+        sidebar.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        //c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridx = 0;
+        c.gridy = 0;
+        sidebar.add(strokeButton, c);
+        
+        c.gridx = 0;
+        c.gridy = 1;
+        sidebar.add(colorButton, c);
+        
+        c.gridx = 0;
+        c.gridy = 2;
+        sidebar.add(eraseToggle, c);
+        setChatClient();
+        
+        c.gridx = 0;
+        c.gridy = 3;
+        sidebar.add(chatBar, c);
         
         colorButton.addActionListener(new ActionListener() {
             @Override
@@ -160,6 +193,7 @@ class BoardClientGUI extends JFrame{
         strokeSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
+                updateCursor();
                 setStroke();
             }
         });
@@ -178,13 +212,8 @@ class BoardClientGUI extends JFrame{
             }
         });
                 
-        sidebar.add(strokeButton);
-        sidebar.add(colorButton);
-        sidebar.add(eraseToggle);
-        setChatClient();
-        sidebar.add(chatBar);
     }
-    
+       
     private void setChatClient() {
         chatBar.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -192,27 +221,27 @@ class BoardClientGUI extends JFrame{
         JButton sendButton = new JButton("Send");
         chatText.append("\n \n \n \n");
         
+        chatBar.setLayout(new GridBagLayout());
         
         c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridx = 0;
+        c.gridy = 1;
+        chatBar.add(inputTextField, c);
+     
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 0.2;
+        c.gridx = 2;
+        c.gridy = 1;
+        chatBar.add(sendButton, c);
+        
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(10,0,0,0);
         c.weightx = 0.0;
         c.gridwidth = 3;
         c.gridx = 0;
         c.gridy = 0;
         chatBar.add(chatText, c);
         
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.weightx = 0.5;
-        c.gridwidth = 2;
-        c.gridx = 0;
-        c.gridy = 1;
-        chatBar.add(inputTextField, c);
-        
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.weightx = 0.5;
-        c.gridwidth = 1;
-        c.gridx = 1;
-        c.gridy = 1;
-        chatBar.add(sendButton, c);
         
     }
     
@@ -258,7 +287,6 @@ class BoardClientGUI extends JFrame{
     }
     
     private void setColor(ActionEvent e) {
-        final JColorChooser colorChooser = new JColorChooser();
         colorChooser.setPreviewPanel(new JPanel());
         AbstractColorChooserPanel[] oldPanels = colorChooser.getChooserPanels();
         for (int i = 0; i < oldPanels.length; i++) {
@@ -275,7 +303,7 @@ class BoardClientGUI extends JFrame{
             }
           };
         
-        JDialog dialog = JColorChooser.createDialog((Component) (e.getSource()), "ColorPicker", false, colorChooser, okListener, null);
+        JDialog dialog = JColorChooser.createDialog((Component) (e.getSource()), "Color Picker", false, colorChooser, okListener, null);
         dialog.setVisible(true);
         
     }
@@ -287,13 +315,14 @@ class BoardClientGUI extends JFrame{
     
     private void updateContentPane() {
         if (model == null) {
-            canvas = new JPanel(new BorderLayout());
+            this.canvas = new JPanel();
         } else {
-            canvas = model.panel();
+            this.canvas = model.panel();
+            this.canvas.setVisible(true);
+            this.canvas.revalidate();
         }
         
-        canvas.setVisible(true);
-        canvas.revalidate();
+        
         Group horizontal = layout.createSequentialGroup();
         horizontal.addGroup(layout.createParallelGroup(LEADING)
                 .addGroup(layout.createSequentialGroup()
@@ -309,6 +338,14 @@ class BoardClientGUI extends JFrame{
         this.pack();
     }
     
+    private void updateCursor() {
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        int strokeWidth = strokeSlider.getValue();
+        Image scaledIcon = iconImage.getScaledInstance(5, 5, Image.SCALE_DEFAULT);
+        Point hotSpot = new Point(strokeWidth/2, strokeWidth/2);
+        brushCursor = toolkit.createCustomCursor(scaledIcon, hotSpot, "circleBrush");
+        this.canvas.setCursor(brushCursor);
+    }
     
     private void newBoardAction() {
         JTextField inputBoardName = new JTextField("Whiteboard");

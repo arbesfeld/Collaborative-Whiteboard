@@ -19,7 +19,7 @@ public class BoardClient {
                 new Thread(controller).start();    
                 
                 // Display the window.
-                view.setSize(450, 260);
+                view.setSize(450, 300);
                 view.setVisible(true);
             }
         });
@@ -29,10 +29,18 @@ public class BoardClient {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new PopupGUI();
+                    new PopupGUI(false);
                 } catch (Exception e) {
                     System.out.println("Connection refused.");
-                    run();
+                    runWithError();
+                }
+            }
+            public void runWithError() {
+                try {
+                    new PopupGUI(true);
+                } catch (Exception e) {
+                    System.out.println("Connection refused.");
+                    runWithError();
                 }
             }
         });
