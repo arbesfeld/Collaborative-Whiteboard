@@ -6,15 +6,18 @@ import static javax.swing.GroupLayout.Alignment.LEADING;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -66,8 +69,8 @@ class ClientGUI extends JFrame{
     private final JSlider strokeSlider;
     private final JToggleButton eraseToggle;
     
-//    private Cursor brushCursor;
-//    private final Image iconImage;
+    private Cursor brushCursor;
+    private final Image iconImage;
     
     private final JPanel sidebar;
     private final JPanel chatBar;
@@ -96,10 +99,10 @@ class ClientGUI extends JFrame{
         layout.setAutoCreateContainerGaps(true);
         
         // Create Cursor
-//        Toolkit toolkit = Toolkit.getDefaultToolkit();
-//        this.iconImage = toolkit.getImage("resources/cursor.gif");
-//        Point hotSpot = new Point(16,16);
-//        this.brushCursor = toolkit.createCustomCursor(iconImage, hotSpot, "circleBrush");
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        this.iconImage = toolkit.getImage("resources/cursor.gif");
+        Point hotSpot = new Point(16,16);
+        this.brushCursor = toolkit.createCustomCursor(iconImage, hotSpot, "circleBrush");
         
         // Create the menu bar.
         this.menuBar = new JMenuBar();
@@ -306,34 +309,33 @@ class ClientGUI extends JFrame{
     }
     
     private void updateContentPane() {
-        if (model == null) {
-            this.canvas = new JPanel();
-        } else {
+        if (model != null) {
             this.canvas = model.canvas();
+            updateCursor();
+            container.removeAll();
+            Group horizontal = layout.createSequentialGroup();
+            horizontal.addGroup(layout.createParallelGroup(LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                            .addComponent(canvas)
+                            .addComponent(sidebar)));
+            layout.setHorizontalGroup(horizontal);
+            
+            Group vertical = layout.createSequentialGroup();
+            vertical.addGroup(layout.createParallelGroup(BASELINE)
+                    .addComponent(canvas)
+                    .addComponent(sidebar));
+            layout.setVerticalGroup(vertical);
+            this.pack();
         }
-
-        Group horizontal = layout.createSequentialGroup();
-        horizontal.addGroup(layout.createParallelGroup(LEADING)
-                .addGroup(layout.createSequentialGroup()
-                        .addComponent(canvas)
-                        .addComponent(sidebar)));
-        layout.setHorizontalGroup(horizontal);
-        
-        Group vertical = layout.createSequentialGroup();
-        vertical.addGroup(layout.createParallelGroup(BASELINE)
-                .addComponent(canvas)
-                .addComponent(sidebar));
-        layout.setVerticalGroup(vertical);
-        this.pack();
     }
     
     private void updateCursor() {
-//        Toolkit toolkit = Toolkit.getDefaultToolkit();
-//        int strokeWidth = strokeSlider.getValue();
-//        Image scaledIcon = iconImage.getScaledInstance(5, 5, Image.SCALE_DEFAULT);
-//        Point hotSpot = new Point(strokeWidth/2, strokeWidth/2);
-//        brushCursor = toolkit.createCustomCursor(scaledIcon, hotSpot, "circleBrush");
-//        this.canvas.setCursor(brushCursor);
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        int strokeWidth = strokeSlider.getValue();
+        Image scaledIcon = iconImage.getScaledInstance(strokeWidth, strokeWidth, Image.SCALE_DEFAULT);
+        Point hotSpot = new Point(strokeWidth/2, strokeWidth/2);
+        brushCursor = toolkit.createCustomCursor(scaledIcon, hotSpot, "circleBrush");
+        this.canvas.setCursor(brushCursor);
     }
     
     private void newBoardAction() {
