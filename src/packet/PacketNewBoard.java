@@ -10,7 +10,7 @@ public final class PacketNewBoard extends Packet {
     private final int height;
     
     public PacketNewBoard(BoardIdentifier boardName, ClientIdentifier senderName, int width, int height) {
-        super(PacketType.PacketTypeNewBoard, boardName, senderName);
+        super(PacketType.NEW_BOARD, boardName, senderName);
         this.width = width;
         this.height = height;
     }

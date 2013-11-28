@@ -11,31 +11,31 @@ abstract public class PacketHandler {
         
         switch(packetType) {
         
-        case PacketTypeNewClient:
+        case NEW_CLIENT:
             receivedNewClientPacket((PacketNewClient) packet);
             break;
             
-        case PacketTypeNewBoard:
+        case NEW_BOARD:
             receivedNewBoardPacket((PacketNewBoard) packet);
             break;
             
-        case PacketTypeJoinBoard:
+        case JOIN_BOARD:
             receivedJoinBoardPacket((PacketJoinBoard) packet);
             break;
             
-        case PacketTypeExitBoard:
+        case EXIT_BOARD:
             receivedExitBoardPacket((PacketExitBoard) packet);
             break;
             
-        case PacketTypeBoardModel:
+        case BOARD_MODEL:
             receivedBoardModelPacket((PacketBoardModel) packet);
             break;
             
-        case PacketTypeBoardIdentifierList:
+        case BOARD_IDENTIFIER_LIST:
             receivedBoardIdentifierListPacket((PacketBoardIdentifierList) packet);
             break;
             
-        case PacketTypeDrawCommand:
+        case DRAW_COMMAND:
             receivedDrawCommandPacket((PacketDrawCommand) packet);
             break;
             

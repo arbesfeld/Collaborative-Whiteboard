@@ -72,6 +72,10 @@ public class Canvas2d extends DrawableBase {
 			makeImage();
 		}
 		
+		if (!isValidPixel(pixel)) {
+			return Color.WHITE;
+		}
+		
 		return new Color(image.getRGB(pixel.x(), pixel.y()));
 	}
 

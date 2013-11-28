@@ -10,7 +10,7 @@ public final class PacketBoardIdentifierList extends Packet {
     private final BoardIdentifier[] boards;
     
     public PacketBoardIdentifierList(BoardIdentifier[] boards, ClientIdentifier senderName) {
-        super(PacketType.PacketTypeBoardIdentifierList, senderName);
+        super(PacketType.BOARD_IDENTIFIER_LIST, senderName);
         this.boards = boards;
     }
     

@@ -8,7 +8,7 @@ public final class PacketBoardModel extends Packet {
     private final BoardModel boardModel;
     
     public PacketBoardModel(BoardModel boardModel, ClientIdentifier senderName) {
-        super(PacketType.PacketTypeBoardModel, boardModel.identifier(), senderName);
+        super(PacketType.BOARD_MODEL, boardModel.identifier(), senderName);
         this.boardModel = boardModel;
     }
     

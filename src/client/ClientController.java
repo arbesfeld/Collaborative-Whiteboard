@@ -42,7 +42,7 @@ public class ClientController extends SocketHandler {
         super(new Socket(hostName, portNumber));
         
         this.user = new ClientIdentifier(Utils.generateId(), userName);
-        this.clientState = ClientState.ClientStateLoading;
+        this.clientState = ClientState.IDLE;
         
         // Default stroke.
         this.strokeProperties = new StrokeProperties();
@@ -81,7 +81,7 @@ public class ClientController extends SocketHandler {
         assert model != null;
         
         // We should only receive these packets if we have loaded.
-        assert clientState == ClientState.ClientStatePlaying;
+        assert clientState == ClientState.PLAYING;
         
         // We should only receive these packets if the board is our current board.
         assert boardName.equals(model.identifier());
@@ -103,7 +103,7 @@ public class ClientController extends SocketHandler {
         final ClientIdentifier packetUser = packet.senderName();
         
         // We should only receive these packets if we have loaded.
-        assert clientState == ClientState.ClientStatePlaying;
+        assert clientState == ClientState.PLAYING;
         
         // We should only receive these packets if the board is our current board.
         BoardIdentifier boardName = packet.boardName();
@@ -111,7 +111,7 @@ public class ClientController extends SocketHandler {
         
         if (user.equals(packetUser)) {
             // If it is ourselves, we must disconnect ourselves from the game.
-            clientState = ClientState.ClientStateLoading;
+            clientState = ClientState.IDLE;
             model = null;
             
             SwingUtilities.invokeLater(new Runnable() {
@@ -138,8 +138,8 @@ public class ClientController extends SocketHandler {
         assert packet.senderName().equals(Server.SERVER_NAME);
         
         // We should only receive these packets if are loading
-        assert clientState == ClientState.ClientStateLoading;
-        clientState = ClientState.ClientStatePlaying;
+        assert clientState == ClientState.IDLE;
+        clientState = ClientState.PLAYING;
         
         BoardModel model = packet.boardModel();
         DrawableBase drawableCanvas = ((Canvas2d) model.canvas()).makeDrawable(strokeProperties, this);
@@ -179,7 +179,7 @@ public class ClientController extends SocketHandler {
         assert out != null;
         
         // We should only receive these packets if we have loaded.
-        assert clientState == ClientState.ClientStatePlaying;
+        assert clientState == ClientState.PLAYING;
 
         BoardIdentifier boardName = packet.boardName();
 

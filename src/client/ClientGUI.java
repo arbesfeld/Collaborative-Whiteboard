@@ -348,6 +348,7 @@ class ClientGUI extends JFrame{
         panel.add(widthName);
         panel.add(new JLabel("Height (px)"));
         panel.add(heightName);
+        
         int result = JOptionPane.showConfirmDialog(null, panel, "Connect To Server",
             JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {

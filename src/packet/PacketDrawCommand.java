@@ -12,7 +12,7 @@ public final class PacketDrawCommand extends Packet {
     private final DrawCommand drawCommand;
     
     public PacketDrawCommand(BoardIdentifier boardName, ClientIdentifier senderName, DrawCommand drawCommand) {
-        super(PacketType.PacketTypeDrawCommand, boardName, senderName);
+        super(PacketType.DRAW_COMMAND, boardName, senderName);
         this.drawCommand = drawCommand;
     }
     
