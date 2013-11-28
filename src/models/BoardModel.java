@@ -6,14 +6,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.swing.JPanel;
-
 import name.BoardIdentifier;
 import name.Identifiable;
-import canvas.Canvas2d;
 import canvas.Drawable;
 import canvas.DrawableBase;
-import canvas.DrawableCanvas2d;
 import canvas.Pixel;
 
 public class BoardModel implements Drawable, Identifiable, Serializable {

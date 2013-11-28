@@ -25,13 +25,13 @@ import stroke.StrokeTypeBasic;
 import stroke.StrokeTypeEraser;
 import util.Utils;
 import canvas.Canvas2d;
-import canvas.Drawable;
 import canvas.DrawableBase;
-import canvas.DrawableCanvas2d;
 import canvas.command.DrawCommand;
 
 public class ClientController extends SocketHandler {
-    private ClientGUI view;
+	private static final long serialVersionUID = 6673644308053728584L;
+	
+	private ClientGUI view;
     private final ClientIdentifier user;
     private BoardModel model;
     
