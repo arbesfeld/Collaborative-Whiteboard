@@ -7,6 +7,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.net.Socket;
+import java.net.SocketException;
 
 import models.BoardModel;
 import name.Identifiable;
@@ -58,11 +59,11 @@ public abstract class SocketHandler
             }
         } 
         catch (EOFException e) {
-        	e.printStackTrace();
+        }
+        catch (SocketException e) {
         }
         catch (Exception e) {
         	e.printStackTrace();
-            connectionClosed();
         }
         finally {
             connectionClosed();
