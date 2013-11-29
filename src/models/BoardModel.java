@@ -37,7 +37,12 @@ public class BoardModel implements Drawable, Identifiable, Serializable {
         users.add(user);
     }
     
+    public boolean containsUser(Identifiable user) {
+    	return users.contains(user);
+    }
+    
     public void removeUser(Identifiable user) {
+    	assert users.contains(user);
         users.remove(user);
     }
     

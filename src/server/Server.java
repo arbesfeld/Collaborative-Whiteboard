@@ -11,25 +11,17 @@ import java.util.Set;
 
 import models.BoardModel;
 import name.BoardIdentifier;
-import name.ClientIdentifier;
 import name.Identifiable;
 import name.Identifier;
 import packet.Packet;
 import packet.PacketBoardIdentifierList;
-import packet.PacketBoardModel;
-import packet.PacketDrawCommand;
-import packet.PacketExitBoard;
 import packet.PacketJoinBoard;
 import packet.PacketNewBoard;
 import canvas.Canvas2d;
 import canvas.DrawableBase;
-import canvas.command.DrawCommand;
 
 public class Server implements Identifiable {
     public static final int DEFAULT_PORT = 4444;
-    
-    // The name used by the server for constructing packets.
-    public static final ClientIdentifier SERVER_NAME = new ClientIdentifier(0, "server");
     
 	private final ServerSocket serverSocket; 
 
@@ -46,11 +38,11 @@ public class Server implements Identifiable {
 		while (true) {
 			final Socket socket = serverSocket.accept();
 			ServerSocketHandler handler = new ServerSocketHandler(socket, this);
+            clients.add(handler);
             
             new Thread(handler).start();
             
             // Update the new client's list of boards.
-            clients.add(handler);
             handler.sendPacket(constructBoardIdentifierListPacket());
 		}
 	}
@@ -62,18 +54,6 @@ public class Server implements Identifiable {
     private void addBoard(BoardIdentifier boardName, BoardModel model) {
         assert !boards.containsKey(boardName);
         boards.put(boardName, model);
-    }
-    
-    /**
-     * Broadcast a packet to all the clients of a specific model.
-     * @param model
-     * @param packet
-     */
-    private void broadcastPacketToBoard(BoardIdentifier boardName, Packet packet) {
-        for (Identifiable handler : boards.get(boardName).users()) {
-            assert clients.contains(handler);
-            ((ServerSocketHandler) handler).sendPacket(packet);
-        }
     }
     
     /**
@@ -89,14 +69,14 @@ public class Server implements Identifiable {
     }
     
     private Packet constructBoardIdentifierListPacket() {
-        return new PacketBoardIdentifierList(boards.keySet().toArray(new BoardIdentifier[boards.keySet().size()]), SERVER_NAME);
+        return new PacketBoardIdentifierList(boards.keySet().toArray(new BoardIdentifier[boards.keySet().size()]));
     }
 
-    private void notifyBoardListChanged() {
+    public void notifyBoardListChanged() {
         broadcastPacketToAllClients(constructBoardIdentifierListPacket());
     }
 
-    public void newBoard(ServerSocketHandler handler, PacketNewBoard packet) {
+    public BoardModel newBoard(PacketNewBoard packet) {
         BoardIdentifier boardName = packet.boardName();
         int width = packet.width();
         int height = packet.height();
@@ -106,54 +86,19 @@ public class Server implements Identifiable {
         BoardModel model = new BoardModel(boardName, canvas);
         addBoard(boardName, model);
         
-        // Tell the user to start his board.
-        handler.sendPacket(new PacketBoardModel(model, SERVER_NAME));
-        model.addUser(handler);
-        
-        // Announce that a new board has been added.
-        notifyBoardListChanged();
+        return model;
     }
     
-    public void joinBoard(ServerSocketHandler handler, PacketJoinBoard packet) {
+    public BoardModel joinBoard(PacketJoinBoard packet) {
         BoardIdentifier boardName = packet.boardName();
-        
-        BoardModel model = boards.get(boardName);
-        handler.sendPacket(new PacketBoardModel(model, SERVER_NAME));
-
-        // Tell the other clients on the board that a new 
-        // client has joined.
-        broadcastPacketToBoard(boardName, packet);
-
-        model.addUser(handler);
-    }
-
-    public void exitBoard(ServerSocketHandler handler, PacketExitBoard packet) {  
-        BoardIdentifier boardName = packet.boardName();
-        
-        // Broadcast the packet to all the clients of the board.
-        broadcastPacketToBoard(boardName, packet);
-        boards.get(boardName).removeUser(handler);
-    }
-
-    public void drawCommand(PacketDrawCommand packet) {
-        BoardIdentifier boardName = packet.boardName();
-        
-        assert boards.containsKey(boardName);
-        
         BoardModel model = boards.get(boardName);
         
-        assert model != null;
-        
-        DrawCommand command = packet.drawCommand();
-        assert command != null;
-        command.drawOn(model);
-        
-        broadcastPacketToBoard(boardName, packet);
+        return model;
     }
 
     @Override
     public Identifier identifier() {
-        return SERVER_NAME;
+    	throw new UnsupportedOperationException();
     }
 
     public static void main(String[] args) {

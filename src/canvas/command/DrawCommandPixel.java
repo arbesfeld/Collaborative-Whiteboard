@@ -9,7 +9,6 @@ public class DrawCommandPixel extends DrawCommand {
     private final Pixel pixel;
     
     public DrawCommandPixel(Pixel pixel) {
-        super(DrawCommandType.PIXEL);
         this.pixel = pixel;
     }
     
