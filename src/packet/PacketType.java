@@ -7,6 +7,9 @@ public enum PacketType {
     // announce the creation of a new board
     NEW_BOARD, // client to server
     
+    // client is ready to accept drawing commmands
+    CLIENT_READY, // client to server
+    
     // announce that a client has just joined a board
     JOIN_BOARD, // client to server and server to client
 
@@ -16,6 +19,9 @@ public enum PacketType {
     // the entire board sent from the server to the client
     // also includes a list of the clients
     BOARD_MODEL, // server to client
+    
+    // all of the users in the board
+    BOARD_USERS, // server to client
     
     // all the boards in the game
     BOARD_IDENTIFIER_LIST, // server to client

@@ -21,7 +21,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.util.Vector;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
@@ -49,12 +48,10 @@ import javax.swing.colorchooser.AbstractColorChooserPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableModel;
 
 import models.BoardModel;
 import name.BoardIdentifier;
 import name.Identifiable;
-import name.Identifier;
 import stroke.StrokeProperties;
 import util.Utils;
 
@@ -90,8 +87,6 @@ class ClientGUI extends JFrame{
     private static final int STROKE_MIN = 1;
     private static final int STROKE_INIT = StrokeProperties.DEFAULT_STROKE_WIDTH;
     
-    private BoardIdentifier[] boardNames;
-    private BoardModel model;
     private ClientController controller;
     
     /**
@@ -99,7 +94,6 @@ class ClientGUI extends JFrame{
      * this method should be invoked from the
      * event-dispatching thread.
      */
-    @SuppressWarnings("serial")
     public ClientGUI() {
         setResizable(false);
         this.container = this.getContentPane();
@@ -148,10 +142,9 @@ class ClientGUI extends JFrame{
         this.userTable = new JTable(this.tableModel);
         setSideBar();
         
-        //Create and set up the content pane.
-        setMenuBar();
-        updateContentPane();
-        
+        // Create and set up the content pane.
+        setMenuBarGUI();
+        setContentPaneGUI(null);
     }
 
     public void setController(ClientController controller) {
@@ -274,7 +267,7 @@ class ClientGUI extends JFrame{
         
     }
     
-    private void setMenuBar() {
+    private void setMenuBarGUI() {
         // Build the first menu.
         menu.setMnemonic(KeyEvent.VK_F);
         menuBar.add(menu);
@@ -294,7 +287,7 @@ class ClientGUI extends JFrame{
         setJMenuBar(menuBar);
     }
     
-    private void updateMenuBar() {
+    private void setBoardNames(BoardIdentifier[] boardNames) {
     	joinGameSubmenu.removeAll();
         if (boardNames == null) {
         	return;
@@ -341,7 +334,7 @@ class ClientGUI extends JFrame{
         controller.setStrokeWidth(strokeSlider.getValue());
     }
     
-    private void updateContentPane() {
+    private void setContentPaneGUI(BoardModel model) {
         if (model != null) {
             this.canvas = model.canvas();
             updateCursor();
@@ -389,9 +382,6 @@ class ClientGUI extends JFrame{
         if (result == JOptionPane.OK_OPTION) {
             BoardIdentifier boardName = new BoardIdentifier(Utils.generateId(), inputBoardName.getText());
 
-            if (model != null) {
-                controller.disconnectFromCurrentBoard();
-            }
             controller.generateNewBoard(boardName, Integer.parseInt(widthName.getText()),
                 						Integer.parseInt(heightName.getText()));
 
@@ -400,9 +390,6 @@ class ClientGUI extends JFrame{
     }
     
     private void joinBoardAction(BoardIdentifier boardName) {
-        if (model != null) {
-            controller.disconnectFromCurrentBoard();
-        }
         controller.connectToBoard(boardName);
     }
     
@@ -411,25 +398,21 @@ class ClientGUI extends JFrame{
      * @param model
      */
     public void setModel(BoardModel model) {
-        this.model = model;
-        updateContentPane();
-        updateUserList();
+        setContentPaneGUI(model);
     }
 
     /**
      * Update the list of users from the current model.
      */
-    public void updateUserList() {
+	public void setUserList(Identifiable[] users) {
         Object[][] tableData = new Object[1][1];
-        if (model.users().length == 0) {
-            tableData[0][0] = "No Users";
+        assert users.length > 0;
+        
+        tableData = new Object[users.length][1];
+        for (int i = 0; i < users.length; i++) {        
+            tableData[i][0] = users[i].identifier().name();
         }
-        else {
-            tableData = new Object[model.users().length][1];
-            for (int i = 0; i < model.users().length; i++) {        
-                tableData[i][0] = model.users()[i].identifier().name();
-            }
-        }
+        
         this.tableModel.updateData(tableData);
         this.pack();
     }
@@ -439,8 +422,7 @@ class ClientGUI extends JFrame{
      * @param boards
      */
     public void updateBoardList(BoardIdentifier[] boards) {
-        this.boardNames = boards;
-        updateMenuBar();
+        setBoardNames(boards);
     }
     
     /**
@@ -529,4 +511,5 @@ class ClientGUI extends JFrame{
         }
 
     }
+
 }

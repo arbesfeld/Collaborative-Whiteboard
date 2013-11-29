@@ -10,14 +10,16 @@ import javax.swing.SwingUtilities;
 import models.BoardModel;
 import name.BoardIdentifier;
 import name.ClientIdentifier;
+import name.Identifiable;
 import packet.PacketBoardIdentifierList;
 import packet.PacketBoardModel;
+import packet.PacketBoardUsers;
+import packet.PacketClientReady;
 import packet.PacketDrawCommand;
 import packet.PacketExitBoard;
 import packet.PacketJoinBoard;
 import packet.PacketNewBoard;
 import packet.PacketNewClient;
-import server.Server;
 import server.SocketHandler;
 import stroke.StrokeProperties;
 import stroke.StrokeType;
@@ -33,7 +35,6 @@ public class ClientController extends SocketHandler {
 	
 	private ClientGUI view;
     private final ClientIdentifier user;
-    private BoardModel model;
     
     private ClientState clientState;
     private final StrokeProperties strokeProperties;
@@ -56,86 +57,11 @@ public class ClientController extends SocketHandler {
         
         this.view = view;
     }
-
+	
     @Override
-    protected void receivedNewClientPacket(PacketNewClient packet) {
-    	// Only client to server.
-    	assert false;
-    }
-    
-    @Override
-    protected void receivedNewBoardPacket(PacketNewBoard packet) {
-        // Only client to server
-        assert false;
-    }
-    
-    @Override
-    protected void receivedJoinBoardPacket(PacketJoinBoard packet) {
-        assert out != null;
-        
-        ClientIdentifier packetUser = packet.senderName();
-        BoardIdentifier boardName = packet.boardName();
-        
-        // This must be for another user that has just joined.
-        assert !user.equals(packetUser);
-        assert model != null;
-        
-        // We should only receive these packets if we have loaded.
-        assert clientState == ClientState.PLAYING;
-        
-        // We should only receive these packets if the board is our current board.
-        assert boardName.equals(model.identifier());
-        
-        model.addUser(packetUser);
-        
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                view.updateUserList();
-            }
-        });
-    }
-
-    @Override
-    protected void receivedExitBoardPacket(PacketExitBoard packet) {
-        assert model != null;
-        assert out != null;
-        
-        final ClientIdentifier packetUser = packet.senderName();
-        
-        // We should only receive these packets if we have loaded.
-        assert clientState == ClientState.PLAYING;
-        
-        // We should only receive these packets if the board is our current board.
-        BoardIdentifier boardName = packet.boardName();
-        assert boardName.equals(model.identifier());
-        
-        if (user.equals(packetUser)) {
-            // If it is ourselves, we must disconnect ourselves from the game.
-            clientState = ClientState.IDLE;
-            model = null;
-            
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    view.setModel(null);
-                }
-            });
-        } else {
-            // Otherwise, remove the user and update the user list.
-            model.removeUser(packetUser);
-            
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    view.updateUserList();
-                }
-            });
-        }
-    }
-
-    @Override
-    protected void receivedBoardModelPacket(PacketBoardModel packet) {
+    public void receivedBoardModelPacket(PacketBoardModel packet) {
         assert model == null;
         assert out != null;
-        assert packet.senderName().equals(Server.SERVER_NAME);
         
         // We should only receive these packets if are loading
         assert clientState == ClientState.IDLE;
@@ -146,22 +72,33 @@ public class ClientController extends SocketHandler {
         final BoardModel newModel = new BoardModel(model.identifier(), drawableCanvas, model.users());
         this.model = newModel;
         
-        try {
-			SwingUtilities.invokeAndWait(new Runnable() {
-			    public void run() {
-			        view.setModel(newModel);
-			        view.updateUserList();
-			    }
-			});
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-    }
+        sendPacket(new PacketClientReady());
 
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                view.setModel(newModel);
+            }
+        });
+    }
+    
+	@Override
+	public void receivedBoardUsersPacket(PacketBoardUsers packet) {
+        assert model != null;
+        assert out != null;
+        
+        // We should only receive these packets if we have loaded.
+        assert clientState == ClientState.PLAYING;
+        
+        final Identifiable[] users = packet.boardUsers();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                view.setUserList(users);
+            }
+        });
+	}
+	
     @Override
-    protected void receivedBoardIdentifierListPacket(PacketBoardIdentifierList packet) {
+    public void receivedBoardIdentifierListPacket(PacketBoardIdentifierList packet) {
         assert out != null;
         
         final BoardIdentifier[] boards = packet.boards();
@@ -174,53 +111,60 @@ public class ClientController extends SocketHandler {
     }
     
     @Override
-    protected void receivedDrawCommandPacket(PacketDrawCommand packet) {
+    public void receivedDrawCommandPacket(PacketDrawCommand packet) {
         assert model != null;
         assert out != null;
         
         // We should only receive these packets if we have loaded.
         assert clientState == ClientState.PLAYING;
 
-        BoardIdentifier boardName = packet.boardName();
-
-        // We should only receive these packets if the board is our current board.
-        assert boardName.equals(model.identifier());
-
         packet.drawCommand().drawOn(model);
     }
-    
+
+	@Override
+	public void receivedExitBoardPacket(PacketExitBoard packet) {
+		assert model != null;
+		assert clientState == ClientState.PLAYING;
+		clientState = ClientState.IDLE;
+		model = null;
+	}
+	
     /*
      * Methods for sending packets.
      */
 
 	public void generateNewBoard(BoardIdentifier boardName, int width, int height) {
-		PacketNewBoard packet = new PacketNewBoard(boardName, user, width, height);
+    	if (model != null) {
+            disconnectFromCurrentBoard();
+    	}
+    	
+		PacketNewBoard packet = new PacketNewBoard(boardName, width, height);
 		sendPacket(packet);
 	}
 	
     public void connectToBoard(BoardIdentifier boardName) {
-        PacketJoinBoard packet = new PacketJoinBoard(boardName, user);
+    	if (model != null) {
+            disconnectFromCurrentBoard();
+    	}
+    	
+        PacketJoinBoard packet = new PacketJoinBoard(boardName);
         sendPacket(packet);
     }
     
     /**
      * Disconnect from the current board.
      */
-    public void disconnectFromCurrentBoard() {
+    private void disconnectFromCurrentBoard() {
         assert model != null;
         
-        BoardIdentifier boardName = model.identifier();
-
-        PacketExitBoard packet = new PacketExitBoard(boardName, user);
+        PacketExitBoard packet = new PacketExitBoard();
         sendPacket(packet);
     }
     
     public void sendDrawCommand(DrawCommand drawCommand) {
         assert model != null;
         
-        BoardIdentifier boardName = model.identifier();
-
-        PacketDrawCommand packet = new PacketDrawCommand(boardName, user, drawCommand);
+        PacketDrawCommand packet = new PacketDrawCommand(drawCommand);
         sendPacket(packet);
     }
     
@@ -236,5 +180,25 @@ public class ClientController extends SocketHandler {
         StrokeType newStroke = eraserOn ? new StrokeTypeEraser() : new StrokeTypeBasic();
         strokeProperties.setStrokeType(newStroke);
     }
+
+	@Override
+	public void receivedNewClientPacket(PacketNewClient packet) {
+		assert false;
+	}
+
+	@Override
+	public void receivedNewBoardPacket(PacketNewBoard packet) {
+		assert false;
+	}
+
+	@Override
+	public void receivedClientReadyPacket(PacketClientReady packet) {
+		assert false;
+	}
+
+	@Override
+	public void receivedJoinBoardPacket(PacketJoinBoard packet) {
+		assert false;
+	}
 
 }

@@ -3,9 +3,17 @@ package server;
 import java.io.IOException;
 import java.net.Socket;
 
+import canvas.command.DrawCommand;
+
+import models.BoardModel;
+import name.BoardIdentifier;
+import name.Identifiable;
+
 import packet.Packet;
 import packet.PacketBoardIdentifierList;
 import packet.PacketBoardModel;
+import packet.PacketBoardUsers;
+import packet.PacketClientReady;
 import packet.PacketDrawCommand;
 import packet.PacketExitBoard;
 import packet.PacketJoinBoard;
@@ -27,16 +35,13 @@ public class ServerSocketHandler extends SocketHandler {
     @Override 
     protected void connectionClosed() {
         server.removeClient(this);
+        if (model != null && model.containsUser(this)) {
+        	model.removeUser(this);
+        }
     }
     
     @Override
-    protected void receivedPacket(Packet packet) {
-        super.receivedPacket(packet);
-        assert identifier().equals(packet.senderName());
-    }
-    
-    @Override
-    protected void receivedNewClientPacket(PacketNewClient packet) {
+    public void receivedNewClientPacket(PacketNewClient packet) {
         assert this.identifier == null;
         assert state == ServerSocketState.INITIALIZING;
         state = ServerSocketState.IDLE;
@@ -45,46 +50,91 @@ public class ServerSocketHandler extends SocketHandler {
     }
     
     @Override
-    protected void receivedNewBoardPacket(PacketNewBoard packet) {
-        assert state == ServerSocketState.IDLE;
-        state = ServerSocketState.PLAYING;
+    public void receivedNewBoardPacket(PacketNewBoard packet) {
+        assert model == null;
+        model = server.newBoard(packet);
         
-        server.newBoard(this, packet);
+        // Tell the user to start his board.
+        sendPacket(new PacketBoardModel(model));
+        
+        // Announce that a new board has been added.
+        server.notifyBoardListChanged();    
     }
     
     @Override
-    protected void receivedJoinBoardPacket(PacketJoinBoard packet) {
-        assert state == ServerSocketState.IDLE;
-        state = ServerSocketState.PLAYING;
-        
+    public void receivedJoinBoardPacket(PacketJoinBoard packet) {
+        assert model == null;
         // First send a GameState packet, then start sending the client new pixel locations.
-        server.joinBoard(this, packet);
+        model = server.joinBoard(packet);
+
+        sendPacket(new PacketBoardModel(model));
     }
 
     @Override
-    protected void receivedExitBoardPacket(PacketExitBoard packet) {
+    public void receivedExitBoardPacket(PacketExitBoard packet) {
         assert state == ServerSocketState.PLAYING;
         state = ServerSocketState.IDLE;
         
-        server.exitBoard(this, packet);
+        assert model != null;
+
+        model.removeUser(this);
+        sendPacket(new PacketExitBoard());
+        notifyBoardUsersChanged();
+        model = null;
+    }
+
+	private void notifyBoardUsersChanged() {
+		assert model != null;
+		broadcastPacketToBoard(new PacketBoardUsers(model.users()));
+	}
+
+	@Override
+	public void receivedClientReadyPacket(PacketClientReady packet) {
+        assert state == ServerSocketState.IDLE;
+        state = ServerSocketState.PLAYING;
+        
+		model.addUser(this);
+        notifyBoardUsersChanged();
+	}
+
+    @Override
+    public void receivedDrawCommandPacket(PacketDrawCommand packet) {
+        assert state == ServerSocketState.PLAYING;
+        assert model != null;
+        
+        DrawCommand command = packet.drawCommand();
+        assert command != null;
+        command.drawOn(model);
+        
+        broadcastPacketToBoard(packet);
     }
 
     @Override
-    protected void receivedBoardModelPacket(PacketBoardModel packet) {
+    public void receivedBoardModelPacket(PacketBoardModel packet) {
         // We only send GameStatePackets from the server.
         assert false;
     }
-
+    
     @Override
-    protected void receivedBoardIdentifierListPacket(PacketBoardIdentifierList packet) {
+    public void receivedBoardIdentifierListPacket(PacketBoardIdentifierList packet) {
         // We only send BoardStatePackets from the server.
         assert false;
     }
-
-    @Override
-    protected void receivedDrawCommandPacket(PacketDrawCommand packet) {
-        assert state == ServerSocketState.PLAYING;
-        
-        server.drawCommand(packet);
+    
+	@Override
+	public void receivedBoardUsersPacket(PacketBoardUsers packet) {
+		// Only server to client.
+		assert false;
+	}
+	
+    /**
+     * Broadcast a packet to all the clients of a specific model.
+     * @param model
+     * @param packet
+     */
+    private void broadcastPacketToBoard(Packet packet) {
+        for (Identifiable handler : model.users()) {
+            ((ServerSocketHandler) handler).sendPacket(packet);
+        }
     }
 }

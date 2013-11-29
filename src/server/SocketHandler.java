@@ -1,24 +1,29 @@
 package server;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.net.Socket;
 
+import models.BoardModel;
 import name.Identifiable;
 import name.Identifier;
 import packet.Packet;
 import packet.PacketHandler;
 
-public abstract class SocketHandler extends PacketHandler implements Runnable, Identifiable, Serializable {
+public abstract class SocketHandler 
+	implements PacketHandler, Runnable, Identifiable, Serializable 
+{
 	private static final long serialVersionUID = -2411978741777099054L;
 
 	private transient final Socket socket;
 
     protected transient final ObjectOutputStream out;
     protected transient final ObjectInputStream in;
-    
+    protected transient BoardModel model;
     protected Identifier identifier;
     
     protected SocketHandler(Socket socket) throws IOException {
@@ -49,10 +54,14 @@ public abstract class SocketHandler extends PacketHandler implements Runnable, I
     protected final void handleConnection() throws IOException {
         try {
             for (Object obj = in.readObject(); obj != null; obj = in.readObject()) {
-                receivedPacket((Packet)obj);
+            	((Packet)obj).process(this);
             }
         } 
+        catch (EOFException e) {
+        	e.printStackTrace();
+        }
         catch (Exception e) {
+        	e.printStackTrace();
             connectionClosed();
         }
         finally {
