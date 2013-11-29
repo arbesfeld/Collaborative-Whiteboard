@@ -21,5 +21,10 @@ public final class StrokeTypeEraser implements StrokeType {
         
         return result.toArray(new Pixel[result.size()]);
     }
+    
+    @Override
+    public String toString() {
+        return "Eraser";
+    }
 
 }

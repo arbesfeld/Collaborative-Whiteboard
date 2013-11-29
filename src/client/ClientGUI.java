@@ -28,6 +28,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -54,6 +55,9 @@ import models.BoardModel;
 import name.BoardIdentifier;
 import name.Identifiable;
 import stroke.StrokeProperties;
+import stroke.StrokeType;
+import stroke.StrokeTypeBasic;
+import stroke.StrokeTypePressure;
 import util.Utils;
 
 
@@ -73,6 +77,9 @@ class ClientGUI extends JFrame{
     private final JButton strokeButton;
     private final JSlider strokeSlider;
     private final JToggleButton eraseToggle;
+    private final JComboBox strokeDropdown;
+    
+    private final StrokeType[] strokeTypes;
     
     private Cursor brushCursor;
     private final Image iconImage;
@@ -128,6 +135,13 @@ class ClientGUI extends JFrame{
         this.eraseToggle = new JToggleButton(new ImageIcon("resources/eraserIcon.gif"));
         this.eraseToggle.setFocusPainted(false);
         
+        //Build stroke dropdown
+        this.strokeTypes = new StrokeType[2];
+            strokeTypes[0] = new StrokeTypeBasic();
+            strokeTypes[1] = new StrokeTypePressure();
+            
+        this.strokeDropdown = new JComboBox(strokeTypes);
+        
         // Join Game submenu.
         this.joinGameSubmenu = new JMenu("Join Game");
         
@@ -168,10 +182,14 @@ class ClientGUI extends JFrame{
         c.gridx = 0;
         c.gridy = 2;
         sidebar.add(eraseToggle, c);
-        setChatClient();
         
         c.gridx = 0;
         c.gridy = 3;
+        sidebar.add(strokeDropdown, c);
+        
+        setChatClient();
+        c.gridx = 0;
+        c.gridy = 4;
         sidebar.add(chatBar, c);
         
         colorButton.addActionListener(new ActionListener() {
@@ -214,6 +232,13 @@ class ClientGUI extends JFrame{
                     eraseToggle.setFocusPainted(false);
                     controller.setEraserOn(false);
                 }
+            }
+        });
+        
+        strokeDropdown.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.setStrokeType((StrokeType)strokeDropdown.getSelectedItem());
             }
         });
                 
