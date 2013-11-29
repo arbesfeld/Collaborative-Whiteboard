@@ -10,4 +10,5 @@ public interface PacketHandler {
      void receivedBoardUsersPacket(PacketBoardUsers packet);
      void receivedBoardIdentifierListPacket(PacketBoardIdentifierList packet);
      void receivedDrawCommandPacket(PacketDrawCommand packet);
+     void receivedMessagePacket(PacketMessage packet);
 }

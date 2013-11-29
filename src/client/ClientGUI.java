@@ -221,7 +221,7 @@ class ClientGUI extends JFrame{
     private void setChatClient() {
         chatBar.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
-        JTextField inputTextField = new JTextField();
+        final JTextField inputTextField = new JTextField();
         JButton sendButton = new JButton("Send");
         chatText.append("\n \n \n \n");
         
@@ -259,8 +259,8 @@ class ClientGUI extends JFrame{
         sendButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //TODO
-                System.out.println("not implemented");
+            	controller.sendMessage(inputTextField.getText());
+            	inputTextField.setText("");
             }
         });
         

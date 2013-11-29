@@ -12,6 +12,7 @@ import packet.PacketClientReady;
 import packet.PacketDrawCommand;
 import packet.PacketExitBoard;
 import packet.PacketJoinBoard;
+import packet.PacketMessage;
 import packet.PacketNewBoard;
 import packet.PacketNewClient;
 import canvas.command.DrawCommand;
@@ -104,7 +105,12 @@ public class ServerSocketHandler extends SocketHandler {
         
         broadcastPacketToBoard(packet);
     }
-
+    
+	@Override
+	public void receivedMessagePacket(PacketMessage packet) {
+		broadcastPacketToBoard(packet);
+	}
+	
     @Override
     public void receivedBoardModelPacket(PacketBoardModel packet) {
         // We only send GameStatePackets from the server.

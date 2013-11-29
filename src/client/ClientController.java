@@ -17,6 +17,7 @@ import packet.PacketClientReady;
 import packet.PacketDrawCommand;
 import packet.PacketExitBoard;
 import packet.PacketJoinBoard;
+import packet.PacketMessage;
 import packet.PacketNewBoard;
 import packet.PacketNewClient;
 import server.SocketHandler;
@@ -127,6 +128,15 @@ public class ClientController extends SocketHandler {
 		clientState = ClientState.IDLE;
 		model = null;
 	}
+
+	@Override
+	public void receivedMessagePacket(final PacketMessage packet) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                view.addChatLine(packet.text());
+            }
+        });
+	}
 	
     /*
      * Methods for sending packets.
@@ -166,7 +176,14 @@ public class ClientController extends SocketHandler {
         PacketDrawCommand packet = new PacketDrawCommand(drawCommand);
         sendPacket(packet);
     }
-    
+
+	public void sendMessage(String text) {
+		assert model != null;
+		
+		PacketMessage packet = new PacketMessage(text);
+		sendPacket(packet);
+	}
+	
     public void setStrokeColor(Color strokeColor) {
     	strokeProperties.setStrokeColor(strokeColor);
     }
