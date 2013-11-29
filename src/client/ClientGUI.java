@@ -29,6 +29,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -56,6 +57,9 @@ import name.BoardIdentifier;
 import name.Identifiable;
 import name.Identifier;
 import stroke.StrokeProperties;
+import stroke.StrokeType;
+import stroke.StrokeTypeBasic;
+import stroke.StrokeTypePressure;
 import util.Utils;
 
 
@@ -75,6 +79,9 @@ class ClientGUI extends JFrame{
     private final JButton strokeButton;
     private final JSlider strokeSlider;
     private final JToggleButton eraseToggle;
+    private final JComboBox strokeDropdown;
+    
+    private final StrokeType[] strokeTypes;
     
     private Cursor brushCursor;
     private final Image iconImage;
@@ -99,7 +106,6 @@ class ClientGUI extends JFrame{
      * this method should be invoked from the
      * event-dispatching thread.
      */
-    @SuppressWarnings("serial")
     public ClientGUI() {
         setResizable(false);
         this.container = this.getContentPane();
@@ -132,6 +138,13 @@ class ClientGUI extends JFrame{
         this.strokeSlider = new JSlider(JSlider.HORIZONTAL, STROKE_MIN, STROKE_MAX, STROKE_INIT);
         this.eraseToggle = new JToggleButton(new ImageIcon("resources/eraserIcon.gif"));
         this.eraseToggle.setFocusPainted(false);
+        
+        //Build stroke dropdown
+        this.strokeTypes = new StrokeType[2];
+            strokeTypes[0] = new StrokeTypeBasic();
+            strokeTypes[1] = new StrokeTypePressure();
+            
+        this.strokeDropdown = new JComboBox(strokeTypes);
         
         // Join Game submenu.
         this.joinGameSubmenu = new JMenu("Join Game");
@@ -174,10 +187,14 @@ class ClientGUI extends JFrame{
         c.gridx = 0;
         c.gridy = 2;
         sidebar.add(eraseToggle, c);
-        setChatClient();
         
         c.gridx = 0;
         c.gridy = 3;
+        sidebar.add(strokeDropdown, c);
+        
+        setChatClient();
+        c.gridx = 0;
+        c.gridy = 4;
         sidebar.add(chatBar, c);
         
         colorButton.addActionListener(new ActionListener() {
@@ -220,6 +237,13 @@ class ClientGUI extends JFrame{
                     eraseToggle.setFocusPainted(false);
                     controller.setEraserOn(false);
                 }
+            }
+        });
+        
+        strokeDropdown.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.setStrokeType((StrokeType)strokeDropdown.getSelectedItem());
             }
         });
                 
@@ -421,17 +445,19 @@ class ClientGUI extends JFrame{
      */
     public void updateUserList() {
         Object[][] tableData = new Object[1][1];
-        if (model.users().length == 0) {
-            tableData[0][0] = "No Users";
-        }
-        else {
-            tableData = new Object[model.users().length][1];
-            for (int i = 0; i < model.users().length; i++) {        
-                tableData[i][0] = model.users()[i].identifier().name();
+        if (model != null) {
+            if (model.users().length == 0) {
+                tableData[0][0] = "No Users";
             }
+            else {
+                tableData = new Object[model.users().length][1];
+                for (int i = 0; i < model.users().length; i++) {        
+                    tableData[i][0] = model.users()[i].identifier().name();
+                }
+            }
+            this.tableModel.updateData(tableData);
+            this.pack();
         }
-        this.tableModel.updateData(tableData);
-        this.pack();
     }
     
     /**
