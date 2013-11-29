@@ -1,6 +1,5 @@
 package packet;
 
-import name.BoardIdentifier;
 import name.Identifiable;
 
 public class PacketBoardUsers extends Packet {

@@ -1,6 +1,5 @@
 package packet;
 
-import name.BoardIdentifier;
 import canvas.command.DrawCommand;
 
 public final class PacketDrawCommand extends Packet {

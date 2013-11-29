@@ -2,7 +2,6 @@ package client;
 
 import java.awt.Color;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 
 import javax.swing.SwingUtilities;

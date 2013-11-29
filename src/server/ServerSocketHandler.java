@@ -3,12 +3,7 @@ package server;
 import java.io.IOException;
 import java.net.Socket;
 
-import canvas.command.DrawCommand;
-
-import models.BoardModel;
-import name.BoardIdentifier;
 import name.Identifiable;
-
 import packet.Packet;
 import packet.PacketBoardIdentifierList;
 import packet.PacketBoardModel;
@@ -19,6 +14,7 @@ import packet.PacketExitBoard;
 import packet.PacketJoinBoard;
 import packet.PacketNewBoard;
 import packet.PacketNewClient;
+import canvas.command.DrawCommand;
 
 public class ServerSocketHandler extends SocketHandler {
 	private static final long serialVersionUID = 5321337579877366643L;

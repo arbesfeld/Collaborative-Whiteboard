@@ -15,14 +15,10 @@ import name.Identifiable;
 import name.Identifier;
 import packet.Packet;
 import packet.PacketBoardIdentifierList;
-import packet.PacketBoardModel;
-import packet.PacketDrawCommand;
-import packet.PacketExitBoard;
 import packet.PacketJoinBoard;
 import packet.PacketNewBoard;
 import canvas.Canvas2d;
 import canvas.DrawableBase;
-import canvas.command.DrawCommand;
 
 public class Server implements Identifiable {
     public static final int DEFAULT_PORT = 4444;

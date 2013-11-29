@@ -1,7 +1,5 @@
 package packet;
 
-import java.util.Arrays;
-
 import name.BoardIdentifier;
 
 public final class PacketBoardIdentifierList extends Packet {
