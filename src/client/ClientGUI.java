@@ -38,6 +38,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
@@ -249,7 +250,7 @@ class ClientGUI extends JFrame{
         GridBagConstraints c = new GridBagConstraints();
         final JTextField inputTextField = new JTextField();
         JButton sendButton = new JButton("Send");
-        chatText.append("\n \n \n \n");
+        JScrollPane scroll = new JScrollPane (chatText, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         
         chatBar.setLayout(new GridBagLayout());
         
@@ -276,19 +277,23 @@ class ClientGUI extends JFrame{
         
         c.fill = GridBagConstraints.HORIZONTAL;
         c.insets = new Insets(10,0,0,0);
+        c.ipady = 60;
         c.weightx = 0.0;
         c.gridwidth = 3;
         c.gridx = 0;
         c.gridy = 1;
-        chatBar.add(chatText, c);
+        chatBar.add(scroll, c);
         
-        sendButton.addActionListener(new ActionListener() {
+        ActionListener enterText = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	controller.sendMessage(inputTextField.getText());
-            	inputTextField.setText("");
+                controller.sendMessage(inputTextField.getText());
+                inputTextField.setText("");
             }
-        });
+        };
+        
+        sendButton.addActionListener(enterText);
+        inputTextField.addActionListener(enterText);
         
         
     }
@@ -513,15 +518,7 @@ class ClientGUI extends JFrame{
     }
     
     public class UserTableModel extends AbstractTableModel{
-        /**
-         * Datatype for the table
-         * The table has three columns and is mutable. Rows can be added, but never deleted.
-         * THe first column is the guess, the second is the number of letter occurrences, and the third is the number of correct letters.
-         * Thread safe because only setValueAt() and addRow() are called by threads. Add row is synchronized so 
-         * the return row index will always be correct. SetValueAt sets data any only depends on the row and column
-         * being valid indices in data. We know that they are because column is hard coded to be either 1,2, or 3 and 
-         * the row is found in the same thread when the row is added. Since rows are never deleted, the index will exist.
-         */
+
         private String[] columnNames = {"Users"};      
         private Object[][] data = new Object[0][0];
         
