@@ -44,6 +44,7 @@ import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.colorchooser.AbstractColorChooserPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -397,40 +398,55 @@ class ClientGUI extends JFrame{
      * Set the current model and allow the user to draw to the screen.
      * @param model
      */
-    public void setModel(BoardModel model) {
-        setContentPaneGUI(model);
+    public void setModel(final BoardModel model) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                setContentPaneGUI(model);
+            }
+        });
     }
 
     /**
      * Update the list of users from the current model.
      */
 	public void setUserList(Identifiable[] users) {
-        Object[][] tableData = new Object[1][1];
         assert users.length > 0;
+        final Object[][] tableData = new Object[users.length][1];
         
-        tableData = new Object[users.length][1];
         for (int i = 0; i < users.length; i++) {        
             tableData[i][0] = users[i].identifier().name();
         }
-        
-        this.tableModel.updateData(tableData);
-        this.pack();
+
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                tableModel.updateData(tableData);
+                pack();
+            }
+        });
     }
     
     /**
      * Update the list of boards.
      * @param boards
      */
-    public void updateBoardList(BoardIdentifier[] boards) {
-        setBoardNames(boards);
+    public void updateBoardList(final BoardIdentifier[] boards) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                setBoardNames(boards);
+            }
+        });
     }
     
     /**
      * Add new chat message
      * @param string
      */
-    public void addChatLine(String string) {
-        this.chatText.append("\n" + string);
+    public void addChatLine(final String string) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+            	chatText.append("\n" + string);
+            }
+        });
     }
     
     /**

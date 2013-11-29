@@ -69,16 +69,12 @@ public class ClientController extends SocketHandler {
         
         BoardModel model = packet.boardModel();
         DrawableBase drawableCanvas = ((Canvas2d) model.canvas()).makeDrawable(strokeProperties, this);
-        final BoardModel newModel = new BoardModel(model.identifier(), drawableCanvas, model.users());
+        BoardModel newModel = new BoardModel(model.identifier(), drawableCanvas, model.users());
         this.model = newModel;
         
         sendPacket(new PacketClientReady());
 
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                view.setModel(newModel);
-            }
-        });
+        view.setModel(newModel);
     }
     
 	@Override
@@ -89,25 +85,14 @@ public class ClientController extends SocketHandler {
         // We should only receive these packets if we have loaded.
         assert clientState == ClientState.PLAYING;
         
-        final Identifiable[] users = packet.boardUsers();
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                view.setUserList(users);
-            }
-        });
+        view.setUserList(packet.boardUsers());
 	}
 	
     @Override
     public void receivedBoardIdentifierListPacket(PacketBoardIdentifierList packet) {
         assert out != null;
         
-        final BoardIdentifier[] boards = packet.boards();
-        
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                view.updateBoardList(boards);
-            }
-        });
+        view.updateBoardList(packet.boards());
     }
     
     @Override
@@ -130,12 +115,8 @@ public class ClientController extends SocketHandler {
 	}
 
 	@Override
-	public void receivedMessagePacket(final PacketMessage packet) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                view.addChatLine(packet.text());
-            }
-        });
+	public void receivedMessagePacket(PacketMessage packet) {
+		view.addChatLine(packet.text());
 	}
 	
     /*
