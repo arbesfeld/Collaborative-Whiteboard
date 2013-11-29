@@ -48,6 +48,8 @@ import javax.swing.SwingConstants;
 import javax.swing.colorchooser.AbstractColorChooserPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableModel;
 
 import models.BoardModel;
 import name.BoardIdentifier;
@@ -81,8 +83,8 @@ class ClientGUI extends JFrame{
     private final JPanel chatBar;
     
     private final JTable userTable;
-    private Object[][] tableData;
     private final JTextArea chatText;
+    private final UserTableModel tableModel;
     
     private static final int STROKE_MAX = 10;
     private static final int STROKE_MIN = 1;
@@ -97,6 +99,7 @@ class ClientGUI extends JFrame{
      * this method should be invoked from the
      * event-dispatching thread.
      */
+    @SuppressWarnings("serial")
     public ClientGUI() {
         setResizable(false);
         this.container = this.getContentPane();
@@ -141,9 +144,8 @@ class ClientGUI extends JFrame{
         this.chatBar = new JPanel();
         this.chatText = new JTextArea();
         this.chatText.setEditable(false);
-        String[] colNames = {"names"};
-        this.tableData = new Object[0][1];
-        this.userTable = new JTable(tableData, colNames);
+        this.tableModel = new UserTableModel();
+        this.userTable = new JTable(this.tableModel);
         setSideBar();
         
         //Create and set up the content pane.
@@ -260,6 +262,14 @@ class ClientGUI extends JFrame{
         c.gridx = 0;
         c.gridy = 1;
         chatBar.add(chatText, c);
+        
+        sendButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //TODO
+                System.out.println("not implemented");
+            }
+        });
         
         
     }
@@ -410,12 +420,18 @@ class ClientGUI extends JFrame{
      * Update the list of users from the current model.
      */
     public void updateUserList() {
-        //this.users = new Vector<Vector<Object>>();
-        Object[][] tableData = new Object[model.users().length][1];
-        for (int i = 0; i < model.users().length; i++) {
-            tableData[i][1] = model.users()[i].identifier().name();
+        Object[][] tableData = new Object[1][1];
+        if (model.users().length == 0) {
+            tableData[0][0] = "No Users";
         }
-        this.userTable.validate();
+        else {
+            tableData = new Object[model.users().length][1];
+            for (int i = 0; i < model.users().length; i++) {        
+                tableData[i][0] = model.users()[i].identifier().name();
+            }
+        }
+        this.tableModel.updateData(tableData);
+        this.pack();
     }
     
     /**
@@ -471,5 +487,46 @@ class ClientGUI extends JFrame{
         public int getIconHeight() {
             return forcedSize;
         }
+    }
+    
+    public class UserTableModel extends AbstractTableModel{
+        /**
+         * Datatype for the table
+         * The table has three columns and is mutable. Rows can be added, but never deleted.
+         * THe first column is the guess, the second is the number of letter occurrences, and the third is the number of correct letters.
+         * Thread safe because only setValueAt() and addRow() are called by threads. Add row is synchronized so 
+         * the return row index will always be correct. SetValueAt sets data any only depends on the row and column
+         * being valid indices in data. We know that they are because column is hard coded to be either 1,2, or 3 and 
+         * the row is found in the same thread when the row is added. Since rows are never deleted, the index will exist.
+         */
+        private String[] columnNames = {"Users"};      
+        private Object[][] data = new Object[0][0];
+        
+        public int getColumnCount() {
+            return columnNames.length;
+        }
+
+        public int getRowCount() {
+            return data.length;
+        }
+
+        public String getColumnName(int col) {
+            return columnNames[col];
+        }
+
+        public Object getValueAt(int row, int col) {
+            return data[row][col];
+        }
+
+        public void setValueAt(Object value, int row, int col) {
+            data[row][col] = value;
+            fireTableCellUpdated(row, col);
+        }
+      
+        public void updateData(Object[][] newData) {
+            data = newData;
+            fireTableDataChanged();
+        }
+
     }
 }
