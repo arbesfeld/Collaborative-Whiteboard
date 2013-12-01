@@ -21,6 +21,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
@@ -134,6 +135,7 @@ class ClientGUI extends JFrame{
         this.strokeButton.setHorizontalAlignment(SwingConstants.LEFT);
         this.strokeSlider = new JSlider(JSlider.HORIZONTAL, STROKE_MIN, STROKE_MAX, STROKE_INIT);
         this.eraseToggle = new JToggleButton(new ImageIcon("resources/eraserIcon.gif"));
+        this.eraseToggle.setPreferredSize(new Dimension(70,20));
         this.eraseToggle.setFocusPainted(false);
         
         //Build stroke dropdown
@@ -141,7 +143,8 @@ class ClientGUI extends JFrame{
             strokeTypes[0] = new StrokeTypeBasic();
             strokeTypes[1] = new StrokeTypePressure();
             
-        this.strokeDropdown = new JComboBox(strokeTypes);
+       this.strokeDropdown = new JComboBox(strokeTypes);
+       this.strokeDropdown.setPreferredSize(new Dimension(70,20));
         
         // Join Game submenu.
         this.joinGameSubmenu = new JMenu("Join Game");
@@ -158,9 +161,12 @@ class ClientGUI extends JFrame{
         this.userTable = new JTable(this.tableModel);
         setSideBar();
         
+        
         // Create and set up the content pane.
         setMenuBarGUI();
         setContentPaneGUI(null);
+        
+
     }
 
     public void setController(ClientController controller) {
@@ -242,7 +248,7 @@ class ClientGUI extends JFrame{
                 controller.setStrokeType((StrokeType)strokeDropdown.getSelectedItem());
             }
         });
-                
+        
     }
        
     private void setChatClient() {
@@ -474,7 +480,7 @@ class ClientGUI extends JFrame{
     public void addChatLine(final String string) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-            	chatText.append("\n" + string);
+            	chatText.append(string + "\n");
             }
         });
     }

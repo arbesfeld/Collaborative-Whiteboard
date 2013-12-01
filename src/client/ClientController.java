@@ -160,7 +160,7 @@ public class ClientController extends SocketHandler {
 	public void sendMessage(String text) {
 		assert model != null;
 		
-		PacketMessage packet = new PacketMessage(text);
+		PacketMessage packet = new PacketMessage(user.name()+ ": " + text);
 		sendPacket(packet);
 	}
 	
