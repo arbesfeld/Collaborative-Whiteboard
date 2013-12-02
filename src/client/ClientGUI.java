@@ -142,7 +142,6 @@ class ClientGUI extends JFrame{
         this.strokeButton.setHorizontalAlignment(SwingConstants.LEFT);
         this.dropperButton = new JButton("Color Dropper");
         this.dropperButton.setFocusPainted(false);
-        this.dropperButton.setIcon(new ColorIcon(STROKE_INIT, Color.black));
         this.dropperButton.setPreferredSize(new Dimension(120, 20));
         this.dropperButton.setHorizontalAlignment(SwingConstants.LEFT);
         this.strokeSlider = new JSlider(JSlider.HORIZONTAL, STROKE_MIN, STROKE_MAX, STROKE_INIT);
