@@ -27,7 +27,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
 
+import javax.imageio.ImageIO;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
 import javax.swing.Icon;
@@ -36,6 +39,7 @@ import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -80,6 +84,7 @@ class ClientGUI extends JFrame{
     
     private final JMenu joinGameSubmenu;
     private final JMenuItem newBoard;
+    private final JMenuItem save;
     private final JButton colorButton;
     private final JButton dropperButton;
     private final JColorChooser colorChooser;
@@ -129,6 +134,9 @@ class ClientGUI extends JFrame{
         this.menuBar = new JMenuBar();
         this.menu = new JMenu("File");
         this.newBoard = new JMenuItem("New Board", KeyEvent.VK_T);
+        this.save = new JMenuItem("Save to png", KeyEvent.VK_T);
+        this.save.setEnabled(false);
+        
         this.colorButton = new JButton("Color");
         this.colorButton.setIcon(new ColorIcon(10, Color.black));
         this.colorButton.setFocusPainted(false);
@@ -364,10 +372,21 @@ class ClientGUI extends JFrame{
     }
     
     private void setMenuBarGUI() {
+        
         // Build the first menu.
         menu.setMnemonic(KeyEvent.VK_F);
         menuBar.add(menu);
-    
+        
+        
+        newBoard.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+        
+        save.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                saveCanvas();
+            }
+        });
+        
         newBoard.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
         newBoard.getAccessibleContext().setAccessibleDescription("Create a new Board");
         
@@ -380,8 +399,11 @@ class ClientGUI extends JFrame{
 
         menu.add(newBoard);
         menu.add(joinGameSubmenu);
+        menu.add(save);
         setJMenuBar(menuBar);
     }
+    
+
     
     private void setBoardNames(BoardIdentifier[] boardNames) {
     	joinGameSubmenu.removeAll();
@@ -432,6 +454,7 @@ class ClientGUI extends JFrame{
     
     private void setContentPaneGUI(BoardModel model) {
         if (model != null) {
+            this.save.setEnabled(true);
             this.canvas = model.canvas();
             updateCursor();
             container.removeAll();
@@ -485,6 +508,24 @@ class ClientGUI extends JFrame{
         
     }
     
+    private void saveCanvas() {
+        BufferedImage bi = new BufferedImage(this.getSize().width, this.getSize().height, BufferedImage.TYPE_INT_ARGB); 
+        Graphics g = bi.createGraphics();
+        canvas.paint(g);
+        g.dispose();
+        JFileChooser fc = new JFileChooser();
+        int returnVal = fc.showSaveDialog(this);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File file = fc.getSelectedFile();
+            try{
+                ImageIO.write(bi,"png",file);
+                }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
     private void joinBoardAction(BoardIdentifier boardName) {
         controller.connectToBoard(boardName);
     }
@@ -497,6 +538,7 @@ class ClientGUI extends JFrame{
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 setContentPaneGUI(model);
+         
             }
         });
     }
