@@ -60,6 +60,7 @@ import stroke.StrokeProperties;
 import stroke.StrokeType;
 import stroke.StrokeTypeBasic;
 import stroke.StrokeTypePressure;
+import stroke.StrokeTypeSpray;
 import util.Utils;
 
 
@@ -139,9 +140,10 @@ class ClientGUI extends JFrame{
         this.eraseToggle.setFocusPainted(false);
         
         //Build stroke dropdown
-        this.strokeTypes = new StrokeType[2];
+        this.strokeTypes = new StrokeType[3];
             strokeTypes[0] = new StrokeTypeBasic();
             strokeTypes[1] = new StrokeTypePressure();
+            strokeTypes[2] = new StrokeTypeSpray();
             
        this.strokeDropdown = new JComboBox(strokeTypes);
        this.strokeDropdown.setPreferredSize(new Dimension(70,20));
