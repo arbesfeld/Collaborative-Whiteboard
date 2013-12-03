@@ -12,8 +12,9 @@ public final class StrokeTypeBasic implements StrokeType {
     @Override
     public Pixel[] paintPoint(Color color, int strokeWidth, int x, int y, Vector2 velocity) {
         List<Pixel> result = new LinkedList<Pixel>();
-        for (int i = x-strokeWidth/2; i <= x+strokeWidth/2; i++) {
-            for (int j = y-strokeWidth/2; j <= y+strokeWidth/2; j++) {
+        for (int j = y-strokeWidth/2; j <= y+strokeWidth/2; j++) {
+            int width = (int)Math.sqrt(Math.abs(strokeWidth/2 - Math.pow(j - y,2)));
+            for (int i = x - (strokeWidth/2 - width); i <= x + strokeWidth/2 - width; i++) {
                 result.add(new Pixel(i, j, color));
             }
         }
