@@ -3,6 +3,7 @@ package client;
 import static javax.swing.GroupLayout.Alignment.BASELINE;
 import static javax.swing.GroupLayout.Alignment.LEADING;
 
+import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -15,14 +16,21 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.MouseInfo;
 import java.awt.Point;
+import java.awt.PointerInfo;
 import java.awt.RenderingHints;
+import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
 
+import javax.imageio.ImageIO;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
 import javax.swing.Icon;
@@ -31,6 +39,7 @@ import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -60,6 +69,7 @@ import stroke.StrokeProperties;
 import stroke.StrokeType;
 import stroke.StrokeTypeBasic;
 import stroke.StrokeTypePressure;
+import stroke.StrokeTypeSpray;
 import util.Utils;
 
 
@@ -74,7 +84,9 @@ class ClientGUI extends JFrame{
     
     private final JMenu joinGameSubmenu;
     private final JMenuItem newBoard;
+    private final JMenuItem save;
     private final JButton colorButton;
+    private final JButton dropperButton;
     private final JColorChooser colorChooser;
     private final JButton strokeButton;
     private final JSlider strokeSlider;
@@ -122,29 +134,37 @@ class ClientGUI extends JFrame{
         this.menuBar = new JMenuBar();
         this.menu = new JMenu("File");
         this.newBoard = new JMenuItem("New Board", KeyEvent.VK_T);
+        this.save = new JMenuItem("Save to png", KeyEvent.VK_T);
+        this.save.setEnabled(false);
+        
         this.colorButton = new JButton("Color");
         this.colorButton.setIcon(new ColorIcon(10, Color.black));
         this.colorButton.setFocusPainted(false);
-        this.colorButton.setPreferredSize(new Dimension(70,20));
+        this.colorButton.setPreferredSize(new Dimension(120,20));
         this.colorButton.setHorizontalAlignment(SwingConstants.LEFT);
         this.colorChooser = new JColorChooser();
         this.strokeButton = new JButton("Stroke");
         this.strokeButton.setFocusPainted(false);
         this.strokeButton.setIcon(new ColorIcon(STROKE_INIT, Color.black));
-        this.strokeButton.setPreferredSize(new Dimension(70, 20));
+        this.strokeButton.setPreferredSize(new Dimension(120, 20));
         this.strokeButton.setHorizontalAlignment(SwingConstants.LEFT);
+        this.dropperButton = new JButton("Color Dropper");
+        this.dropperButton.setFocusPainted(false);
+        this.dropperButton.setPreferredSize(new Dimension(120, 20));
+        this.dropperButton.setHorizontalAlignment(SwingConstants.LEFT);
         this.strokeSlider = new JSlider(JSlider.HORIZONTAL, STROKE_MIN, STROKE_MAX, STROKE_INIT);
         this.eraseToggle = new JToggleButton(new ImageIcon("resources/eraserIcon.gif"));
-        this.eraseToggle.setPreferredSize(new Dimension(70,20));
+        this.eraseToggle.setPreferredSize(new Dimension(120,20));
         this.eraseToggle.setFocusPainted(false);
         
         //Build stroke dropdown
-        this.strokeTypes = new StrokeType[2];
+        this.strokeTypes = new StrokeType[3];
             strokeTypes[0] = new StrokeTypeBasic();
             strokeTypes[1] = new StrokeTypePressure();
+            strokeTypes[2] = new StrokeTypeSpray();
             
        this.strokeDropdown = new JComboBox(strokeTypes);
-       this.strokeDropdown.setPreferredSize(new Dimension(70,20));
+       this.strokeDropdown.setPreferredSize(new Dimension(120,20));
         
         // Join Game submenu.
         this.joinGameSubmenu = new JMenu("Join Game");
@@ -178,6 +198,7 @@ class ClientGUI extends JFrame{
         
         sidebar.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(5,0,0,0);
         c.gridx = 0;
         c.gridy = 0;
         sidebar.add(strokeButton, c);
@@ -192,11 +213,16 @@ class ClientGUI extends JFrame{
         
         c.gridx = 0;
         c.gridy = 3;
+        sidebar.add(dropperButton, c);
+        
+       
+        c.gridx = 0;
+        c.gridy = 4;
         sidebar.add(strokeDropdown, c);
         
         setChatClient();
         c.gridx = 0;
-        c.gridy = 4;
+        c.gridy = 5;
         sidebar.add(chatBar, c);
         
         colorButton.addActionListener(new ActionListener() {
@@ -249,6 +275,46 @@ class ClientGUI extends JFrame{
             }
         });
         
+        dropperButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dropperButton.setFocusPainted(true);
+                try {
+                    final Robot robot = new Robot();
+                    canvas.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    MouseListener mouseListener = new MouseListener() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            PointerInfo pointer;
+                            pointer = MouseInfo.getPointerInfo();
+                            Point coord = pointer.getLocation();
+                            Color color = robot.getPixelColor((int)coord.getX(), (int)coord.getX());
+                            colorButton.setIcon(new ColorIcon(10, color));
+                            controller.setStrokeColor(color);
+                            canvas.removeMouseListener(this);
+                            updateCursor();
+                            dropperButton.setFocusPainted(false);
+                        }
+                        @Override
+                        public void mouseEntered(MouseEvent arg0) { }
+
+                        @Override
+                        public void mouseExited(MouseEvent arg0) { }
+
+                        @Override
+                        public void mousePressed(MouseEvent arg0) { }
+
+                        @Override
+                        public void mouseReleased(MouseEvent arg0) { }
+                    };
+                    canvas.addMouseListener(mouseListener);
+                } catch (AWTException e1) {
+                    e1.printStackTrace();
+                }
+                
+            }
+        });
+        
     }
        
     private void setChatClient() {
@@ -262,6 +328,7 @@ class ClientGUI extends JFrame{
         
         c.fill = GridBagConstraints.HORIZONTAL;
         c.insets = new Insets(10,0,0,0);
+        c.ipadx = 120;
         c.weightx = 0.0;
         c.gridwidth = 3;
         c.gridx = 0;
@@ -305,10 +372,21 @@ class ClientGUI extends JFrame{
     }
     
     private void setMenuBarGUI() {
+        
         // Build the first menu.
         menu.setMnemonic(KeyEvent.VK_F);
         menuBar.add(menu);
-    
+        
+        
+        newBoard.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+        
+        save.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                saveCanvas();
+            }
+        });
+        
         newBoard.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
         newBoard.getAccessibleContext().setAccessibleDescription("Create a new Board");
         
@@ -321,8 +399,11 @@ class ClientGUI extends JFrame{
 
         menu.add(newBoard);
         menu.add(joinGameSubmenu);
+        menu.add(save);
         setJMenuBar(menuBar);
     }
+    
+
     
     private void setBoardNames(BoardIdentifier[] boardNames) {
     	joinGameSubmenu.removeAll();
@@ -373,6 +454,7 @@ class ClientGUI extends JFrame{
     
     private void setContentPaneGUI(BoardModel model) {
         if (model != null) {
+            this.save.setEnabled(true);
             this.canvas = model.canvas();
             updateCursor();
             container.removeAll();
@@ -426,6 +508,24 @@ class ClientGUI extends JFrame{
         
     }
     
+    private void saveCanvas() {
+        BufferedImage bi = new BufferedImage(this.getSize().width, this.getSize().height, BufferedImage.TYPE_INT_ARGB); 
+        Graphics g = bi.createGraphics();
+        canvas.paint(g);
+        g.dispose();
+        JFileChooser fc = new JFileChooser();
+        int returnVal = fc.showSaveDialog(this);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File file = fc.getSelectedFile();
+            try{
+                ImageIO.write(bi,"png",file);
+                }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
     private void joinBoardAction(BoardIdentifier boardName) {
         controller.connectToBoard(boardName);
     }
@@ -438,6 +538,7 @@ class ClientGUI extends JFrame{
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 setContentPaneGUI(model);
+         
             }
         });
     }
