@@ -36,6 +36,7 @@ public class ClientController extends SocketHandler {
     private ClientState clientState;
     private final StrokeProperties strokeProperties;
     private StrokeType strokeType;
+    private Boolean eraserOn;
     
     public ClientController(String userName, String hostName, int portNumber) throws IOException {
         super(new Socket(hostName, portNumber));
@@ -46,6 +47,7 @@ public class ClientController extends SocketHandler {
         // Default stroke.
         this.strokeProperties = new StrokeProperties();
         this.strokeType = new StrokeTypeBasic();
+        this.eraserOn = false;
         
         // Send a NewClientPacket to announce yourself.
         sendPacket(new PacketNewClient(user));
@@ -174,10 +176,13 @@ public class ClientController extends SocketHandler {
     
     public void setStrokeType(StrokeType newStrokeType) {
         strokeType = newStrokeType;
-        strokeProperties.setStrokeType(strokeType);
+        if (!eraserOn) {
+            strokeProperties.setStrokeType(strokeType);
+        }
     }
     
     public void setEraserOn(boolean eraserOn) {
+        this.eraserOn = eraserOn;
         StrokeType newStroke = eraserOn ? new StrokeTypeEraser() : strokeType;
         strokeProperties.setStrokeType(newStroke);
     }
