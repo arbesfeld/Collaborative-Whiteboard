@@ -1,5 +1,9 @@
 package packet;
-
+/**
+ * Interface to handle different types of packets
+ * 
+ *
+ */
 public interface PacketHandler {
      void receivedNewClientPacket(PacketNewClient packet);
      void receivedNewBoardPacket(PacketNewBoard packet);

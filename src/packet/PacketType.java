@@ -1,5 +1,8 @@
 package packet;
-
+/**
+ * Enum to represent different types of Packets
+ *
+ */
 public enum PacketType {
     // announce that you are a new client in the game   
     NEW_CLIENT, // client to server

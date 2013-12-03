@@ -1,7 +1,10 @@
 package packet;
 
 import canvas.command.DrawCommand;
-
+/**
+ * Class that represents a DrawCommand packet
+ *
+ */
 public final class PacketDrawCommand extends Packet {
     private static final long serialVersionUID = 8957926132249921422L;
     private final DrawCommand drawCommand;
@@ -13,7 +16,9 @@ public final class PacketDrawCommand extends Packet {
     public DrawCommand drawCommand() {
         return drawCommand;
     }
-
+    /**
+     * Handles receiving a DrawCommandPacket
+     */
 	@Override
 	public void process(PacketHandler handler) {
 		handler.receivedDrawCommandPacket(this);
