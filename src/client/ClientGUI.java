@@ -124,6 +124,9 @@ class ClientGUI extends JFrame{
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
         
+        // Set the title
+        setTitle("Whiteboard: Interactive Drawing Tool!");
+        
         // Create Cursor
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         this.iconImage = toolkit.getImage("resources/cursor.gif");
@@ -185,7 +188,6 @@ class ClientGUI extends JFrame{
         // Create and set up the content pane.
         setMenuBarGUI();
         setContentPaneGUI(null);
-        
 
     }
 
