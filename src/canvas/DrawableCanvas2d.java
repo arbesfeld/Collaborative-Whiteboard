@@ -6,6 +6,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
+import javax.swing.SwingUtilities;
+
 import stroke.StrokeProperties;
 import util.Vector2;
 import canvas.command.DrawCommandPixel;
@@ -82,9 +84,8 @@ public class DrawableCanvas2d extends DrawableBase {
                 int curY = (int) (y*i/dist + lastY*(dist-i)/dist);
 
                 Pixel[] pixels = strokeProperties.paintPoint(curX, curY, velocity);
-                for (Pixel pixel : pixels) {
+                for (final Pixel pixel : pixels) {
                 	if (!canvas.getPixelColor(pixel).equals(pixel.color())) {
-                        canvas.drawPixel(pixel);
                         clientController.sendDrawCommand(new DrawCommandPixel(pixel));
                 	}
                 }
