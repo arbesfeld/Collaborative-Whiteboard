@@ -37,7 +37,7 @@ public class Canvas2d extends DrawableBase {
     /*
      * Make the drawing buffer and draw some starting content for it.
      */
-    private void makeImage() {
+    private synchronized void makeImage() {
         image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         fillWithWhite();
     }
@@ -45,7 +45,7 @@ public class Canvas2d extends DrawableBase {
     /*
      * Make the drawing buffer entirely white.
      */
-    private void fillWithWhite() {
+    private synchronized void fillWithWhite() {
         final Graphics2D g = (Graphics2D) image.getGraphics();
 
         g.setColor(Color.WHITE);
@@ -54,7 +54,7 @@ public class Canvas2d extends DrawableBase {
     }
     
     @Override
-    public void drawPixel(Pixel pixel) {
+    public synchronized void drawPixel(Pixel pixel) {
         if (image == null) {
         	makeImage();
         }
@@ -67,7 +67,7 @@ public class Canvas2d extends DrawableBase {
         repaint();
     }
 
-	public Color getPixelColor(Pixel pixel) {
+	public synchronized Color getPixelColor(Pixel pixel) {
 		if (image == null) {
 			makeImage();
 		}
@@ -83,7 +83,7 @@ public class Canvas2d extends DrawableBase {
      * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
      */
     @Override
-    public void paintComponent(Graphics g) {
+    public synchronized void paintComponent(Graphics g) {
     	if (image == null) {
     		makeImage();
     	}
@@ -91,7 +91,7 @@ public class Canvas2d extends DrawableBase {
         g.drawImage(image, 0, 0, null);
     }
     
-    private void writeObject(ObjectOutputStream out) throws IOException {
+    private synchronized void writeObject(ObjectOutputStream out) throws IOException {
     	if (image == null) {
     		makeImage();
     	}
@@ -100,14 +100,14 @@ public class Canvas2d extends DrawableBase {
         ImageIO.write(image, "png", out); 
     }
 
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    private synchronized void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         image = ImageIO.read(in);
         
         assert image != null;
     }
     
-    public DrawableCanvas2d makeDrawable(StrokeProperties strokeProperties, ClientController clientController) {
+    public synchronized DrawableCanvas2d makeDrawable(StrokeProperties strokeProperties, ClientController clientController) {
     	return new DrawableCanvas2d(strokeProperties, clientController, this);
     }
 }
