@@ -32,7 +32,7 @@ public class Server implements Identifiable {
 
 	private final Map<BoardIdentifier, BoardModel> boards;
     private final Set<ServerSocketHandler> clients;
-	
+	 
     /**
      * Constructor for Server using only the port
      * @param port

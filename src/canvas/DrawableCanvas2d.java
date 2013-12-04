@@ -86,11 +86,6 @@ public class DrawableCanvas2d extends DrawableBase {
                 Pixel[] pixels = strokeProperties.paintPoint(curX, curY, velocity);
                 for (final Pixel pixel : pixels) {
                 	if (!canvas.getPixelColor(pixel).equals(pixel.color())) {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                canvas.drawPixel(pixel);
-                            }
-                        });
                         clientController.sendDrawCommand(new DrawCommandPixel(pixel));
                 	}
                 }
