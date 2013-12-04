@@ -73,7 +73,7 @@ public abstract class SocketHandler
 
     protected void connectionClosed() { }
 
-    public void sendPacket(Packet packet) {
+    public synchronized void sendPacket(Packet packet) {
         try {
             out.writeObject(packet);
         } catch (IOException e) {
