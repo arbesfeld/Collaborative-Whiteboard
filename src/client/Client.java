@@ -9,7 +9,7 @@ public class Client {
     public static void startClient(String userName, String hostName, int portNumber) throws IOException {
 
         final ClientController controller = new ClientController(userName, hostName, portNumber);
-        
+         
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 ClientGUI view = new ClientGUI();

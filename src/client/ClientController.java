@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.io.IOException;
 import java.net.Socket;
 
+import javax.swing.SwingUtilities;
+
 import models.BoardModel;
 import name.BoardIdentifier;
 import name.ClientIdentifier;
@@ -97,14 +99,17 @@ public class ClientController extends SocketHandler {
     }
     
     @Override
-    public void receivedDrawCommandPacket(PacketDrawCommand packet) {
+    public void receivedDrawCommandPacket(final PacketDrawCommand packet) {
         assert model != null;
         assert out != null;
         
         // We should only receive these packets if we have loaded.
         assert clientState == ClientState.PLAYING;
-
-        packet.drawCommand().drawOn(model);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                packet.drawCommand().drawOn(model);
+            }
+        });
     }
 
 	@Override
