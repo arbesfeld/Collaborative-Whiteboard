@@ -382,7 +382,7 @@ class ClientGUI extends JFrame{
         menuBar.add(menu);
         
         
-        newBoard.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+        save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
         
         save.addActionListener(new ActionListener() {
             @Override
