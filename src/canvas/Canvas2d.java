@@ -29,7 +29,7 @@ public class Canvas2d extends DrawableBase {
      */
     public Canvas2d(int width, int height) {
         super(width, height);
-
+     
         this.setPreferredSize(new Dimension(width, height));
         // note: we can't call makeImage here, because it only
         // works *after* this canvas has been added to a window.  Have to
@@ -40,7 +40,7 @@ public class Canvas2d extends DrawableBase {
      * Make the drawing buffer and draw some starting content for it.
      */
     private synchronized void makeImage() {
-        image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB); 
         fillWithWhite();
     }
     

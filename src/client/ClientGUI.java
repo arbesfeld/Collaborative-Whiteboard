@@ -68,6 +68,7 @@ import name.Identifiable;
 import stroke.StrokeProperties;
 import stroke.StrokeType;
 import stroke.StrokeTypeBasic;
+import stroke.StrokeTypeFill;
 import stroke.StrokeTypePressure;
 import stroke.StrokeTypeProc1;
 import stroke.StrokeTypeProc2;
@@ -96,6 +97,7 @@ class ClientGUI extends JFrame{
     private final JButton strokeButton;
     private final JSlider strokeSlider;
     private final JToggleButton eraseToggle;
+    private final JToggleButton fillToggle;
     private final JComboBox strokeDropdown;
     
     private final StrokeType[] strokeTypes;
@@ -110,7 +112,7 @@ class ClientGUI extends JFrame{
     private final JTextArea chatText;
     private final UserTableModel tableModel;
     
-    private static final int STROKE_MAX = 10;
+    private static final int STROKE_MAX = 20;
     private static final int STROKE_MIN = 1;
     private static final int STROKE_INIT = StrokeProperties.DEFAULT_STROKE_WIDTH;
     
@@ -164,9 +166,12 @@ class ClientGUI extends JFrame{
         this.eraseToggle = new JToggleButton(new ImageIcon("resources/eraserIcon.gif"));
         this.eraseToggle.setPreferredSize(new Dimension(120,20));
         this.eraseToggle.setFocusPainted(false);
+        this.fillToggle = new JToggleButton("Fill");
+        this.fillToggle.setPreferredSize(new Dimension(120,20));
+        this.fillToggle.setFocusPainted(false);
         
         //Build stroke dropdown
-        this.strokeTypes = new StrokeType[8];
+        this.strokeTypes = new StrokeType[9];
             strokeTypes[0] = new StrokeTypeBasic();
             strokeTypes[1] = new StrokeTypePressure();
             strokeTypes[2] = new StrokeTypeSpray();
@@ -175,6 +180,7 @@ class ClientGUI extends JFrame{
             strokeTypes[5] = new StrokeTypeProc3();
             strokeTypes[6] = new StrokeTypeProc4();
             strokeTypes[7] = new StrokeTypeProc5();
+            strokeTypes[8] = new StrokeTypeFill();
              
        this.strokeDropdown = new JComboBox(strokeTypes);
        this.strokeDropdown.setPreferredSize(new Dimension(120,20));
@@ -225,16 +231,20 @@ class ClientGUI extends JFrame{
         
         c.gridx = 0;
         c.gridy = 3;
+        sidebar.add(fillToggle, c);
+        
+        c.gridx = 0;
+        c.gridy = 4;
         sidebar.add(dropperButton, c);
         
        
         c.gridx = 0;
-        c.gridy = 4;
+        c.gridy = 5;
         sidebar.add(strokeDropdown, c);
         
         setChatClient();
         c.gridx = 0;
-        c.gridy = 5;
+        c.gridy = 6;
         sidebar.add(chatBar, c);
         
         colorButton.addActionListener(new ActionListener() {
@@ -276,6 +286,20 @@ class ClientGUI extends JFrame{
                 else {
                     eraseToggle.setFocusPainted(false);
                     controller.setEraserOn(false);
+                }
+            }
+        });
+        
+        fillToggle.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (fillToggle.isSelected()) {
+                    eraseToggle.setFocusPainted(true);
+                    controller.setFillOn(true);
+                }
+                else {
+                    fillToggle.setFocusPainted(false);
+                    controller.setFillOn(false);
                 }
             }
         });

@@ -51,7 +51,6 @@ public class DrawableCanvas2d extends DrawableBase {
      */
     @Override
     public void paintComponent(Graphics g) {
-        System.out.println("Painting in drwaaable");
     	canvas.paintComponent(g);
     }
     
