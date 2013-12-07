@@ -1,5 +1,7 @@
 package models;
 
+import java.awt.Color;
+import java.awt.Stroke;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
@@ -53,6 +55,16 @@ public class BoardModel implements Drawable, Identifiable, Serializable {
     @Override
     public void drawPixel(Pixel pixel) {
         canvas.drawPixel(pixel);
+    }
+
+    @Override
+    public void drawLine(Pixel pixelStart, Pixel pixelEnd, Stroke stroke) {
+        canvas.drawLine(pixelStart, pixelEnd, stroke);
+    }
+    
+    @Override
+    public Color getPixelColor(Pixel pixel) {
+        return canvas.getPixelColor(pixel);
     }
 
     @Override

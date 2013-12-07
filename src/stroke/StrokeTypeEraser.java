@@ -7,20 +7,25 @@ import java.util.List;
 import util.Vector2;
 import canvas.Drawable;
 import canvas.Pixel;
+import canvas.command.DrawCommand;
+import canvas.command.DrawCommandPixel;
 
 public final class StrokeTypeEraser implements StrokeType {
 
     @Override
-    public Pixel[] paintPoint(Drawable canvas, Color color, int strokeWidth, int x, int y, Vector2 velocity) {
-        List<Pixel> result = new LinkedList<Pixel>();
+    public DrawCommand[] paintLine(Drawable canvas, Color color, int strokeWidth, int x1, int y1, int x2, int y2, Vector2 velocity) {
+        List<DrawCommand> result = new LinkedList<DrawCommand>();
         
-        for (int i = x-strokeWidth/2; i <= x+strokeWidth/2; i++) {
-            for (int j = y-strokeWidth/2; j <= y+strokeWidth/2; j++) {
-                result.add(new Pixel(i, j, Color.WHITE));
+        for (int i = x1-strokeWidth/2; i <= x1+strokeWidth/2; i++) {
+            for (int j = y1-strokeWidth/2; j <= y1+strokeWidth/2; j++) {
+                Pixel pixel = new Pixel(i, j, Color.WHITE);
+                if (!canvas.getPixelColor(pixel).equals(pixel.color())) {
+                    result.add(new DrawCommandPixel(pixel));
+                }
             }
         }
         
-        return result.toArray(new Pixel[result.size()]);
+        return result.toArray(new DrawCommand[result.size()]);
     }
     
     @Override

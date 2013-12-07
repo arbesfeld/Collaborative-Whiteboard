@@ -1,9 +1,11 @@
 package canvas;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Stroke;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -62,18 +64,42 @@ public class Canvas2d extends DrawableBase {
         if (!isValidPixel(pixel)) {
             return;
         }
+
+        final Graphics2D g = (Graphics2D) image.getGraphics();
+
+        g.setColor(Color.BLACK);
         
         image.setRGB(pixel.x(), pixel.y(), pixel.color().getRGB());
         repaint();
     }
+    
+    @Override
+    public synchronized void drawLine(Pixel pixelStart, Pixel pixelEnd, Stroke stroke) {
+        if (image == null) {
+           makeImage();
+        }
 
+        if (!isValidPixel(pixelStart) || !isValidPixel(pixelEnd)) {
+            return;
+        }
+        
+        final Graphics2D g = (Graphics2D) image.getGraphics();
+
+        g.setColor(pixelStart.color());
+        g.setStroke(stroke);
+        g.drawLine(pixelStart.x(), pixelStart.y(), pixelEnd.x(), pixelEnd.y());
+
+        repaint();
+    }
+    
+    @Override
 	public synchronized Color getPixelColor(Pixel pixel) {
 		if (image == null) {
 			makeImage();
 		}
 		
 		if (!isValidPixel(pixel)) {
-			return Color.WHITE;
+			return pixel.color();
 		}
 		
 		return new Color(image.getRGB(pixel.x(), pixel.y()));
@@ -87,7 +113,7 @@ public class Canvas2d extends DrawableBase {
     	if (image == null) {
     		makeImage();
     	}
-    	
+
         g.drawImage(image, 0, 0, null);
     }
     

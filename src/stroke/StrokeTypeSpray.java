@@ -7,22 +7,28 @@ import java.util.List;
 import util.Vector2;
 import canvas.Drawable;
 import canvas.Pixel;
+import canvas.command.DrawCommand;
+import canvas.command.DrawCommandPixel;
 
 public class StrokeTypeSpray implements StrokeType {
 
     @Override
-    public Pixel[] paintPoint(Drawable canvas, Color color, int strokeWidth, int x, int y, Vector2 velocity) {
-        List<Pixel> result = new LinkedList<Pixel>();      
+    public DrawCommand[] paintLine(Drawable canvas, Color color, int strokeWidth, int x1, int y1, int x2, int y2, Vector2 velocity) {
+        List<DrawCommand> result = new LinkedList<DrawCommand>();      
         int extraWidth = 8-(int)Math.sqrt(Math.pow(velocity.x(), 2) + Math.pow(velocity.y(), 2));
         if (extraWidth < 0) {extraWidth = 0;}
-        for (int i = x+strokeWidth; i <= x+strokeWidth; i++) {
-            for (int j = y-strokeWidth; j <= y+strokeWidth; j++) {
+        for (int i = x1+strokeWidth; i <= x1+strokeWidth; i++) {
+            for (int j = y1-strokeWidth; j <= y1+strokeWidth; j++) {
                 if (Math.random() > .5) {
-                    result.add(new Pixel(i, j, color));
+                    Pixel pixel = new Pixel(i, j, color);
+
+                    if (!canvas.getPixelColor(pixel).equals(pixel.color())) {
+                        result.add(new DrawCommandPixel(pixel));
+                    }
                 }
             }
         }  
-        return result.toArray(new Pixel[result.size()]);
+        return result.toArray(new DrawCommand[result.size()]);
     }
     
     @Override

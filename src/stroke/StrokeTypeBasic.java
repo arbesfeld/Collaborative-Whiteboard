@@ -1,26 +1,25 @@
 package stroke;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Stroke;
 import java.util.LinkedList;
 import java.util.List;
 
 import util.Vector2;
 import canvas.Drawable;
 import canvas.Pixel;
+import canvas.command.DrawCommand;
+import canvas.command.DrawCommandLine;
+import canvas.command.DrawCommandPixel;
 
 public final class StrokeTypeBasic implements StrokeType {
 
     @Override
-    public Pixel[] paintPoint(Drawable canvas, Color color, int strokeWidth, int x, int y, Vector2 velocity) {
-        List<Pixel> result = new LinkedList<Pixel>();
-        for (int j = y-strokeWidth/2; j <= y+strokeWidth/2; j++) {
-            int width = (int)Math.sqrt(Math.abs(strokeWidth/2 - Math.pow(j - y,2)));
-            for (int i = x - (strokeWidth/2 - width); i <= x + strokeWidth/2 - width; i++) {
-                result.add(new Pixel(i, j, color));
-            }
-        }
-        
-        return result.toArray(new Pixel[result.size()]);
+    public DrawCommand[] paintLine(Drawable canvas, Color color, int strokeWidth, int x1, int y1, int x2, int y2, Vector2 velocity) {
+        BasicStroke stroke = new BasicStroke(strokeWidth);
+        DrawCommand command = new DrawCommandLine(new Pixel(x1, y1, color), new Pixel(x2, y2, color), stroke);
+        return new DrawCommand[]{ command };
     }
     
     @Override

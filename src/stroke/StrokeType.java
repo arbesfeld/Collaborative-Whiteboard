@@ -4,8 +4,8 @@ import java.awt.Color;
 
 import util.Vector2;
 import canvas.Drawable;
-import canvas.Pixel;
+import canvas.command.DrawCommand;
 
 public interface StrokeType {
-    public Pixel[] paintPoint(Drawable canvas, Color color, int strokeWidth, int x, int y, Vector2 velocity);
+    public DrawCommand[] paintLine(Drawable canvas, Color color, int strokeWidth, int x1, int y1, int x2, int y2, Vector2 velocity);
 }

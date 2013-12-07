@@ -1,10 +1,14 @@
 package stroke;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Stroke;
 
 import util.Vector2;
 import canvas.Drawable;
 import canvas.Pixel;
+import canvas.command.DrawCommand;
+import canvas.command.DrawCommandLine;
 
 public class StrokeProperties {
     public final static Color DEFAULT_STROKE_COLOR = Color.BLACK;
@@ -36,7 +40,8 @@ public class StrokeProperties {
         this.strokeType = strokeType;
     }
 
-    public Pixel[] paintPoint(Drawable canvas, int x, int y, Vector2 velocity) {
-        return strokeType.paintPoint(canvas, strokeColor, strokeWidth, x, y, velocity);
+    public DrawCommand[] paintLine(Drawable canvas, int x1, int y1, int x2, int y2, Vector2 velocity) {
+        return strokeType.paintLine(canvas, strokeColor, strokeWidth, x1, y1, x2, y2, velocity);
     }
+    
 }
