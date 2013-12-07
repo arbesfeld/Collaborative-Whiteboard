@@ -3,6 +3,7 @@ package stroke;
 import java.awt.Color;
 
 import util.Vector2;
+import canvas.Drawable;
 import canvas.Pixel;
 
 public class StrokeProperties {
@@ -35,7 +36,7 @@ public class StrokeProperties {
         this.strokeType = strokeType;
     }
 
-    public Pixel[] paintPoint(int x, int y, Vector2 velocity) {
-        return strokeType.paintPoint(strokeColor, strokeWidth, x, y, velocity);
+    public Pixel[] paintPoint(Drawable canvas, int x, int y, Vector2 velocity) {
+        return strokeType.paintPoint(canvas, strokeColor, strokeWidth, x, y, velocity);
     }
 }

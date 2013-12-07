@@ -83,7 +83,7 @@ public class DrawableCanvas2d extends DrawableBase {
                 int curX = (int) (x*i/dist + lastX*(dist-i)/dist);
                 int curY = (int) (y*i/dist + lastY*(dist-i)/dist);
 
-                Pixel[] pixels = strokeProperties.paintPoint(curX, curY, velocity);
+                Pixel[] pixels = strokeProperties.paintPoint(canvas, curX, curY, velocity);
                 for (final Pixel pixel : pixels) {
                 	if (!canvas.getPixelColor(pixel).equals(pixel.color())) {
                         clientController.sendDrawCommand(new DrawCommandPixel(pixel));

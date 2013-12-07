@@ -5,12 +5,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import util.Vector2;
+import canvas.Drawable;
 import canvas.Pixel;
 
 public class StrokeTypeSpray implements StrokeType {
 
     @Override
-    public Pixel[] paintPoint(Color color, int strokeWidth, int x, int y, Vector2 velocity) {
+    public Pixel[] paintPoint(Drawable canvas, Color color, int strokeWidth, int x, int y, Vector2 velocity) {
         List<Pixel> result = new LinkedList<Pixel>();      
         int extraWidth = 8-(int)Math.sqrt(Math.pow(velocity.x(), 2) + Math.pow(velocity.y(), 2));
         if (extraWidth < 0) {extraWidth = 0;}

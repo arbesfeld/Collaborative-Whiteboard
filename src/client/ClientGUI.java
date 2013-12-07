@@ -70,6 +70,10 @@ import stroke.StrokeType;
 import stroke.StrokeTypeBasic;
 import stroke.StrokeTypePressure;
 import stroke.StrokeTypeProc1;
+import stroke.StrokeTypeProc2;
+import stroke.StrokeTypeProc3;
+import stroke.StrokeTypeProc4;
+import stroke.StrokeTypeProc5;
 import stroke.StrokeTypeSpray;
 import util.Utils;
 
@@ -162,12 +166,16 @@ class ClientGUI extends JFrame{
         this.eraseToggle.setFocusPainted(false);
         
         //Build stroke dropdown
-        this.strokeTypes = new StrokeType[4];
+        this.strokeTypes = new StrokeType[8];
             strokeTypes[0] = new StrokeTypeBasic();
             strokeTypes[1] = new StrokeTypePressure();
             strokeTypes[2] = new StrokeTypeSpray();
-            strokeTypes[3] = new StrokeTypeProc1();
-            
+            strokeTypes[3] = new StrokeTypeProc2();
+            strokeTypes[4] = new StrokeTypeProc1();
+            strokeTypes[5] = new StrokeTypeProc3();
+            strokeTypes[6] = new StrokeTypeProc4();
+            strokeTypes[7] = new StrokeTypeProc5();
+             
        this.strokeDropdown = new JComboBox(strokeTypes);
        this.strokeDropdown.setPreferredSize(new Dimension(120,20));
         
@@ -489,8 +497,8 @@ class ClientGUI extends JFrame{
     
     private void newBoardAction() {
         JTextField inputBoardName = new JTextField("Whiteboard");
-        JTextField widthName = new JTextField("256");
-        JTextField heightName = new JTextField("256");
+        JTextField widthName = new JTextField("512");
+        JTextField heightName = new JTextField("512");
         JPanel panel = new JPanel(new GridLayout(0, 1));
         
         panel.add(new JLabel("Whiteboard Name"));
