@@ -3,6 +3,7 @@ package canvas;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
@@ -84,8 +85,14 @@ public class Canvas2d extends DrawableBase {
         }
         
         final Graphics2D g = (Graphics2D) image.getGraphics();
-
-        g.setColor(pixelStart.color());
+        if (pixelStart.color() != pixelEnd.color()) {
+            System.out.println("here");
+            g.setPaint(new GradientPaint(pixelStart.x(), pixelStart.y(), pixelStart.color(),
+                                                       pixelEnd.x(), pixelEnd.y(), pixelEnd.color()));
+        }
+        else {
+            g.setColor(pixelStart.color());
+        }
         g.setStroke(stroke);
         g.drawLine(pixelStart.x(), pixelStart.y(), pixelEnd.x(), pixelEnd.y());
 

@@ -171,7 +171,7 @@ class ClientGUI extends JFrame{
         this.fillToggle.setFocusPainted(false);
         
         //Build stroke dropdown
-        this.strokeTypes = new StrokeType[9];
+        this.strokeTypes = new StrokeType[8];
             strokeTypes[0] = new StrokeTypeBasic();
             strokeTypes[1] = new StrokeTypePressure();
             strokeTypes[2] = new StrokeTypeSpray();
@@ -180,7 +180,6 @@ class ClientGUI extends JFrame{
             strokeTypes[5] = new StrokeTypeProc3();
             strokeTypes[6] = new StrokeTypeProc4();
             strokeTypes[7] = new StrokeTypeProc5();
-            strokeTypes[8] = new StrokeTypeFill();
              
        this.strokeDropdown = new JComboBox(strokeTypes);
        this.strokeDropdown.setPreferredSize(new Dimension(120,20));
