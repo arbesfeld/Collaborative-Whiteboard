@@ -86,7 +86,6 @@ public class Canvas2d extends DrawableBase {
         
         final Graphics2D g = (Graphics2D) image.getGraphics();
         if (pixelStart.color() != pixelEnd.color()) {
-            System.out.println("here");
             g.setPaint(new GradientPaint(pixelStart.x(), pixelStart.y(), pixelStart.color(),
                                                        pixelEnd.x(), pixelEnd.y(), pixelEnd.color()));
         }

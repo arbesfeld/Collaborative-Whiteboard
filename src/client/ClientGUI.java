@@ -75,7 +75,9 @@ import stroke.StrokeTypeProc2;
 import stroke.StrokeTypeProc3;
 import stroke.StrokeTypeProc4;
 import stroke.StrokeTypeProc5;
+import stroke.StrokeTypeProc6;
 import stroke.StrokeTypeSpray;
+import stroke.StrokeTypeSquares;
 import util.Utils;
 
 
@@ -171,7 +173,7 @@ class ClientGUI extends JFrame{
         this.fillToggle.setFocusPainted(false);
         
         //Build stroke dropdown
-        this.strokeTypes = new StrokeType[8];
+        this.strokeTypes = new StrokeType[10];
             strokeTypes[0] = new StrokeTypeBasic();
             strokeTypes[1] = new StrokeTypePressure();
             strokeTypes[2] = new StrokeTypeSpray();
@@ -180,7 +182,9 @@ class ClientGUI extends JFrame{
             strokeTypes[5] = new StrokeTypeProc3();
             strokeTypes[6] = new StrokeTypeProc4();
             strokeTypes[7] = new StrokeTypeProc5();
-             
+            strokeTypes[8] = new StrokeTypeProc6();
+            strokeTypes[9] = new StrokeTypeSquares(); 
+            
        this.strokeDropdown = new JComboBox(strokeTypes);
        this.strokeDropdown.setPreferredSize(new Dimension(120,20));
         
