@@ -122,6 +122,12 @@ public class DrawableCanvas2d extends DrawableBase {
     }
     
     @Override
+    public void drawFill(Pixel pixel) {
+        canvas.drawFill(pixel);
+        repaint();
+    }
+    
+    @Override
     public Color getPixelColor(Pixel pixel) {
         return canvas.getPixelColor(pixel);
     }

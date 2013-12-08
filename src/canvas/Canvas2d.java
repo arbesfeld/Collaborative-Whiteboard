@@ -11,10 +11,14 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import javax.imageio.ImageIO;
 
 import stroke.StrokeProperties;
+import canvas.command.DrawCommandPixel;
 import client.ClientController;
 
 public class Canvas2d extends DrawableBase {
@@ -98,6 +102,43 @@ public class Canvas2d extends DrawableBase {
         repaint();
     }
     
+    public void drawFill(Pixel pixel) {
+        if (image == null) {
+            makeImage();
+        }
+        
+        if (!isValidPixel(pixel)) {
+            return;
+        }
+
+        final Graphics2D g = (Graphics2D) image.getGraphics();
+
+        g.setColor(Color.BLACK);
+        
+        HashSet<Pixel> pixels = new HashSet<Pixel>();
+        Queue<Pixel> queue = new LinkedList<Pixel>();
+        queue.add(pixel);
+        Color initialColor = getPixelColor(pixel);
+        
+        while (!queue.isEmpty()) {
+            Pixel newPixel = queue.remove();
+            if (!pixels.contains(newPixel)) {
+                if (getPixelColor(newPixel).equals(initialColor)) { 
+                    drawPixel(newPixel);
+                    pixels.add(newPixel);
+                    for (int i = -1; i <= 2; i++) {
+                        for (int j = -1; j <= 2; j++) {
+                            if (!pixels.contains(new Pixel(newPixel.x() + i,  newPixel.y() + j, pixel.color()))) {
+                                queue.add(new Pixel(newPixel.x() + i,  newPixel.y() + j, pixel.color()));
+                            }
+                        }
+                    }   
+                }
+            }
+        }
+        repaint();
+    }
+    
     @Override
 	public synchronized Color getPixelColor(Pixel pixel) {
 		if (image == null) {
@@ -142,4 +183,5 @@ public class Canvas2d extends DrawableBase {
     public synchronized DrawableCanvas2d makeDrawable(StrokeProperties strokeProperties, ClientController clientController) {
     	return new DrawableCanvas2d(strokeProperties, clientController, this);
     }
+
 }

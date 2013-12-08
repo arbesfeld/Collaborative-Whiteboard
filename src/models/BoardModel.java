@@ -63,6 +63,11 @@ public class BoardModel implements Drawable, Identifiable, Serializable {
     }
     
     @Override
+    public void drawFill(Pixel pixel) {
+        canvas.drawFill(pixel);
+    }
+    
+    @Override
     public Color getPixelColor(Pixel pixel) {
         return canvas.getPixelColor(pixel);
     }

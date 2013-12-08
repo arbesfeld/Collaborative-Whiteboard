@@ -9,5 +9,6 @@ public interface Drawable {
     
     public void drawPixel(Pixel pixel);
     public void drawLine(Pixel pixelStart, Pixel pixelEnd, Stroke stroke);
+    public void drawFill(Pixel pixel);
     public Color getPixelColor(Pixel pixel);
 }
