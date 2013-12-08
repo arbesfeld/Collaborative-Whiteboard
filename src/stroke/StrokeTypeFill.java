@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import util.Vector2;
 import canvas.Drawable;
@@ -16,28 +17,32 @@ public class StrokeTypeFill implements StrokeType {
     @Override
     public DrawCommand[] paintLine(Drawable canvas, Color color, int strokeWidth, int x1, int y1, int x2, int y2, Vector2 velocity) {
         List<DrawCommand> result = new LinkedList<DrawCommand>();
-        HashSet<Pixel> pixels = new HashSet<Pixel>();
-        result.addAll(fillAround(canvas, x1,  y1, canvas.getPixelColor(new Pixel(x1,y1,color)), color, pixels));
+        if (x1 == x2 && y1 == y2) {
+            HashSet<Pixel> pixels = new HashSet<Pixel>();
+            Queue<Pixel> queue = new LinkedList<Pixel>();
+            queue.add(new Pixel(x1, y1, color));
+            Color initialColor = canvas.getPixelColor(new Pixel(x1,y1,color));
+            
+            while (!queue.isEmpty()) {
+                Pixel newPixel = queue.remove();
+                if (!pixels.contains(newPixel)) {
+                    if (canvas.getPixelColor(newPixel).equals(initialColor)) {        
+                        result.add(new DrawCommandPixel(newPixel));
+                        pixels.add(newPixel);
+                        for (int i = -1; i <= 2; i++) {
+                            for (int j = -1; j <= 2; j++) {
+                                if (!pixels.contains(new Pixel(newPixel.x() + i,  newPixel.y() + j, color))) {
+                                    queue.add(new Pixel(newPixel.x() + i,  newPixel.y() + j, color));
+                                }
+                            }
+                        }   
+                    }
+                }
+            }
+        }
         return result.toArray(new DrawCommand[result.size()]);
     }
         
-    private List<DrawCommand> fillAround(Drawable canvas, int x, int y, Color initialColor, Color newColor, HashSet<Pixel> pixels) {
-        List<DrawCommand> result = new LinkedList<DrawCommand>();
-            Pixel newPixel = new Pixel(x,y,newColor);
-            //System.out.println(pixels.size());
-            if (!pixels.contains(newPixel)) {
-                if (canvas.getPixelColor(newPixel).equals(initialColor)) {
-                    result.add(new DrawCommandPixel(newPixel));
-                    pixels.add(newPixel);
-                    result.addAll(fillAround(canvas, x + 1,  y, initialColor, newColor, pixels));
-                    result.addAll(fillAround(canvas, x,  y + 1, initialColor, newColor, pixels));
-                    result.addAll(fillAround(canvas, x - 1,  y, initialColor, newColor, pixels));
-                    result.addAll(fillAround(canvas, x,  y - 1, initialColor, newColor, pixels));
-                }
-            }
-      //  }
-        return result;
-    }
     
     @Override
     public String toString() {

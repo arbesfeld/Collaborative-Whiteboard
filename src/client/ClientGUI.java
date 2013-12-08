@@ -83,7 +83,7 @@ import util.Utils;
 
 
 class ClientGUI extends JFrame{
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -8313236674630578250L;
     private final JMenuBar menuBar;
     private final JMenu menu;
     
@@ -139,7 +139,7 @@ class ClientGUI extends JFrame{
         
         // Create Cursor
         Toolkit toolkit = Toolkit.getDefaultToolkit();
-        this.iconImage = toolkit.getImage("resources/cursor.gif");
+        this.iconImage = toolkit.getImage(getClass().getResource("resources/cursor.gif"));
         Point hotSpot = new Point(16,16);
         this.brushCursor = toolkit.createCustomCursor(iconImage, hotSpot, "circleBrush");
         
@@ -519,7 +519,7 @@ class ClientGUI extends JFrame{
     private void updateCursor() {
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         int strokeWidth = strokeSlider.getValue();
-        Image scaledIcon = iconImage.getScaledInstance(strokeWidth, strokeWidth, Image.SCALE_DEFAULT);
+        Image scaledIcon = iconImage.getScaledInstance(strokeWidth, strokeWidth, Image.SCALE_SMOOTH);
         Point hotSpot = new Point(strokeWidth/2, strokeWidth/2);
         brushCursor = toolkit.createCustomCursor(scaledIcon, hotSpot, "circleBrush");
         this.canvas.setCursor(brushCursor);

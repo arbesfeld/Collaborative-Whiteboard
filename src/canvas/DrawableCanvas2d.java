@@ -68,6 +68,12 @@ public class DrawableCanvas2d extends DrawableBase {
         public void mousePressed(MouseEvent e) {
             lastX = e.getX();
             lastY = e.getY();
+            
+            DrawCommand[] commands = strokeProperties.paintLine(canvas, lastX, lastY, lastX, lastY, 
+            new Vector2(0,0));
+            for (DrawCommand command : commands) {
+                clientController.sendDrawCommand(command);
+            }
         }
 
         /*
