@@ -139,7 +139,7 @@ class ClientGUI extends JFrame{
         
         // Create Cursor
         Toolkit toolkit = Toolkit.getDefaultToolkit();
-        this.iconImage = toolkit.getImage(getClass().getResource("resources/cursor.gif"));
+        this.iconImage = toolkit.getImage("resources/cursor.gif");
         Point hotSpot = new Point(16,16);
         this.brushCursor = toolkit.createCustomCursor(iconImage, hotSpot, "circleBrush");
         
