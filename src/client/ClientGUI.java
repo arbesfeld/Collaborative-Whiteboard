@@ -38,6 +38,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -95,12 +96,13 @@ class ClientGUI extends JFrame{
     private final JMenuItem newBoard;
     private final JMenuItem save;
     private final JButton colorButton;
-    private final JButton dropperButton;
+    private final JToggleButton dropperToggle;
     private final JColorChooser colorChooser;
     private final JButton strokeButton;
     private final JSlider strokeSlider;
     private final JToggleButton eraseToggle;
     private final JToggleButton fillToggle;
+    private final JToggleButton brushToggle;
     private final JComboBox strokeDropdown;
     
     private final StrokeType[] strokeTypes;
@@ -161,17 +163,24 @@ class ClientGUI extends JFrame{
         this.strokeButton.setIcon(new ColorIcon(STROKE_INIT, Color.black));
         this.strokeButton.setPreferredSize(new Dimension(120, 20));
         this.strokeButton.setHorizontalAlignment(SwingConstants.LEFT);
-        this.dropperButton = new JButton("Color Dropper");
-        this.dropperButton.setFocusPainted(false);
-        this.dropperButton.setPreferredSize(new Dimension(120, 20));
-        this.dropperButton.setHorizontalAlignment(SwingConstants.LEFT);
+        this.dropperToggle = new JToggleButton(new ImageIcon(((new ImageIcon("resources/eyedropperIcon.png")).getImage())
+                .getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH)));  
+        this.dropperToggle.setFocusPainted(false);
+        this.dropperToggle.setPreferredSize(new Dimension(40, 40));
+        this.dropperToggle.setHorizontalAlignment(SwingConstants.LEFT);
         this.strokeSlider = new JSlider(JSlider.HORIZONTAL, STROKE_MIN, STROKE_MAX, STROKE_INIT);
-        this.eraseToggle = new JToggleButton(new ImageIcon("resources/eraserIcon.gif"));
-        this.eraseToggle.setPreferredSize(new Dimension(120,20));
+        this.eraseToggle = new JToggleButton(new ImageIcon(((new ImageIcon("resources/eraserIcon.png")).getImage())
+                .getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH)));  
+        this.eraseToggle.setPreferredSize(new Dimension(40,40));
         this.eraseToggle.setFocusPainted(false);
-        this.fillToggle = new JToggleButton("Fill");
-        this.fillToggle.setPreferredSize(new Dimension(120,20));
+        this.fillToggle = new JToggleButton(new ImageIcon(((new ImageIcon("resources/fillIcon.png")).getImage())
+                .getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH)));  
+        this.fillToggle.setPreferredSize(new Dimension(40,40));
         this.fillToggle.setFocusPainted(false);
+        this.brushToggle = new JToggleButton(new ImageIcon(((new ImageIcon("resources/brushIcon.png")).getImage())
+                .getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH)));  
+        this.brushToggle.setPreferredSize(new Dimension(40,40));
+        this.brushToggle.setFocusPainted(false);
         
         //Build stroke dropdown
         this.strokeTypes = new StrokeType[11];
@@ -231,26 +240,36 @@ class ClientGUI extends JFrame{
         c.gridy = 1;
         sidebar.add(colorButton, c);
         
+        JPanel brushBar = new JPanel();
+        brushBar.add(brushToggle);
+        brushBar.add(fillToggle);
+        brushBar.add(eraseToggle);
+        brushBar.add(dropperToggle);
+        
         c.gridx = 0;
         c.gridy = 2;
-        sidebar.add(eraseToggle, c);
+        sidebar.add(brushBar, c);
         
-        c.gridx = 0;
-        c.gridy = 3;
-        sidebar.add(fillToggle, c);
-        
-        c.gridx = 0;
-        c.gridy = 4;
-        sidebar.add(dropperButton, c);
+//        c.gridx = 0;
+//        c.gridy = 2;
+//        sidebar.add(fillToggle, c);
+//        
+//        c.gridx = 2;
+//        c.gridy = 2;
+//        sidebar.add(eraseToggle, c);
+//        
+//        c.gridx = 3;
+//        c.gridy = 2;
+//        sidebar.add(dropperToggle, c);
         
        
         c.gridx = 0;
-        c.gridy = 5;
+        c.gridy = 3;
         sidebar.add(strokeDropdown, c);
         
         setChatClient();
         c.gridx = 0;
-        c.gridy = 6;
+        c.gridy = 4;
         sidebar.add(chatBar, c);
         
         colorButton.addActionListener(new ActionListener() {
@@ -317,10 +336,10 @@ class ClientGUI extends JFrame{
             }
         });
         
-        dropperButton.addActionListener(new ActionListener() {
+        dropperToggle.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                dropperButton.setFocusPainted(true);
+                dropperToggle.setFocusPainted(true);
                 try {
                     final Robot robot = new Robot();
                     canvas.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -335,7 +354,7 @@ class ClientGUI extends JFrame{
                             controller.setStrokeColor(color);
                             canvas.removeMouseListener(this);
                             updateCursor();
-                            dropperButton.setFocusPainted(false);
+                            dropperToggle.setFocusPainted(false);
                         }
                         @Override
                         public void mouseEntered(MouseEvent arg0) { }
