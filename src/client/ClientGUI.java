@@ -82,6 +82,7 @@ import stroke.StrokeTypeProc3;
 import stroke.StrokeTypeProc4;
 import stroke.StrokeTypeProc5;
 import stroke.StrokeTypeProc6;
+import stroke.StrokeTypeProc7;
 import stroke.StrokeTypeSpray;
 import stroke.StrokeTypeSquares;
 import util.Utils;
@@ -204,18 +205,19 @@ class ClientGUI extends JFrame{
         this.brushToggle.setSelected(true);
         
         //Build stroke dropdown
-        this.strokeTypes = new StrokeType[4];
+        this.strokeTypes = new StrokeType[6];
             strokeTypes[0] = new StrokeTypeBasic();
-            //strokeTypes[1] = new StrokeTypePressure();
+            strokeTypes[1] = new StrokeTypePressure();
             //strokeTypes[2] = new StrokeTypeSpray();
             //strokeTypes[3] = new StrokeTypeProc2();
             //strokeTypes[4] = new StrokeTypeProc1();
             //strokeTypes[5] = new StrokeTypeProc3();
             //strokeTypes[6] = new StrokeTypeProc4();
             //strokeTypes[7] = new StrokeTypeProc5();
-            strokeTypes[1] = new StrokeTypeProc6();
-            strokeTypes[2] = new StrokeTypeSquares(); 
-            strokeTypes[3] = new StrokeTypeFur(); 
+            strokeTypes[2] = new StrokeTypeProc6();
+            strokeTypes[3] = new StrokeTypeSquares(); 
+            strokeTypes[4] = new StrokeTypeFur(); 
+            strokeTypes[5] = new StrokeTypeProc7();
 
             
        this.strokeDropdown = new JComboBox(strokeTypes);
@@ -612,7 +614,11 @@ class ClientGUI extends JFrame{
     }
     
     private void newBoardAction() {
-        JTextField inputBoardName = new JTextField("Whiteboard");
+        String[] names = {  "Acerila","Cornelian","Kingman Turquoise","Precious Cat's Eye","Achroite","Cornflower Sapphire","Precious Fire Opal","Acmite","Coyamito Agate" ,"Kittlite"
+                ,"Precious Opal","Adamine" ,"Crazy Lace Agate","Kunzite","Pseudoleucite","Adularia","Crocidolite","Kutnohorite","Purple Copper Ore","African Amethyst"
+                ,"Cromfordite","Laguna Agate","Pycnite","African Jade","Cromite","Lake Superior Agate","Pyralspite","Agalmatolite","Cronstedtite" ,"Landscape Agate"
+                ,"Pyrite Cube","Agaric Mineral","Crystal Opal","Lapis"};
+        JTextField inputBoardName = new JTextField(names[(int)(Math.random() * names.length)]);
         JTextField widthName = new JTextField("512");
         JTextField heightName = new JTextField("512");
         JPanel panel = new JPanel(new GridLayout(0, 1));
