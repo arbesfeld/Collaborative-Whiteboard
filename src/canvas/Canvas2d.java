@@ -48,7 +48,7 @@ public class Canvas2d extends DrawableBase {
      * Make the drawing buffer and draw some starting content for it.
      */
     private synchronized void makeImage() {
-        image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         if (imageIcon == null) {
             imageIcon = new ImageIcon(image);
             fillWithWhite();
