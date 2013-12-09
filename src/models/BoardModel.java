@@ -52,6 +52,10 @@ public class BoardModel implements Drawable, Identifiable, Serializable {
         return users.toArray(new Identifiable[users.size()]).clone();
     }
     
+    public BoardIdentifier getBoardName() {
+        return boardName;
+    }
+    
     @Override
     public void drawPixel(Pixel pixel) {
         canvas.drawPixel(pixel);

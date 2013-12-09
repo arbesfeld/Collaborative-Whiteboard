@@ -33,6 +33,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
 import javax.swing.Icon;
@@ -60,6 +61,7 @@ import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.border.TitledBorder;
 import javax.swing.colorchooser.AbstractColorChooserPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -157,13 +159,13 @@ class ClientGUI extends JFrame{
         this.colorButton = new JButton("Color");
         this.colorButton.setIcon(new ColorIcon(10, Color.black));
         this.colorButton.setFocusPainted(false);
-        this.colorButton.setPreferredSize(new Dimension(120,20));
+        this.colorButton.setPreferredSize(new Dimension(60,30));
         this.colorButton.setHorizontalAlignment(SwingConstants.LEFT);
         this.colorChooser = new JColorChooser();
         this.strokeButton = new JButton("Stroke");
         this.strokeButton.setFocusPainted(false);
         this.strokeButton.setIcon(new ColorIcon(STROKE_INIT, Color.black));
-        this.strokeButton.setPreferredSize(new Dimension(120, 20));
+        this.strokeButton.setPreferredSize(new Dimension(70, 30));
         this.strokeButton.setHorizontalAlignment(SwingConstants.LEFT);
         this.strokeSlider = new JSlider(JSlider.HORIZONTAL, STROKE_MIN, STROKE_MAX, STROKE_INIT);
         
@@ -194,22 +196,23 @@ class ClientGUI extends JFrame{
         this.brushToggle.setSelected(true);
         
         //Build stroke dropdown
-        this.strokeTypes = new StrokeType[11];
+        this.strokeTypes = new StrokeType[4];
             strokeTypes[0] = new StrokeTypeBasic();
-            strokeTypes[1] = new StrokeTypePressure();
-            strokeTypes[2] = new StrokeTypeSpray();
-            strokeTypes[3] = new StrokeTypeProc2();
-            strokeTypes[4] = new StrokeTypeProc1();
-            strokeTypes[5] = new StrokeTypeProc3();
-            strokeTypes[6] = new StrokeTypeProc4();
-            strokeTypes[7] = new StrokeTypeProc5();
-            strokeTypes[8] = new StrokeTypeProc6();
-            strokeTypes[9] = new StrokeTypeSquares(); 
-            strokeTypes[10] = new StrokeTypeFur(); 
+            //strokeTypes[1] = new StrokeTypePressure();
+            //strokeTypes[2] = new StrokeTypeSpray();
+            //strokeTypes[3] = new StrokeTypeProc2();
+            //strokeTypes[4] = new StrokeTypeProc1();
+            //strokeTypes[5] = new StrokeTypeProc3();
+            //strokeTypes[6] = new StrokeTypeProc4();
+            //strokeTypes[7] = new StrokeTypeProc5();
+            strokeTypes[1] = new StrokeTypeProc6();
+            strokeTypes[2] = new StrokeTypeSquares(); 
+            strokeTypes[3] = new StrokeTypeFur(); 
 
             
        this.strokeDropdown = new JComboBox(strokeTypes);
-       this.strokeDropdown.setPreferredSize(new Dimension(120,20));
+       this.strokeDropdown.setPreferredSize(new Dimension(100,40));
+       this.strokeDropdown.setFocusable(false);
         
         // Join Game submenu.
         this.joinGameSubmenu = new JMenu("Join Game");
@@ -239,35 +242,41 @@ class ClientGUI extends JFrame{
     }
     
     private void setSideBar() {
+             
+        JPanel brushPanel = new JPanel();
+        brushPanel.add(strokeButton);
+        brushPanel.add(colorButton);
+        brushPanel.add(strokeDropdown);
+        TitledBorder BrushPanelBorder = BorderFactory.createTitledBorder("Brush Settings");
+        brushPanel.setBorder(BrushPanelBorder);
+        
+        JPanel toolBar = new JPanel();
+        toolBar.add(brushToggle);
+        toolBar.add(fillToggle);
+        toolBar.add(eraseToggle);
+        toolBar.add(dropperToggle);
+        TitledBorder toolBorder = BorderFactory.createTitledBorder("Tools");
+        toolBar.setBorder(toolBorder);
+        
+        setChatClient();
+        TitledBorder chatBorder = BorderFactory.createTitledBorder("Chat Client");
+        chatBar.setBorder(chatBorder);
         
         sidebar.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
+        
         c.insets = new Insets(5,0,0,0);
+        c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 0;
-        sidebar.add(strokeButton, c);
+        sidebar.add(brushPanel, c);
         
         c.gridx = 0;
         c.gridy = 1;
-        sidebar.add(colorButton, c);
-        
-        JPanel brushBar = new JPanel();
-        brushBar.add(brushToggle);
-        brushBar.add(fillToggle);
-        brushBar.add(eraseToggle);
-        brushBar.add(dropperToggle);
+        sidebar.add(toolBar, c); 
         
         c.gridx = 0;
         c.gridy = 2;
-        sidebar.add(brushBar, c);     
-       
-        c.gridx = 0;
-        c.gridy = 3;
-        sidebar.add(strokeDropdown, c);
-        
-        setChatClient();
-        c.gridx = 0;
-        c.gridy = 4;
         sidebar.add(chatBar, c);
         
         colorButton.addActionListener(new ActionListener() {
@@ -377,8 +386,8 @@ class ClientGUI extends JFrame{
                                 colorButton.setIcon(new ColorIcon(10, color));
                                 controller.setStrokeColor(color);
                                 canvas.removeMouseListener(this);
+                                brushToggle.setSelected(true);
                                 updateCursor();
-                                dropperToggle.setFocusPainted(false);
                             }
                             @Override
                             public void mouseEntered(MouseEvent arg0) { }
@@ -398,6 +407,7 @@ class ClientGUI extends JFrame{
                     }
                 }
                 else {
+                    canvas.removeAll();
                     dropperToggle.setEnabled(true);
                 }  
             }
@@ -423,27 +433,27 @@ class ClientGUI extends JFrame{
         c.gridy = 0;
         chatBar.add(userTable, c);
         
-        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(10,0,0,0);
+        c.ipady = 60;
+        c.weightx = 0.0;
+        c.gridx = 0;
+        c.gridy = 1;
+        chatBar.add(scroll, c);
+
         c.insets = new Insets(5,0,0,0);
+        c.ipady = 0;
         c.gridx = 0;
         c.gridy = 2;
         chatBar.add(inputTextField, c);
-     
-        c.fill = GridBagConstraints.HORIZONTAL;
+        
+        c.fill = GridBagConstraints.NONE;
         c.insets = new Insets(0,0,0,0);
         c.weightx = 0.2;
         c.gridx = 0;
         c.gridy = 3;
         chatBar.add(sendButton, c);
-        
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(10,0,0,0);
-        c.ipady = 60;
-        c.weightx = 0.0;
-        c.gridwidth = 3;
-        c.gridx = 0;
-        c.gridy = 1;
-        chatBar.add(scroll, c);
+
+
         
         ActionListener enterText = new ActionListener() {
             @Override
@@ -536,7 +546,7 @@ class ClientGUI extends JFrame{
     }
     
     private void setStroke() {
-        strokeButton.setIcon(new ColorIcon(strokeSlider.getValue(), Color.black));
+        strokeButton.setIcon(new ColorIcon(Math.max((int)(strokeSlider.getValue() * 3/5), 2), Color.black));
         controller.setStrokeWidth(strokeSlider.getValue());
     }
     
@@ -588,7 +598,7 @@ class ClientGUI extends JFrame{
             JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             BoardIdentifier boardName = new BoardIdentifier(Utils.generateId(), inputBoardName.getText());
-
+            this.setTitle(boardName.name());
             controller.generateNewBoard(boardName, Integer.parseInt(widthName.getText()),
                 						Integer.parseInt(heightName.getText()));
 
@@ -615,6 +625,7 @@ class ClientGUI extends JFrame{
     }
     
     private void joinBoardAction(BoardIdentifier boardName) {
+        this.setTitle(boardName.name());
         controller.connectToBoard(boardName);
     }
     
