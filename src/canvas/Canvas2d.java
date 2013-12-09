@@ -2,6 +2,7 @@ package canvas;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
@@ -114,12 +115,11 @@ public class Canvas2d extends DrawableBase {
         final Graphics2D g = (Graphics2D) image.getGraphics();
 
         g.setColor(Color.BLACK);
-        
+
         HashSet<Pixel> pixels = new HashSet<Pixel>();
         Queue<Pixel> queue = new LinkedList<Pixel>();
         queue.add(pixel);
         Color initialColor = getPixelColor(pixel);
-        
         while (!queue.isEmpty()) {
             Pixel newPixel = queue.remove();
             if (!pixels.contains(newPixel)) {

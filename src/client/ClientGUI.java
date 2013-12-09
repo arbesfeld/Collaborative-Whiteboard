@@ -107,6 +107,7 @@ class ClientGUI extends JFrame{
     private final JToggleButton eraseToggle;
     private final JToggleButton fillToggle;
     private final JToggleButton brushToggle;
+    private final JToggleButton cloneToggle;
     private final JComboBox strokeDropdown;
     
     private final StrokeType[] strokeTypes;
@@ -145,7 +146,7 @@ class ClientGUI extends JFrame{
         
         // Create Cursor
         Toolkit toolkit = Toolkit.getDefaultToolkit();
-        this.iconImage = toolkit.getImage("resources/cursor.gif");
+        this.iconImage = toolkit.getImage("resources/cursor.png");
         Point hotSpot = new Point(16,16);
         this.brushCursor = toolkit.createCustomCursor(iconImage, hotSpot, "circleBrush");
         
@@ -186,6 +187,13 @@ class ClientGUI extends JFrame{
         this.fillToggle.setDisabledIcon(new ImageIcon(((new ImageIcon("resources/fillSelectedIcon.png")).getImage())
                 .getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH)));  
         this.fillToggle.setFocusPainted(false);
+        this.fillToggle.setPreferredSize(new Dimension(40,40));
+        this.cloneToggle = new JToggleButton(new ImageIcon(((new ImageIcon("resources/stampIcon.png")).getImage())
+                .getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH)));  
+        this.cloneToggle.setDisabledIcon(new ImageIcon(((new ImageIcon("resources/stampSelectedIcon.png")).getImage())
+                .getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH)));  
+        this.cloneToggle.setFocusPainted(false);
+        this.cloneToggle.setPreferredSize(new Dimension(40,40));
         this.brushToggle = new JToggleButton(new ImageIcon(((new ImageIcon("resources/brushIcon.png")).getImage())
                 .getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH)));
         this.brushToggle.setDisabledIcon(new ImageIcon(((new ImageIcon("resources/brushSelectedIcon.png")).getImage())
@@ -253,6 +261,7 @@ class ClientGUI extends JFrame{
         JPanel toolBar = new JPanel();
         toolBar.add(brushToggle);
         toolBar.add(fillToggle);
+        toolBar.add(cloneToggle);
         toolBar.add(eraseToggle);
         toolBar.add(dropperToggle);
         TitledBorder toolBorder = BorderFactory.createTitledBorder("Tools");
@@ -322,6 +331,7 @@ class ClientGUI extends JFrame{
             public void itemStateChanged(ItemEvent e) {
                 if (brushToggle.isSelected()) {
                     brushToggle.setEnabled(false);
+                    cloneToggle.setSelected(false);
                     eraseToggle.setSelected(false);
                     fillToggle.setSelected(false);
                     dropperToggle.setSelected(false);
@@ -332,11 +342,29 @@ class ClientGUI extends JFrame{
             }
         });
         
+        cloneToggle.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (cloneToggle.isSelected()) {
+                    cloneToggle.setEnabled(false);
+                    brushToggle.setSelected(false);
+                    eraseToggle.setSelected(false);
+                    fillToggle.setSelected(false);
+                    dropperToggle.setSelected(false);
+                    //TODO implement clone
+                }
+                else {
+                    cloneToggle.setEnabled(true);
+                }
+            }
+        });
+        
         eraseToggle.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (eraseToggle.isSelected()) {
                     eraseToggle.setEnabled(false);
+                    cloneToggle.setSelected(false);
                     brushToggle.setSelected(false);
                     fillToggle.setSelected(false);
                     dropperToggle.setSelected(false);
@@ -354,6 +382,7 @@ class ClientGUI extends JFrame{
             public void itemStateChanged(ItemEvent e) {
                 if (fillToggle.isSelected()) {
                     fillToggle.setEnabled(false);
+                    cloneToggle.setSelected(false);
                     brushToggle.setSelected(false);
                     eraseToggle.setSelected(false);
                     dropperToggle.setSelected(false);
@@ -372,6 +401,7 @@ class ClientGUI extends JFrame{
                 if (dropperToggle.isSelected()) {
                     dropperToggle.setEnabled(false);
                     brushToggle.setSelected(false);
+                    cloneToggle.setSelected(false);
                     eraseToggle.setSelected(false);
                     fillToggle.setSelected(false);
                     controller.setFillOn(true);
