@@ -17,7 +17,7 @@ public class PopupGUI extends JFrame {
     private static final long serialVersionUID = 1L;
 
     public PopupGUI(Boolean incorrectServer) throws Exception {
-        JTextField username = new JTextField("Matt");
+        JTextField username = new JTextField(System.getProperty("user.name"));
         JTextField ip = new JTextField("localhost");
         JTextField port = new JTextField(Integer.toString(Server.DEFAULT_PORT));
         JPanel panel = new JPanel(new GridLayout(0, 1));
