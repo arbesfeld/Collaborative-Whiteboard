@@ -265,6 +265,8 @@ class ClientGUI extends JFrame{
         sidebar.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         
+        c.weighty = 1;
+        c.anchor = GridBagConstraints.NORTH;
         c.insets = new Insets(5,0,0,0);
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
