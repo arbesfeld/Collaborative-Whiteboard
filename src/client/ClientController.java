@@ -26,7 +26,9 @@ import stroke.StrokeTypeBasic;
 import stroke.StrokeTypeEraser;
 import util.Utils;
 import canvas.Canvas2d;
+import canvas.Drawable;
 import canvas.DrawableBase;
+import canvas.DrawableCanvas2d;
 import canvas.command.DrawCommand;
 
 public class ClientController extends SocketHandler {
@@ -66,9 +68,8 @@ public class ClientController extends SocketHandler {
         assert clientState == ClientState.IDLE;
         clientState = ClientState.PLAYING;
         
-        BoardModel model = packet.boardModel();
-        DrawableBase drawableCanvas = ((Canvas2d) model.canvas()).makeDrawable(strokeProperties, this);
-        BoardModel newModel = new BoardModel(model.identifier(), drawableCanvas, model.users());
+        DrawableBase drawableCanvas = packet.canvas().makeDrawable(strokeProperties, this);
+        BoardModel newModel = new BoardModel(packet.boardName(), drawableCanvas, packet.users());
         this.model = newModel;
        
         sendPacket(new PacketClientReady());

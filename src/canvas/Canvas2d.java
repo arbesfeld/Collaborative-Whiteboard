@@ -18,6 +18,7 @@ import java.awt.image.PixelGrabber;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -29,11 +30,10 @@ import stroke.StrokeProperties;
 import canvas.command.DrawCommandPixel;
 import client.ClientController;
 
-public class Canvas2d extends DrawableBase {
+public class Canvas2d extends DrawableBase implements Drawable, Serializable {
     private static final long serialVersionUID = -6329493755553689791L;
 
     // image where the user's drawing is stored
-    private transient ImageIcon imageIcon;
     private transient BufferedImage image;
     
     /**
@@ -43,24 +43,18 @@ public class Canvas2d extends DrawableBase {
      */
     public Canvas2d(int width, int height) {
         super(width, height);
-     
-        this.setPreferredSize(new Dimension(width, height));
-        // note: we can't call makeImage here, because it only
-        // works *after* this canvas has been added to a window.  Have to
-        // wait until paintComponent() is first called.
     }
     
+    public Canvas2d(BufferedImage image) {
+        super(image.getWidth(), image.getHeight());
+        this.image = image;
+    }
     /*
      * Make the drawing buffer and draw some starting content for it.
      */
     private synchronized void makeImage() {
         image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        if (imageIcon == null) {
-            imageIcon = new ImageIcon(image);
-            fillWithWhite();
-        } else {
-            image.getGraphics().drawImage(imageIcon.getImage(), 0, 0 , null);
-        }
+        fillWithWhite();
     }
     
     /*
@@ -71,7 +65,6 @@ public class Canvas2d extends DrawableBase {
 
         g.setColor(Color.WHITE);
         g.fillRect(0, 0, width, height);
-        repaint();
     }
     
     @Override
@@ -89,7 +82,6 @@ public class Canvas2d extends DrawableBase {
         g.setColor(Color.BLACK);
         
         image.setRGB(pixel.x(), pixel.y(), pixel.color().getRGB());
-        repaint();
     }
     
     @Override
@@ -112,8 +104,6 @@ public class Canvas2d extends DrawableBase {
         }
         g.setStroke(stroke);
         g.drawLine(pixelStart.x(), pixelStart.y(), pixelEnd.x(), pixelEnd.y());
-
-        repaint();
     }
     
     public synchronized void drawFill(Pixel pixel) {
@@ -149,9 +139,8 @@ public class Canvas2d extends DrawableBase {
                 }
             }
         }
-        repaint();
     }
-    
+
     @Override
 	public synchronized Color getPixelColor(Pixel pixel) {
 		if (image == null) {
@@ -165,10 +154,6 @@ public class Canvas2d extends DrawableBase {
 		return new Color(image.getRGB(pixel.x(), pixel.y()));
 	}
 
-    /**
-     * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
-     */
-    @Override
     public synchronized void paintComponent(Graphics g) {
     	if (image == null) {
     		makeImage();
@@ -181,47 +166,12 @@ public class Canvas2d extends DrawableBase {
     	return new DrawableCanvas2d(strokeProperties, clientController, this);
     }
 
-    private void writeObject(ObjectOutputStream s) throws IOException {
-        s.defaultWriteObject();
+    public synchronized BufferedImage image() {
         if (image == null) {
             makeImage();
         }
-        int w = imageIcon.getIconWidth();
-        int h = imageIcon.getIconHeight();
-        int[] pixels = image != null? new int[w * h] : null;
-
-        if (image != null) {
-            try {
-                PixelGrabber pg = new PixelGrabber(image, 0, 0, w, h, pixels, 0, w);
-                pg.grabPixels();
-                if ((pg.getStatus() & ImageObserver.ABORT) != 0) {
-                    throw new IOException("failed to load image contents");
-                }
-            }
-            catch (InterruptedException e) {
-                throw new IOException("image load interrupted");
-            }
-        }
-        s.writeInt(w);
-        s.writeInt(h);
-        s.writeObject(pixels);
-    }
-
-    private void readObject(ObjectInputStream s) throws ClassNotFoundException, IOException {
-        s.defaultReadObject();
-
-        int w = s.readInt();
-        int h = s.readInt();
-        int[] pixels = (int[])(s.readObject());
-
-        if (pixels != null) {
-            Toolkit tk = Toolkit.getDefaultToolkit();
-            ColorModel cm = ColorModel.getRGBdefault();
-            Image temp = tk.createImage(new MemoryImageSource(w, h, cm, pixels, 0, w));
-            image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-            image.getGraphics().drawImage(temp, 0, 0, null);
-            imageIcon = new ImageIcon(image);
-        }
+        
+        return image;
     }
         
 }

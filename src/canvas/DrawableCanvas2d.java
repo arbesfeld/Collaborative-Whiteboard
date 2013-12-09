@@ -9,6 +9,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
+import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
 import stroke.StrokeProperties;
@@ -21,7 +22,7 @@ import client.ClientController;
  * Canvas represents a drawing surface that allows the user to draw
  * on it freehand, with the mouse.
  */
-public class DrawableCanvas2d extends DrawableBase {
+public class DrawableCanvas2d extends DrawableBase implements Drawable {
     private static final long serialVersionUID = -7112257891818505133L;
 
     private final ClientController clientController;
@@ -30,7 +31,7 @@ public class DrawableCanvas2d extends DrawableBase {
     private final Canvas2d canvas;
     
     public DrawableCanvas2d(StrokeProperties strokeProperties, ClientController clientController, Canvas2d canvas) {
-        super(canvas.width(), canvas.height());
+        super(canvas.width, canvas.height);
         
         this.setPreferredSize(new Dimension(width(), height()));
         this.clientController = clientController;
@@ -103,13 +104,6 @@ public class DrawableCanvas2d extends DrawableBase {
         public void mouseExited(MouseEvent e) { }
     }
     
-    @Override 
-    public void repaint() {
-    	if (canvas != null) {
-    		canvas.repaint();
-    	}
-    	super.repaint();
-    }
     
     @Override
     public void drawPixel(Pixel pixel) {
@@ -132,5 +126,15 @@ public class DrawableCanvas2d extends DrawableBase {
     @Override
     public Color getPixelColor(Pixel pixel) {
         return canvas.getPixelColor(pixel);
+    }
+    
+    @Override
+    public int width() {
+        return width;
+    }
+    
+    @Override
+    public int height() {
+        return height;
     }
 }

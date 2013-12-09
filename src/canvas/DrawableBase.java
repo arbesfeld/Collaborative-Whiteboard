@@ -1,5 +1,6 @@
 package canvas;
 
+import java.awt.Graphics;
 import java.io.Serializable;
 
 import javax.swing.JPanel;
@@ -17,6 +18,8 @@ public abstract class DrawableBase extends JPanel implements Drawable, Serializa
     
     @Override
     public abstract void drawPixel(Pixel pixel);
+    @Override
+    public abstract void paintComponent(Graphics g);
     
     public int width() {
         return width;

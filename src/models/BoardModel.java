@@ -1,18 +1,28 @@
 package models;
 
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Stroke;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+
+import util.Vector2;
 import name.BoardIdentifier;
 import name.Identifiable;
 import canvas.Drawable;
 import canvas.DrawableBase;
 import canvas.Pixel;
+import canvas.command.DrawCommand;
 
 public class BoardModel implements Drawable, Identifiable, Serializable {
 	private static final long serialVersionUID = -7812022750931126889L;
@@ -94,4 +104,9 @@ public class BoardModel implements Drawable, Identifiable, Serializable {
     public BoardIdentifier identifier() {
         return boardName;
     }
+    
+    public void paintComponent(Graphics g) {
+        canvas.paintComponent(g);
+    }
+    
 }
