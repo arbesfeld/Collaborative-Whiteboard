@@ -41,7 +41,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -90,16 +89,14 @@ import util.Utils;
 
 class ClientGUI extends JFrame{
     private static final long serialVersionUID = -8313236674630578250L;
-    private final JMenuBar menuBar;
-    private final JMenu menu;
     
     private final Container container;
     private final GroupLayout layout;
     private JPanel canvas;
     
-    private final JMenu joinGameSubmenu;
-    private final JMenuItem newBoard;
     private final JMenuItem save;
+    
+    private final JMenu joinGameSubmenu;
     private final JButton colorButton;
     private final JToggleButton dropperToggle;
     private final JColorChooser colorChooser;
@@ -109,7 +106,7 @@ class ClientGUI extends JFrame{
     private final JToggleButton fillToggle;
     private final JToggleButton brushToggle;
     private final JToggleButton cloneToggle;
-    private final JComboBox strokeDropdown;
+    private final JComboBox<StrokeType> strokeDropdown;
     
     private final StrokeType[] strokeTypes;
     
@@ -142,6 +139,8 @@ class ClientGUI extends JFrame{
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
         
+        this.save = new JMenuItem("Save to png", KeyEvent.VK_T);
+        
         // Set the title
         setTitle("Whiteboard: Interactive Drawing Tool");
         
@@ -150,13 +149,6 @@ class ClientGUI extends JFrame{
         this.iconImage = toolkit.getImage("resources/cursor.png");
         Point hotSpot = new Point(16,16);
         this.brushCursor = toolkit.createCustomCursor(iconImage, hotSpot, "circleBrush");
-        
-        // Create the menu bar.
-        this.menuBar = new JMenuBar();
-        this.menu = new JMenu("File");
-        this.newBoard = new JMenuItem("New Board", KeyEvent.VK_T);
-        this.save = new JMenuItem("Save to png", KeyEvent.VK_T);
-        this.save.setEnabled(false);
         
         this.colorButton = new JButton("Color");
         this.colorButton.setIcon(new ColorIcon(10, Color.black));
@@ -220,7 +212,7 @@ class ClientGUI extends JFrame{
             strokeTypes[5] = new StrokeTypeProc7();
 
             
-       this.strokeDropdown = new JComboBox(strokeTypes);
+       this.strokeDropdown = new JComboBox<StrokeType>(strokeTypes);
        this.strokeDropdown.setPreferredSize(new Dimension(100,40));
        this.strokeDropdown.setFocusable(false);
         
@@ -241,7 +233,7 @@ class ClientGUI extends JFrame{
         
         
         // Create and set up the content pane.
-        setMenuBarGUI();
+        buildMenuBar();
         setContentPaneGUI(null);
 
     }
@@ -332,11 +324,8 @@ class ClientGUI extends JFrame{
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (brushToggle.isSelected()) {
+                    setBrushToggles(true,false,false,false,false);
                     brushToggle.setEnabled(false);
-                    cloneToggle.setSelected(false);
-                    eraseToggle.setSelected(false);
-                    fillToggle.setSelected(false);
-                    dropperToggle.setSelected(false);
                 }
                 else {
                     brushToggle.setEnabled(true);
@@ -349,10 +338,7 @@ class ClientGUI extends JFrame{
             public void itemStateChanged(ItemEvent e) {
                 if (cloneToggle.isSelected()) {
                     cloneToggle.setEnabled(false);
-                    brushToggle.setSelected(false);
-                    eraseToggle.setSelected(false);
-                    fillToggle.setSelected(false);
-                    dropperToggle.setSelected(false);
+                    setBrushToggles(false,false,true,false,false);
                     //TODO implement clone
                 }
                 else {
@@ -366,10 +352,7 @@ class ClientGUI extends JFrame{
             public void itemStateChanged(ItemEvent e) {
                 if (eraseToggle.isSelected()) {
                     eraseToggle.setEnabled(false);
-                    cloneToggle.setSelected(false);
-                    brushToggle.setSelected(false);
-                    fillToggle.setSelected(false);
-                    dropperToggle.setSelected(false);
+                    setBrushToggles(false,false,false,true,false);
                     controller.setEraserOn(true);
                 }
                 else {
@@ -384,10 +367,7 @@ class ClientGUI extends JFrame{
             public void itemStateChanged(ItemEvent e) {
                 if (fillToggle.isSelected()) {
                     fillToggle.setEnabled(false);
-                    cloneToggle.setSelected(false);
-                    brushToggle.setSelected(false);
-                    eraseToggle.setSelected(false);
-                    dropperToggle.setSelected(false);
+                    setBrushToggles(false,true,false,false,false);
                     controller.setFillOn(true);
                 }
                 else {
@@ -402,10 +382,7 @@ class ClientGUI extends JFrame{
             public void itemStateChanged(ItemEvent e) {
                 if (dropperToggle.isSelected()) {
                     dropperToggle.setEnabled(false);
-                    brushToggle.setSelected(false);
-                    cloneToggle.setSelected(false);
-                    eraseToggle.setSelected(false);
-                    fillToggle.setSelected(false);
+                    setBrushToggles(false,false,false,false,true);
                     try {
                         final Robot robot = new Robot();
                         canvas.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -445,6 +422,14 @@ class ClientGUI extends JFrame{
             }
         });
         
+    }
+    
+    private void setBrushToggles(boolean brush, boolean fill, boolean clone, boolean eraser, boolean dropper) {
+        brushToggle.setSelected(brush);
+        cloneToggle.setSelected(clone);
+        eraseToggle.setSelected(eraser);
+        fillToggle.setSelected(fill);
+        dropperToggle.setSelected(dropper);
     }
        
     private void setChatClient() {
@@ -501,16 +486,21 @@ class ClientGUI extends JFrame{
         
     }
     
-    private void setMenuBarGUI() {
+    private void buildMenuBar() {     
+        // Create the menu bar.
+        JMenuBar menuBar = new JMenuBar();
+        JMenu menu = new JMenu("File");
+        JMenuItem newBoard = new JMenuItem("New Board", KeyEvent.VK_T);
+        this.save.setEnabled(false);
         
         // Build the first menu.
         menu.setMnemonic(KeyEvent.VK_F);
         menuBar.add(menu);
         
         
-        save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+        this.save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
         
-        save.addActionListener(new ActionListener() {
+        this.save.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 saveCanvas();
@@ -529,7 +519,7 @@ class ClientGUI extends JFrame{
 
         menu.add(newBoard);
         menu.add(joinGameSubmenu);
-        menu.add(save);
+        menu.add(this.save);
         setJMenuBar(menuBar);
     }
     
