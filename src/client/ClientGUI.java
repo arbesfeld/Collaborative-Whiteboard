@@ -121,6 +121,7 @@ class ClientGUI extends JFrame{
     
     private final JPanel sidebar;
     private final JPanel chatBar;
+    private String title="Whiteboard: Interactive Drawing Tool";
     
     private final JTable userTable;
     private final JTextArea chatText;
@@ -149,7 +150,7 @@ class ClientGUI extends JFrame{
         this.save = new JMenuItem("Save to png", KeyEvent.VK_T);
         
         // Set the title
-        setTitle("Whiteboard: Interactive Drawing Tool");
+        setTitle(title);
         
         // Create Cursors
         Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -172,11 +173,15 @@ class ClientGUI extends JFrame{
         this.colorButton = new JButton("Color");
         this.colorButton.setIcon(new ColorIcon(10, Color.black));
         this.colorButton.setFocusPainted(false);
+
+        this.colorButton.setPreferredSize(new Dimension(80,30));
         this.colorButton.setHorizontalAlignment(SwingConstants.LEFT);
         this.colorChooser = new JColorChooser();
         this.strokeButton = new JButton("Stroke");
         this.strokeButton.setFocusPainted(false);
         this.strokeButton.setIcon(new ColorIcon(STROKE_INIT, Color.black));
+
+        this.strokeButton.setPreferredSize(new Dimension(90, 30));
         this.strokeButton.setHorizontalAlignment(SwingConstants.LEFT);
         this.strokeSlider = new JSlider(JSlider.HORIZONTAL, STROKE_MIN, STROKE_MAX, STROKE_INIT);
         
@@ -230,7 +235,7 @@ class ClientGUI extends JFrame{
 
             
        this.strokeDropdown = new JComboBox<StrokeType>(strokeTypes);
-
+       this.strokeDropdown.setPreferredSize(new Dimension(100,30));
        this.strokeDropdown.setFocusable(false);
         
         // Join Game submenu.
@@ -418,8 +423,11 @@ class ClientGUI extends JFrame{
                     try {
                         final Robot robot = new Robot();
                         canvas.setCursor(dropperCursor);
+
+                        controller.setStrokeWidth(-1);
                         MouseListener mouseListener = new MouseListener() {
-                            @Override
+                            
+                        	@Override
                             public void mouseClicked(MouseEvent e) {
                                 PointerInfo pointer;
                                 pointer = MouseInfo.getPointerInfo();
@@ -430,6 +438,7 @@ class ClientGUI extends JFrame{
                                 canvas.removeMouseListener(this); 
                                 brushToggle.setSelected(true);
                                 updateCursor();
+                                setStroke();
                             }
                             @Override
                             public void mouseEntered(MouseEvent arg0) { }
@@ -655,7 +664,7 @@ class ClientGUI extends JFrame{
             JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             BoardIdentifier boardName = new BoardIdentifier(Utils.generateId(), inputBoardName.getText());
-            this.setTitle(boardName.name());
+            this.setTitle(title+ " - " + boardName.name());
             controller.generateNewBoard(boardName, Integer.parseInt(widthName.getText()),
                 						Integer.parseInt(heightName.getText()));
 
@@ -664,7 +673,7 @@ class ClientGUI extends JFrame{
     }
     
     private void saveCanvas() {
-        BufferedImage bi = new BufferedImage(this.getSize().width, this.getSize().height, BufferedImage.TYPE_INT_ARGB); 
+        BufferedImage bi = new BufferedImage(controller.getBoardWidth(), controller.getBoardHeight(), BufferedImage.TYPE_INT_ARGB); 
         Graphics g = bi.createGraphics();
         canvas.paint(g);
         g.dispose();

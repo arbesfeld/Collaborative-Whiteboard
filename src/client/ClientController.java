@@ -207,5 +207,12 @@ public class ClientController extends SocketHandler {
 	public void receivedJoinBoardPacket(PacketJoinBoard packet) {
 		assert false;
 	}
-
+	
+	public int getBoardWidth() {
+		return this.model.width();
+	}
+	
+	public int getBoardHeight() {
+		return this.model.height();
+	}
 }
