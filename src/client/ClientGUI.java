@@ -174,14 +174,12 @@ class ClientGUI extends JFrame{
         this.colorButton.setIcon(new ColorIcon(10, Color.black));
         this.colorButton.setFocusPainted(false);
 
-        this.colorButton.setPreferredSize(new Dimension(80,30));
         this.colorButton.setHorizontalAlignment(SwingConstants.LEFT);
         this.colorChooser = new JColorChooser();
         this.strokeButton = new JButton("Stroke");
         this.strokeButton.setFocusPainted(false);
         this.strokeButton.setIcon(new ColorIcon(STROKE_INIT, Color.black));
 
-        this.strokeButton.setPreferredSize(new Dimension(90, 30));
         this.strokeButton.setHorizontalAlignment(SwingConstants.LEFT);
         this.strokeSlider = new JSlider(JSlider.HORIZONTAL, STROKE_MIN, STROKE_MAX, STROKE_INIT);
         
@@ -235,7 +233,6 @@ class ClientGUI extends JFrame{
 
             
        this.strokeDropdown = new JComboBox<StrokeType>(strokeTypes);
-       this.strokeDropdown.setPreferredSize(new Dimension(100,30));
        this.strokeDropdown.setFocusable(false);
         
         // Join Game submenu.
