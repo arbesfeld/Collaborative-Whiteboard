@@ -84,6 +84,7 @@ import stroke.StrokeTypeProc6;
 import stroke.StrokeTypeProc7;
 import stroke.StrokeTypeSpray;
 import stroke.StrokeTypeSquares;
+import util.MineralNames;
 import util.Utils;
 
 
@@ -93,6 +94,8 @@ class ClientGUI extends JFrame{
     private final Container container;
     private final GroupLayout layout;
     private JPanel canvas;
+    
+    private final boolean isWindows;
     
     private final JMenuItem save;
     
@@ -111,6 +114,9 @@ class ClientGUI extends JFrame{
     private final StrokeType[] strokeTypes;
     
     private Cursor brushCursor;
+    private Cursor fillCursor;
+    private Cursor dropperCursor;
+    private Cursor eraserCursor;
     private final Image iconImage;
     
     private final JPanel sidebar;
@@ -132,6 +138,7 @@ class ClientGUI extends JFrame{
      * event-dispatching thread.
      */
     public ClientGUI() {
+        isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");  
         setResizable(false);
         this.container = this.getContentPane();
         this.layout = new GroupLayout(container);
@@ -144,22 +151,32 @@ class ClientGUI extends JFrame{
         // Set the title
         setTitle("Whiteboard: Interactive Drawing Tool");
         
-        // Create Cursor
+        // Create Cursors
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         this.iconImage = toolkit.getImage("resources/cursor.png");
         Point hotSpot = new Point(16,16);
         this.brushCursor = toolkit.createCustomCursor(iconImage, hotSpot, "circleBrush");
         
+        Image fillImage = toolkit.getImage("resources/fillCursor.png");
+        hotSpot = new Point(2,30);
+        this.fillCursor = toolkit.createCustomCursor(fillImage, hotSpot, "fillCursor");
+        
+        fillImage = toolkit.getImage("resources/eyedropperCursor.png");
+        hotSpot = new Point(2,30);
+        this.dropperCursor = toolkit.createCustomCursor(fillImage, hotSpot, "dropperCursor");
+
+        fillImage = toolkit.getImage("resources/eraserCursor.png");
+        hotSpot = new Point(2,2);
+        this.eraserCursor = toolkit.createCustomCursor(fillImage, hotSpot, "eraserCursor");
+        
         this.colorButton = new JButton("Color");
         this.colorButton.setIcon(new ColorIcon(10, Color.black));
         this.colorButton.setFocusPainted(false);
-        this.colorButton.setPreferredSize(new Dimension(60,30));
         this.colorButton.setHorizontalAlignment(SwingConstants.LEFT);
         this.colorChooser = new JColorChooser();
         this.strokeButton = new JButton("Stroke");
         this.strokeButton.setFocusPainted(false);
         this.strokeButton.setIcon(new ColorIcon(STROKE_INIT, Color.black));
-        this.strokeButton.setPreferredSize(new Dimension(70, 30));
         this.strokeButton.setHorizontalAlignment(SwingConstants.LEFT);
         this.strokeSlider = new JSlider(JSlider.HORIZONTAL, STROKE_MIN, STROKE_MAX, STROKE_INIT);
         
@@ -213,7 +230,7 @@ class ClientGUI extends JFrame{
 
             
        this.strokeDropdown = new JComboBox<StrokeType>(strokeTypes);
-       this.strokeDropdown.setPreferredSize(new Dimension(100,40));
+
        this.strokeDropdown.setFocusable(false);
         
         // Join Game submenu.
@@ -230,6 +247,18 @@ class ClientGUI extends JFrame{
         this.tableModel = new UserTableModel();
         this.userTable = new JTable(this.tableModel);
         setSideBar();
+        
+        if (isWindows) {
+            this.brushCursor = Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
+            this.colorButton.setPreferredSize(new Dimension(80,30));
+            this.strokeButton.setPreferredSize(new Dimension(90, 30));
+            this.strokeDropdown.setPreferredSize(new Dimension(120,30));
+        }
+        else {
+            this.colorButton.setPreferredSize(new Dimension(60,30));
+            this.strokeButton.setPreferredSize(new Dimension(70, 30));
+            this.strokeDropdown.setPreferredSize(new Dimension(100,30));
+        }
         
         
         // Create and set up the content pane.
@@ -326,6 +355,7 @@ class ClientGUI extends JFrame{
                 if (brushToggle.isSelected()) {
                     setBrushToggles(true,false,false,false,false);
                     brushToggle.setEnabled(false);
+                    updateCursor();
                 }
                 else {
                     brushToggle.setEnabled(true);
@@ -354,6 +384,7 @@ class ClientGUI extends JFrame{
                     eraseToggle.setEnabled(false);
                     setBrushToggles(false,false,false,true,false);
                     controller.setEraserOn(true);
+                    canvas.setCursor(eraserCursor);
                 }
                 else {
                     eraseToggle.setEnabled(true);
@@ -369,6 +400,7 @@ class ClientGUI extends JFrame{
                     fillToggle.setEnabled(false);
                     setBrushToggles(false,true,false,false,false);
                     controller.setFillOn(true);
+                    canvas.setCursor(fillCursor);
                 }
                 else {
                     fillToggle.setEnabled(true);
@@ -385,7 +417,7 @@ class ClientGUI extends JFrame{
                     setBrushToggles(false,false,false,false,true);
                     try {
                         final Robot robot = new Robot();
-                        canvas.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                        canvas.setCursor(dropperCursor);
                         MouseListener mouseListener = new MouseListener() {
                             @Override
                             public void mouseClicked(MouseEvent e) {
@@ -595,20 +627,19 @@ class ClientGUI extends JFrame{
     }
     
     private void updateCursor() {
-        Toolkit toolkit = Toolkit.getDefaultToolkit();
-        int strokeWidth = strokeSlider.getValue();
-        Image scaledIcon = iconImage.getScaledInstance(strokeWidth, strokeWidth, Image.SCALE_SMOOTH);
-        Point hotSpot = new Point(strokeWidth/2, strokeWidth/2);
-        brushCursor = toolkit.createCustomCursor(scaledIcon, hotSpot, "circleBrush");
-        this.canvas.setCursor(brushCursor);
+        if (!isWindows) {
+            Toolkit toolkit = Toolkit.getDefaultToolkit();
+            int strokeWidth = strokeSlider.getValue();
+            Image scaledIcon = iconImage.getScaledInstance(strokeWidth, strokeWidth, Image.SCALE_SMOOTH);
+            Point hotSpot = new Point(strokeWidth/2, strokeWidth/2);
+            brushCursor = toolkit.createCustomCursor(scaledIcon, hotSpot, "circleBrush");
+            this.canvas.setCursor(brushCursor);
+        }
     }
     
     private void newBoardAction() {
-        String[] names = {  "Acerila","Cornelian","Kingman Turquoise","Precious Cat's Eye","Achroite","Cornflower Sapphire","Precious Fire Opal","Acmite","Coyamito Agate" ,"Kittlite"
-                ,"Precious Opal","Adamine" ,"Crazy Lace Agate","Kunzite","Pseudoleucite","Adularia","Crocidolite","Kutnohorite","Purple Copper Ore","African Amethyst"
-                ,"Cromfordite","Laguna Agate","Pycnite","African Jade","Cromite","Lake Superior Agate","Pyralspite","Agalmatolite","Cronstedtite" ,"Landscape Agate"
-                ,"Pyrite Cube","Agaric Mineral","Crystal Opal","Lapis"};
-        JTextField inputBoardName = new JTextField(names[(int)(Math.random() * names.length)]);
+        
+        JTextField inputBoardName = new JTextField(MineralNames.getName());
         JTextField widthName = new JTextField("512");
         JTextField heightName = new JTextField("512");
         JPanel panel = new JPanel(new GridLayout(0, 1));
@@ -620,7 +651,7 @@ class ClientGUI extends JFrame{
         panel.add(new JLabel("Height (px)"));
         panel.add(heightName);
         
-        int result = JOptionPane.showConfirmDialog(null, panel, "Connect To Server",
+        int result = JOptionPane.showConfirmDialog(null, panel, "Create Board",
             JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             BoardIdentifier boardName = new BoardIdentifier(Utils.generateId(), inputBoardName.getText());
