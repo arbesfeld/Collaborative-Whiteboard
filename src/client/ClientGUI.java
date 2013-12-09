@@ -24,6 +24,8 @@ import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -137,7 +139,7 @@ class ClientGUI extends JFrame{
         layout.setAutoCreateContainerGaps(true);
         
         // Set the title
-        setTitle("Whiteboard: Interactive Drawing Tool!");
+        setTitle("Whiteboard: Interactive Drawing Tool");
         
         // Create Cursor
         Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -163,24 +165,33 @@ class ClientGUI extends JFrame{
         this.strokeButton.setIcon(new ColorIcon(STROKE_INIT, Color.black));
         this.strokeButton.setPreferredSize(new Dimension(120, 20));
         this.strokeButton.setHorizontalAlignment(SwingConstants.LEFT);
+        this.strokeSlider = new JSlider(JSlider.HORIZONTAL, STROKE_MIN, STROKE_MAX, STROKE_INIT);
+        
         this.dropperToggle = new JToggleButton(new ImageIcon(((new ImageIcon("resources/eyedropperIcon.png")).getImage())
                 .getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH)));  
+        this.dropperToggle.setDisabledIcon(new ImageIcon(((new ImageIcon("resources/eyedropperSelectedIcon.png")).getImage())
+                .getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH))); 
         this.dropperToggle.setFocusPainted(false);
         this.dropperToggle.setPreferredSize(new Dimension(40, 40));
-        this.dropperToggle.setHorizontalAlignment(SwingConstants.LEFT);
-        this.strokeSlider = new JSlider(JSlider.HORIZONTAL, STROKE_MIN, STROKE_MAX, STROKE_INIT);
         this.eraseToggle = new JToggleButton(new ImageIcon(((new ImageIcon("resources/eraserIcon.png")).getImage())
+                .getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH)));  
+        this.eraseToggle.setDisabledIcon(new ImageIcon(((new ImageIcon("resources/eraserSelectedIcon.png")).getImage())
                 .getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH)));  
         this.eraseToggle.setPreferredSize(new Dimension(40,40));
         this.eraseToggle.setFocusPainted(false);
         this.fillToggle = new JToggleButton(new ImageIcon(((new ImageIcon("resources/fillIcon.png")).getImage())
                 .getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH)));  
-        this.fillToggle.setPreferredSize(new Dimension(40,40));
+        this.fillToggle.setDisabledIcon(new ImageIcon(((new ImageIcon("resources/fillSelectedIcon.png")).getImage())
+                .getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH)));  
         this.fillToggle.setFocusPainted(false);
         this.brushToggle = new JToggleButton(new ImageIcon(((new ImageIcon("resources/brushIcon.png")).getImage())
+                .getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH)));
+        this.brushToggle.setDisabledIcon(new ImageIcon(((new ImageIcon("resources/brushSelectedIcon.png")).getImage())
                 .getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH)));  
         this.brushToggle.setPreferredSize(new Dimension(40,40));
         this.brushToggle.setFocusPainted(false);
+        this.brushToggle.setEnabled(false);
+        this.brushToggle.setSelected(true);
         
         //Build stroke dropdown
         this.strokeTypes = new StrokeType[11];
@@ -248,20 +259,7 @@ class ClientGUI extends JFrame{
         
         c.gridx = 0;
         c.gridy = 2;
-        sidebar.add(brushBar, c);
-        
-//        c.gridx = 0;
-//        c.gridy = 2;
-//        sidebar.add(fillToggle, c);
-//        
-//        c.gridx = 2;
-//        c.gridy = 2;
-//        sidebar.add(eraseToggle, c);
-//        
-//        c.gridx = 3;
-//        c.gridy = 2;
-//        sidebar.add(dropperToggle, c);
-        
+        sidebar.add(brushBar, c);     
        
         c.gridx = 0;
         c.gridy = 3;
@@ -301,34 +299,6 @@ class ClientGUI extends JFrame{
             }
         });
         
-        eraseToggle.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (eraseToggle.isSelected()) {
-                    eraseToggle.setFocusPainted(true);
-                    controller.setEraserOn(true);
-                }
-                else {
-                    eraseToggle.setFocusPainted(false);
-                    controller.setEraserOn(false);
-                }
-            }
-        });
-        
-        fillToggle.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (fillToggle.isSelected()) {
-                    eraseToggle.setFocusPainted(true);
-                    controller.setFillOn(true);
-                }
-                else {
-                    fillToggle.setFocusPainted(false);
-                    controller.setFillOn(false);
-                }
-            }
-        });
-        
         strokeDropdown.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -336,43 +306,100 @@ class ClientGUI extends JFrame{
             }
         });
         
-        dropperToggle.addActionListener(new ActionListener() {
+        brushToggle.addItemListener(new ItemListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                dropperToggle.setFocusPainted(true);
-                try {
-                    final Robot robot = new Robot();
-                    canvas.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    MouseListener mouseListener = new MouseListener() {
-                        @Override
-                        public void mouseClicked(MouseEvent e) {
-                            PointerInfo pointer;
-                            pointer = MouseInfo.getPointerInfo();
-                            Point coord = pointer.getLocation();
-                            Color color = robot.getPixelColor((int)coord.getX(), (int)coord.getX());
-                            colorButton.setIcon(new ColorIcon(10, color));
-                            controller.setStrokeColor(color);
-                            canvas.removeMouseListener(this);
-                            updateCursor();
-                            dropperToggle.setFocusPainted(false);
-                        }
-                        @Override
-                        public void mouseEntered(MouseEvent arg0) { }
-
-                        @Override
-                        public void mouseExited(MouseEvent arg0) { }
-
-                        @Override
-                        public void mousePressed(MouseEvent arg0) { }
-
-                        @Override
-                        public void mouseReleased(MouseEvent arg0) { }
-                    };
-                    canvas.addMouseListener(mouseListener);
-                } catch (AWTException e1) {
-                    e1.printStackTrace();
+            public void itemStateChanged(ItemEvent e) {
+                if (brushToggle.isSelected()) {
+                    brushToggle.setEnabled(false);
+                    eraseToggle.setSelected(false);
+                    fillToggle.setSelected(false);
+                    dropperToggle.setSelected(false);
                 }
-                
+                else {
+                    brushToggle.setEnabled(true);
+                }
+            }
+        });
+        
+        eraseToggle.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (eraseToggle.isSelected()) {
+                    eraseToggle.setEnabled(false);
+                    brushToggle.setSelected(false);
+                    fillToggle.setSelected(false);
+                    dropperToggle.setSelected(false);
+                    controller.setEraserOn(true);
+                }
+                else {
+                    eraseToggle.setEnabled(true);
+                    controller.setEraserOn(false);
+                }
+            }
+        });
+        
+        fillToggle.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (fillToggle.isSelected()) {
+                    fillToggle.setEnabled(false);
+                    brushToggle.setSelected(false);
+                    eraseToggle.setSelected(false);
+                    dropperToggle.setSelected(false);
+                    controller.setFillOn(true);
+                }
+                else {
+                    fillToggle.setEnabled(true);
+                    controller.setFillOn(false);
+                }
+            }
+        });
+        
+        dropperToggle.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (dropperToggle.isSelected()) {
+                    dropperToggle.setEnabled(false);
+                    brushToggle.setSelected(false);
+                    eraseToggle.setSelected(false);
+                    fillToggle.setSelected(false);
+                    controller.setFillOn(true);
+                    try {
+                        final Robot robot = new Robot();
+                        canvas.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                        MouseListener mouseListener = new MouseListener() {
+                            @Override
+                            public void mouseClicked(MouseEvent e) {
+                                PointerInfo pointer;
+                                pointer = MouseInfo.getPointerInfo();
+                                Point coord = pointer.getLocation();
+                                Color color = robot.getPixelColor((int)coord.getX(), (int)coord.getX());
+                                colorButton.setIcon(new ColorIcon(10, color));
+                                controller.setStrokeColor(color);
+                                canvas.removeMouseListener(this);
+                                updateCursor();
+                                dropperToggle.setFocusPainted(false);
+                            }
+                            @Override
+                            public void mouseEntered(MouseEvent arg0) { }
+    
+                            @Override
+                            public void mouseExited(MouseEvent arg0) { }
+    
+                            @Override
+                            public void mousePressed(MouseEvent arg0) { }
+    
+                            @Override
+                            public void mouseReleased(MouseEvent arg0) { }
+                        };
+                        canvas.addMouseListener(mouseListener);
+                    } catch (AWTException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+                else {
+                    dropperToggle.setEnabled(true);
+                }  
             }
         });
         
