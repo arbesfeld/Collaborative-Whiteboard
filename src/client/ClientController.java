@@ -70,7 +70,7 @@ public class ClientController extends SocketHandler {
         DrawableBase drawableCanvas = ((Canvas2d) model.canvas()).makeDrawable(strokeProperties, this);
         BoardModel newModel = new BoardModel(model.identifier(), drawableCanvas, model.users());
         this.model = newModel;
-        
+       
         sendPacket(new PacketClientReady());
 
         view.setModel(newModel);
@@ -129,7 +129,7 @@ public class ClientController extends SocketHandler {
     	if (model != null) {
             disconnectFromCurrentBoard();
     	}
-    	
+    	 
 		PacketNewBoard packet = new PacketNewBoard(boardName, width, height);
 		sendPacket(packet);
 	}

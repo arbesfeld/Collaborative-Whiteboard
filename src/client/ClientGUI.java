@@ -404,7 +404,6 @@ class ClientGUI extends JFrame{
                     cloneToggle.setSelected(false);
                     eraseToggle.setSelected(false);
                     fillToggle.setSelected(false);
-                    controller.setFillOn(true);
                     try {
                         final Robot robot = new Robot();
                         canvas.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -417,7 +416,7 @@ class ClientGUI extends JFrame{
                                 Color color = robot.getPixelColor((int)coord.getX(), (int)coord.getX());
                                 colorButton.setIcon(new ColorIcon(10, color));
                                 controller.setStrokeColor(color);
-                                canvas.removeMouseListener(this);
+                                canvas.removeMouseListener(this); 
                                 brushToggle.setSelected(true);
                                 updateCursor();
                             }
@@ -437,9 +436,8 @@ class ClientGUI extends JFrame{
                     } catch (AWTException e1) {
                         e1.printStackTrace();
                     }
-                }
+                } 
                 else {
-                    canvas.removeAll();
                     dropperToggle.setEnabled(true);
                 }  
             }
@@ -547,8 +545,8 @@ class ClientGUI extends JFrame{
             subMenuItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    joinBoardAction(boardName);
-                }
+                    joinBoardAction(boardName); 
+                } 
             });
             
             joinGameSubmenu.add(subMenuItem);

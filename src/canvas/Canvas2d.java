@@ -103,7 +103,7 @@ public class Canvas2d extends DrawableBase {
         repaint();
     }
     
-    public void drawFill(Pixel pixel) {
+    public synchronized void drawFill(Pixel pixel) {
         if (image == null) {
             makeImage();
         }
