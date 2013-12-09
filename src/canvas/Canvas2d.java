@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 
 import stroke.StrokeProperties;
 import canvas.command.DrawCommandPixel;
@@ -26,6 +27,7 @@ public class Canvas2d extends DrawableBase {
     private static final long serialVersionUID = -6329493755553689791L;
 
     // image where the user's drawing is stored
+    private ImageIcon imageIcon;
     private transient BufferedImage image;
     
     /**
@@ -46,8 +48,13 @@ public class Canvas2d extends DrawableBase {
      * Make the drawing buffer and draw some starting content for it.
      */
     private synchronized void makeImage() {
-        image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB); 
-        fillWithWhite();
+        image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        if (imageIcon == null) {
+            imageIcon = new ImageIcon(image);
+            fillWithWhite();
+        } else {
+            image.getGraphics().drawImage(imageIcon.getImage(), 0, 0 , null);
+        }
     }
     
     /*
@@ -162,22 +169,6 @@ public class Canvas2d extends DrawableBase {
     	}
 
         g.drawImage(image, 0, 0, null);
-    }
-    
-    private synchronized void writeObject(ObjectOutputStream out) throws IOException {
-    	if (image == null) {
-    		makeImage();
-    	}
-    	
-        out.defaultWriteObject();
-        ImageIO.write(image, "png", out); 
-    }
-
-    private synchronized void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        image = ImageIO.read(in);
-        
-        assert image != null;
     }
     
     public synchronized DrawableCanvas2d makeDrawable(StrokeProperties strokeProperties, ClientController clientController) {
