@@ -115,6 +115,7 @@ class ClientGUI extends JFrame{
     
     private final JPanel sidebar;
     private final JPanel chatBar;
+    private String title="Whiteboard: Interactive Drawing Tool";
     
     private final JTable userTable;
     private final JTextArea chatText;
@@ -142,7 +143,7 @@ class ClientGUI extends JFrame{
         this.save = new JMenuItem("Save to png", KeyEvent.VK_T);
         
         // Set the title
-        setTitle("Whiteboard: Interactive Drawing Tool");
+        setTitle(title);
         
         // Create Cursor
         Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -387,8 +388,10 @@ class ClientGUI extends JFrame{
                     try {
                         final Robot robot = new Robot();
                         canvas.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                        controller.setStrokeWidth(-1);
                         MouseListener mouseListener = new MouseListener() {
-                            @Override
+                            
+                        	@Override
                             public void mouseClicked(MouseEvent e) {
                                 PointerInfo pointer;
                                 pointer = MouseInfo.getPointerInfo();
@@ -399,6 +402,7 @@ class ClientGUI extends JFrame{
                                 canvas.removeMouseListener(this); 
                                 brushToggle.setSelected(true);
                                 updateCursor();
+                                setStroke();
                             }
                             @Override
                             public void mouseEntered(MouseEvent arg0) { }
@@ -625,7 +629,7 @@ class ClientGUI extends JFrame{
             JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             BoardIdentifier boardName = new BoardIdentifier(Utils.generateId(), inputBoardName.getText());
-            this.setTitle(boardName.name());
+            this.setTitle(title+ " - " + boardName.name());
             controller.generateNewBoard(boardName, Integer.parseInt(widthName.getText()),
                 						Integer.parseInt(heightName.getText()));
 
