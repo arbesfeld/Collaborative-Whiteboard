@@ -638,7 +638,7 @@ class ClientGUI extends JFrame{
     }
     
     private void saveCanvas() {
-        BufferedImage bi = new BufferedImage(this.getSize().width, this.getSize().height, BufferedImage.TYPE_INT_ARGB); 
+        BufferedImage bi = new BufferedImage(controller.getBoardWidth(), controller.getBoardHeight(), BufferedImage.TYPE_INT_ARGB); 
         Graphics g = bi.createGraphics();
         canvas.paint(g);
         g.dispose();
