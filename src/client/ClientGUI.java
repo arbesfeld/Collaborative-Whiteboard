@@ -666,6 +666,9 @@ class ClientGUI extends JFrame{
             brushCursor = toolkit.createCustomCursor(scaledIcon, hotSpot, "circleBrush");
             this.canvas.setCursor(brushCursor);
         }
+        else {
+            this.canvas.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+        }
     }
     
     private void newBoardAction() {
