@@ -1,4 +1,4 @@
-package canvas;
+package canvas.layer;
 
 import java.awt.Color;
 import java.awt.GradientPaint;
@@ -15,27 +15,28 @@ import java.awt.image.PixelGrabber;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class Canvas extends DrawableBase {
-    private static final long serialVersionUID = -6329493755553689791L;
+import canvas.DrawableBase;
+import canvas.Pixel;
+
+public class Layer extends DrawableBase {
 
     // image where the user's drawing is stored
     private transient BufferedImage image;
     
-    /**
+	/**
      * Make a canvas.
      * @param width width in pixels
      * @param height height in pixels
      */
-    public Canvas(int width, int height) {
+    public Layer(int width, int height) {
         super(width, height);
     }
     
-    public Canvas(BufferedImage image) {
+    public Layer(BufferedImage image) {
         super(image.getWidth(), image.getHeight());
         this.image = image;
     }

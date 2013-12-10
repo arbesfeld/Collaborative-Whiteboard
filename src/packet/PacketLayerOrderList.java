@@ -1,6 +1,6 @@
 package packet;
 
-import layer.LayerProperties;
+import canvas.layer.LayerProperties;
 
 public class PacketLayerOrderList extends Packet {
 	

@@ -15,7 +15,7 @@ import client.ClientController;
  * Canvas represents a drawing surface that allows the user to draw
  * on it freehand, with the mouse.
  */
-public class CanvasController extends DrawableBase implements Drawable {
+public class CanvasController extends DrawableBase {
     private static final long serialVersionUID = -7112257891818505133L;
 
     private final DrawingController defaultDrawingController;

@@ -1,4 +1,4 @@
-package layer;
+package canvas.layer;
 
 import name.LayerIdentifier;
 
