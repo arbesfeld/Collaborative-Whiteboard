@@ -265,7 +265,9 @@ class ClientGUI extends JFrame{
         this.layerTable.setRowHeight(50);
         this.layerTable.getColumnModel().getColumn(0).setPreferredWidth(30);
         this.layerTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
+        JScrollPane scrollPane = new JScrollPane(layerTable, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        add(scrollPane);
+        //TODO Add scroll pane
         
         //TODO remove below
 //        this.addLayer();
@@ -855,6 +857,7 @@ class ClientGUI extends JFrame{
 	        	LayerProperties selectedLayer = layerTable.getRowCount() == 0 ?
 	        			layers[0].layerProperties() : selectedLayer();
 	        	int newSelectedRowNum=0;
+	        	int oldNumRows = layerTable.getRowCount();
 	    	    layerTableModel.clearTable();
 	        	
 	        	for (int i = layers.length -1; i >= 0 ; i--) {
@@ -869,12 +872,15 @@ class ClientGUI extends JFrame{
 	    	        Vector<Object> newLayer = new Vector<Object>();
 	    	        newLayer.add(l.layerProperties().getVisibility());
 	    	        newLayer.add(newIcon);
-	    	        newLayer.add(l.layerProperties());
+	    	        newLayer.add(l.layerProperties().clone());
 	 
 	    	        layerTableModel.addRow(newLayer);
 	    	        layerTable.revalidate();
 	        	}
-	        	layerTable.setRowSelectionInterval(newSelectedRowNum, newSelectedRowNum);
+	        	if (layerTable.getRowCount() == oldNumRows) 
+	        		layerTable.setRowSelectionInterval(newSelectedRowNum, newSelectedRowNum);
+	        	else
+	        		layerTable.setRowSelectionInterval(0, 0);
 	        	
 	        }
 	    });
