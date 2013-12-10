@@ -846,5 +846,37 @@ class ClientGUI extends JFrame{
         }
 
     }
+    
+    public class LayerTableModel extends AbstractTableModel{
+        private String[] columnNames = {"Visible", "Thumbnail", "Name", "UP", "DOWN"};      
+        private Object[][] data = new Object[0][0];
+        
+        public int getColumnCount() {
+            return columnNames.length;
+        }
+
+        public int getRowCount() {
+            return data.length;
+        }
+
+        public String getColumnName(int col) {
+            return columnNames[col];
+        }
+
+        public Object getValueAt(int row, int col) {
+            return data[row][col];
+        }
+
+        public void setValueAt(Object value, int row, int col) {
+            data[row][col] = value;
+            fireTableCellUpdated(row, col);
+        }
+      
+        public void updateData(Object[][] newData) {
+            data = newData;
+            fireTableDataChanged();
+        }
+
+    }
 
 }
