@@ -116,17 +116,19 @@ public class ServerSocketHandler extends SocketHandler {
 
 	@Override
 	public void receivedLayerAdjustmentPacket(
-			PacketLayerAdjustment packetAdjustment) {
+			PacketLayerAdjustment packet) {
         assert state == ServerSocketState.PLAYING;
         assert model != null;
-		model.adjustLayer(packetAdjustment.layer(), packetAdjustment.adjustment());
+		model.adjustLayer(packet.layer(), packet.adjustment());
+		broadcastPacketToBoard(packet);
 	}
 
 	@Override
-	public void receivedNewLayerPacket(PacketNewLayer packetNewLayer) {
+	public void receivedNewLayerPacket(PacketNewLayer packet) {
         assert state == ServerSocketState.PLAYING;
         assert model != null;
-		model.addLayer(packetNewLayer.layerName());
+		model.addLayer(packet.layerName());
+		broadcastPacketToBoard(packet);
 	}
 	
     @Override

@@ -79,12 +79,8 @@ public abstract class Identifier implements Identifiable, Serializable {
             return false;
         return true;
     }
-    
-    /**
-     * Generates a string representation of this identifier
-     */
-    @Override
-    public String toString() {
-        return "Name [id=" + id + ", name=" + name + "]";
-    }
+
+	public String toString() {
+		return this.name();
+	}
 }

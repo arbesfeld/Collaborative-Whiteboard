@@ -34,6 +34,7 @@ public class Canvas extends DrawableBase {
         this.layers = new LinkedList<Layer>();
         this.layerSet = new HashMap<LayerIdentifier, Layer>();
         addLayer(new LayerIdentifier(Utils.generateId(), BASE_NAME));
+        this.layers.get(0).fillWithColor(Color.WHITE);
     }
     
     public void checkRep() {

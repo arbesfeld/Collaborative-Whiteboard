@@ -41,6 +41,7 @@ public class Layer extends DrawableBase {
         super(width, height);
         this.layerProperties = new LayerProperties(layerIdentifier);
         this.level = level;
+        this.image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
     }
     
     public LayerProperties layerProperties() {
@@ -54,18 +55,12 @@ public class Layer extends DrawableBase {
     public int level() {
     	return level;
     }
-    /*
-     * Make the drawing buffer and draw some starting content for it.
-     */
-    private synchronized void makeImage() {
-        image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        fillWithWhite();
-    }
     
     /*
      * Make the drawing buffer entirely white.
      */
-    private synchronized void fillWithWhite() {
+    public synchronized void fillWithColor(Color color) {
+    	
         final Graphics2D g = (Graphics2D) image.getGraphics();
 
         g.setColor(Color.WHITE);
@@ -74,10 +69,6 @@ public class Layer extends DrawableBase {
     
     @Override
     public synchronized void drawPixel(Pixel pixel) {
-        if (image == null) {
-        	makeImage();
-        }
-        
         if (!isValidPixel(pixel)) {
             return;
         }
@@ -91,10 +82,6 @@ public class Layer extends DrawableBase {
     
     @Override
     public synchronized void drawLine(Pixel pixelStart, Pixel pixelEnd, Stroke stroke, int symetry) {
-        if (image == null) {
-           makeImage();
-        }
-
         if (!isValidPixel(pixelStart) || !isValidPixel(pixelEnd)) {
             return;
         }
@@ -138,10 +125,6 @@ public class Layer extends DrawableBase {
     }
     
     public synchronized void drawFill(Pixel pixel) {
-        if (image == null) {
-            makeImage();
-        }
-        
         if (!isValidPixel(pixel)) {
             return;
         }
@@ -174,10 +157,6 @@ public class Layer extends DrawableBase {
 
     @Override
 	public synchronized Color getPixelColor(Pixel pixel) {
-		if (image == null) {
-			makeImage();
-		}
-		
 		if (!isValidPixel(pixel)) {
 			return pixel.color();
 		}
@@ -186,18 +165,10 @@ public class Layer extends DrawableBase {
 	}
 
     public synchronized void paintOnGraphics(Graphics g) {
-    	if (image == null) {
-    		makeImage();
-    	}
-
         g.drawImage(image, 0, 0, null);
     }
 	
 	private void writeObject(ObjectOutputStream s) throws IOException {
-		if (image == null) {
-			makeImage();
-		}
-		
         s.defaultWriteObject();
         
         int w = image.getWidth();

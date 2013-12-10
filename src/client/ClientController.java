@@ -214,11 +214,11 @@ public class ClientController extends SocketHandler {
     }
 
     public void addLayer(LayerIdentifier identifier) {
-    	model.addLayer(identifier);
+    	sendPacket(new PacketNewLayer(identifier));
     }
     
     public void adjustLayer(LayerIdentifier layerIdentifier, LayerAdjustment adjustment) {
-    	model.adjustLayer(layerIdentifier, adjustment);
+    	sendPacket(new PacketLayerAdjustment(layerIdentifier, adjustment));
     }
     
 	@Override
