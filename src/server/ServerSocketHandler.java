@@ -119,7 +119,7 @@ public class ServerSocketHandler extends SocketHandler {
 			PacketLayerAdjustment packet) {
         assert state == ServerSocketState.PLAYING;
         assert model != null;
-		model.adjustLayer(packet.layer(), packet.adjustment());
+		model.adjustLayer(packet.layerProperties(), packet.adjustment());
 		broadcastPacketToBoard(packet);
 	}
 

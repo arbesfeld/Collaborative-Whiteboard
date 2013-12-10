@@ -28,7 +28,7 @@ public class Layer extends DrawableBase {
 	
 	// image where the user's drawing is stored
     private transient BufferedImage image;
-    private final LayerProperties layerProperties;
+    private LayerProperties layerProperties;
     private int level;
     
 	/**
@@ -79,7 +79,11 @@ public class Layer extends DrawableBase {
         
         image.setRGB(pixel.x(), pixel.y(), pixel.color().getRGB());
     }
-    
+
+	public void setProperties(LayerProperties properties) {
+		this.layerProperties = properties;
+	}
+	
     @Override
     public synchronized void drawLine(LayerIdentifier identifier, Pixel pixelStart, Pixel pixelEnd, Stroke stroke, int symetry) {
         if (!isValidPixel(pixelStart) || !isValidPixel(pixelEnd)) {
@@ -165,9 +169,19 @@ public class Layer extends DrawableBase {
 	}
 
     public synchronized void paintOnGraphics(Graphics g) {
-        g.drawImage(image, 0, 0, null);
+    	if (isVisible()) {
+            g.drawImage(image, 0, 0, null);
+    	}
     }
 	
+    public synchronized boolean isVisible() {
+    	return layerProperties.getVisibility();
+    }
+    
+    public synchronized double opacity() {
+    	return layerProperties.getOpacity();
+    }
+    
 	private void writeObject(ObjectOutputStream s) throws IOException {
         s.defaultWriteObject();
         
@@ -206,5 +220,5 @@ public class Layer extends DrawableBase {
             image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
             image.getGraphics().drawImage(temp, 0, 0, null);
         }
-    }
+    } 
 }

@@ -20,6 +20,7 @@ import canvas.CanvasController;
 import canvas.Drawable;
 import canvas.Pixel;
 import canvas.layer.LayerAdjustment;
+import canvas.layer.LayerProperties;
 
 public class BoardModel extends JPanel implements Drawable, Identifiable, Serializable {
 	private static final long serialVersionUID = -7812022750931126889L;
@@ -118,8 +119,8 @@ public class BoardModel extends JPanel implements Drawable, Identifiable, Serial
 		canvas.canvas().addLayer(layer);
 	}
 	
-	public void adjustLayer(LayerIdentifier layer, LayerAdjustment adjustment) {
-		canvas.canvas().adjustLayer(layer, adjustment);
+	public void adjustLayer(LayerProperties properties, LayerAdjustment adjustment) {
+		canvas.canvas().adjustLayer(properties, adjustment);
 		repaint();
 	}
 	

@@ -13,6 +13,7 @@ import name.LayerIdentifier;
 import util.Utils;
 import canvas.layer.Layer;
 import canvas.layer.LayerAdjustment;
+import canvas.layer.LayerProperties;
 
 public class Canvas extends DrawableBase {
     private static final long serialVersionUID = -6329493755553689791L;
@@ -47,8 +48,9 @@ public class Canvas extends DrawableBase {
     	checkRep();
     }
     
-    public synchronized void adjustLayer(LayerIdentifier layerIdentifier, LayerAdjustment adjustment) {
-    	Layer layer = layerSet.get(layerIdentifier);
+    public synchronized void adjustLayer(LayerProperties properties, LayerAdjustment adjustment) {
+    	Layer layer = layerSet.get(properties.layerIdentifier());
+    	
     	int level = layer.level();
 
     	int modifier = 0;
@@ -58,6 +60,10 @@ public class Canvas extends DrawableBase {
     		break;
     	case DOWN:
     		modifier = -1;
+    		break;
+    	case PROPERTIES:
+    		layer.setProperties(properties);
+    		break;
     	}
     	
     	int newLevel = level + modifier;

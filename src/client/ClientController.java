@@ -129,7 +129,7 @@ public class ClientController extends SocketHandler {
 			PacketLayerAdjustment packetLayerOrderList) {
 		assert model != null;
 		assert clientState == ClientState.PLAYING;
-		model.adjustLayer(packetLayerOrderList.layer(), packetLayerOrderList.adjustment());
+		model.adjustLayer(packetLayerOrderList.layerProperties(), packetLayerOrderList.adjustment());
 		setGUILayers();
 	}
 
