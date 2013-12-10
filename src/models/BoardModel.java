@@ -72,8 +72,8 @@ public class BoardModel implements Drawable, Identifiable, Serializable {
     }
 
     @Override
-    public void drawLine(Pixel pixelStart, Pixel pixelEnd, Stroke stroke) {
-        canvas.drawLine(pixelStart, pixelEnd, stroke);
+    public void drawLine(Pixel pixelStart, Pixel pixelEnd, Stroke stroke, int symetry) {
+        canvas.drawLine(pixelStart, pixelEnd, stroke, symetry);
     }
     
     @Override

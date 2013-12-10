@@ -13,7 +13,7 @@ import canvas.command.DrawCommandPixel;
 public class StrokeTypeProc1 implements StrokeType {
 
     @Override
-    public DrawCommand[] paintLine(Drawable canvas, Color color, int strokeWidth, int x1, int y1, int x2, int y2, Vector2 velocity) {
+    public DrawCommand[] paintLine(Drawable canvas, Color color, int strokeWidth, int x1, int y1, int x2, int y2, Vector2 velocity, int symetry) {
         List<DrawCommand> result = new LinkedList<DrawCommand>();
         double rand = Math.random() * 2*Math.PI;
         double spinniness = Math.random()*4;

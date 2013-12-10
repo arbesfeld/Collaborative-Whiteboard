@@ -187,6 +187,10 @@ public class ClientController extends SocketHandler {
     public void setFillOn(boolean fillOn) {
         strokeProperties.setFillOn(fillOn);
     }
+    
+    public void setSymetry(int symetry) {
+        strokeProperties.setSymetry(symetry);
+    }
 
 	@Override
 	public void receivedNewClientPacket(PacketNewClient packet) {

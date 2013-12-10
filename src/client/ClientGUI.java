@@ -34,6 +34,7 @@ import java.io.File;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
 import javax.swing.Icon;
@@ -110,6 +111,7 @@ class ClientGUI extends JFrame{
     private final JToggleButton brushToggle;
     private final JToggleButton cloneToggle;
     private final JComboBox<StrokeType> strokeDropdown;
+    private final JSlider symetrySlider;
     
     private final StrokeType[] strokeTypes;
     
@@ -216,6 +218,11 @@ class ClientGUI extends JFrame{
         this.brushToggle.setEnabled(false);
         this.brushToggle.setSelected(true);
         
+        this.symetrySlider = new JSlider(JSlider.HORIZONTAL, 1, 5, 1);
+        this.symetrySlider.setMinorTickSpacing(1);
+        this.symetrySlider.setPaintTicks(true);
+        this.symetrySlider.setSnapToTicks(true);
+        
         //Build stroke dropdown
         this.strokeTypes = new StrokeType[6];
             strokeTypes[0] = new StrokeTypeBasic();
@@ -272,16 +279,27 @@ class ClientGUI extends JFrame{
     public void setController(ClientController controller) {
         assert this.controller == null;
         this.controller = controller;
+
     }
     
     private void setSideBar() {
-             
+        
+        
         JPanel brushPanel = new JPanel();
         brushPanel.add(strokeButton);
         brushPanel.add(colorButton);
         brushPanel.add(strokeDropdown);
+        
+        JPanel sliderPanel = new JPanel();
+        sliderPanel.add(new JLabel("Symetry"));
+        sliderPanel.add(symetrySlider);
+        
+        JPanel allBrushPanel = new JPanel();
+        allBrushPanel.setLayout(new BoxLayout(allBrushPanel, BoxLayout.Y_AXIS));
+        allBrushPanel.add(brushPanel);
+        allBrushPanel.add(sliderPanel);
         TitledBorder BrushPanelBorder = BorderFactory.createTitledBorder("Brush Settings");
-        brushPanel.setBorder(BrushPanelBorder);
+        allBrushPanel.setBorder(BrushPanelBorder);
         
         JPanel toolBar = new JPanel();
         toolBar.add(brushToggle);
@@ -305,7 +323,7 @@ class ClientGUI extends JFrame{
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 0;
-        sidebar.add(brushPanel, c);
+        sidebar.add(allBrushPanel, c);
         
         c.gridx = 0;
         c.gridy = 1;
@@ -348,6 +366,13 @@ class ClientGUI extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 controller.setStrokeType((StrokeType)strokeDropdown.getSelectedItem());
+            }
+        });
+        
+        symetrySlider.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                controller.setSymetry(symetrySlider.getValue());;
             }
         });
         

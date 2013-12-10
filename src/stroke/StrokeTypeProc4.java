@@ -13,7 +13,7 @@ import canvas.command.DrawCommandPixel;
 public class StrokeTypeProc4 implements StrokeType {
 
     @Override
-    public DrawCommand[] paintLine(Drawable canvas, Color color, int strokeWidth, int x1, int y1, int x2, int y2, Vector2 velocity) {
+    public DrawCommand[] paintLine(Drawable canvas, Color color, int strokeWidth, int x1, int y1, int x2, int y2, Vector2 velocity, int symetry) {
         List<DrawCommand> result = branchBulder(canvas, color, x1, y1, velocity);
         return result.toArray(new DrawCommand[result.size()]);
     }

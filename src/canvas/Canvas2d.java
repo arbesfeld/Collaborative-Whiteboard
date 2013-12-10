@@ -85,7 +85,7 @@ public class Canvas2d extends DrawableBase implements Drawable, Serializable {
     }
     
     @Override
-    public synchronized void drawLine(Pixel pixelStart, Pixel pixelEnd, Stroke stroke) {
+    public synchronized void drawLine(Pixel pixelStart, Pixel pixelEnd, Stroke stroke, int symetry) {
         if (image == null) {
            makeImage();
         }
@@ -103,7 +103,41 @@ public class Canvas2d extends DrawableBase implements Drawable, Serializable {
             g.setColor(pixelStart.color());
         }
         g.setStroke(stroke);
+        
+//        int rots = 3;
+//        int y1 = -pixelStart.y() + height/2;
+//        int x1 = pixelStart.x() - width/2;
+//        double distanceStart = Math.sqrt(Math.pow(x1, 2) + Math.pow(y1, 2));
+//        double thetaStart = Math.atan(y1/x1);
+//        
+//        int y2 = -pixelEnd.y() + height/2;
+//        int x2 = pixelEnd.x() - width/2;
+//        double distanceEnd = Math.sqrt(Math.pow(x2, 2) + Math.pow(y2, 2));
+//        double thetaEnd = Math.atan(y2/x2);
+//        
+//        double rotAmmount = 2 * Math.PI / rots;
+//        
+//        
+//        for (int i = 0; i < rots; i++) {
+//            g.drawLine(width/2 + (int)(Math.sin(thetaStart) * distanceStart), height/2 + (int)(Math.cos(thetaStart) * distanceStart), 
+//                    width/2 + (int)(Math.sin(thetaEnd) * distanceEnd), height/2 + (int)(Math.cos(thetaEnd) * distanceEnd));
+//            thetaStart += rotAmmount;
+//            thetaEnd += rotAmmount;
+//        }
         g.drawLine(pixelStart.x(), pixelStart.y(), pixelEnd.x(), pixelEnd.y());
+        if (symetry >= 2) {
+            g.drawLine(width - pixelStart.x(), height - pixelStart.y(), width - pixelEnd.x(), height - pixelEnd.y());
+        }
+        if (symetry >= 3) {
+            g.drawLine(pixelStart.y(), pixelStart.x(), pixelEnd.y(), pixelEnd.x());
+            g.drawLine(width - pixelStart.y(), height - pixelStart.x(), width - pixelEnd.y(), height - pixelEnd.x());
+        }
+        if (symetry >= 4) {
+            g.drawLine(pixelStart.x(), height - pixelStart.y(), pixelEnd.x(), height - pixelEnd.y());
+            g.drawLine(pixelStart.y(), height - pixelStart.x(), pixelEnd.y(), height - pixelEnd.x());
+            g.drawLine(width - pixelStart.x(),pixelStart.y(), width - pixelEnd.x(),pixelEnd.y());
+            g.drawLine(width - pixelStart.y(),pixelStart.x(), width - pixelEnd.y(),pixelEnd.x());
+        }
     }
     
     public synchronized void drawFill(Pixel pixel) {

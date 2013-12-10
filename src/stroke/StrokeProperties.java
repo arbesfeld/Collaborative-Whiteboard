@@ -21,6 +21,7 @@ public class StrokeProperties {
     private Boolean eraserOn;
     private StrokeType fillStroke;
     private Boolean fillOn;
+    private int symetry;
     
     public StrokeProperties(Color strokeColor, int strokeWidth) {
         this.strokeColor = strokeColor;
@@ -30,6 +31,7 @@ public class StrokeProperties {
         this.eraserStroke = new StrokeTypeEraser();
         this.fillOn = false;
         this.fillStroke = new StrokeTypeFill();
+        this.symetry = 1;
     }    
     
     public StrokeProperties() {
@@ -55,16 +57,20 @@ public class StrokeProperties {
     public void setFillOn(Boolean fillOn) {
         this.fillOn = fillOn;
     }
+    
+    public void setSymetry(int symetry) {
+        this.symetry = symetry;
+    }
 
     public DrawCommand[] paintLine(Drawable canvas, int x1, int y1, int x2, int y2, Vector2 velocity) {
         if (eraserOn) {
-            return eraserStroke.paintLine(canvas, Color.WHITE, strokeWidth, x1, y1, x2, y2, velocity);
+            return eraserStroke.paintLine(canvas, Color.WHITE, strokeWidth, x1, y1, x2, y2, velocity, symetry);
         }
         else if (fillOn) {
-            return fillStroke.paintLine(canvas, strokeColor, strokeWidth, x1, y1, x2, y2, velocity);
+            return fillStroke.paintLine(canvas, strokeColor, strokeWidth, x1, y1, x2, y2, velocity, symetry);
         }
         else {
-            return strokeType.paintLine(canvas, strokeColor, strokeWidth, x1, y1, x2, y2, velocity);
+            return strokeType.paintLine(canvas, strokeColor, strokeWidth, x1, y1, x2, y2, velocity, symetry);
         }
     }
 }

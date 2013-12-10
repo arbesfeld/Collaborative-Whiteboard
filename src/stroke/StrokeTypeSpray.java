@@ -13,7 +13,7 @@ import canvas.command.DrawCommandPixel;
 public class StrokeTypeSpray implements StrokeType {
 
     @Override
-    public DrawCommand[] paintLine(Drawable canvas, Color color, int strokeWidth, int x1, int y1, int x2, int y2, Vector2 velocity) {
+    public DrawCommand[] paintLine(Drawable canvas, Color color, int strokeWidth, int x1, int y1, int x2, int y2, Vector2 velocity, int symetry) {
         List<DrawCommand> result = new LinkedList<DrawCommand>();      
         int extraWidth = 8-(int)Math.sqrt(Math.pow(velocity.x(), 2) + Math.pow(velocity.y(), 2));
         if (extraWidth < 0) {extraWidth = 0;}

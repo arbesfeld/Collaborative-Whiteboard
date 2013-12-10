@@ -17,16 +17,18 @@ public class DrawCommandLine extends DrawCommand {
     private final Pixel pixelStart;
     private final Pixel pixelEnd;
     private transient BasicStroke stroke;
+    private final int symetry;
     
-    public DrawCommandLine(Pixel pixelStart, Pixel pixelEnd, BasicStroke stroke) {
+    public DrawCommandLine(Pixel pixelStart, Pixel pixelEnd, BasicStroke stroke, int symetry) {
         this.pixelStart = pixelStart;
         this.pixelEnd = pixelEnd;
         this.stroke = stroke;
+        this.symetry = symetry;
     }
     
     @Override
     public void drawOn(Drawable drawable) {
-        drawable.drawLine(pixelStart, pixelEnd, stroke);
+        drawable.drawLine(pixelStart, pixelEnd, stroke, symetry);
     }
     
     private synchronized void writeObject(ObjectOutputStream out) throws IOException {
