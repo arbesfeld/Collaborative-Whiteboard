@@ -11,6 +11,7 @@ public class LayerProperties {
 	public LayerProperties(LayerIdentifier layerIdentifier){
 		this.layerIdentifier = layerIdentifier;
 		this.opacity = 1.0;
+		this.visible=true;
 	}
 	
 	public void setOpacity(double opacity){
