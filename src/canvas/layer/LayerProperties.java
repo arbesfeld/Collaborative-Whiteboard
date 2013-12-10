@@ -46,4 +46,41 @@ public class LayerProperties implements Serializable {
 	public LayerProperties clone() {
 		return new LayerProperties(this.layerIdentifier, this.opacity, this.visible);
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((layerIdentifier == null) ? 0 : layerIdentifier.hashCode());
+		long temp;
+		temp = Double.doubleToLongBits(opacity);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + (visible ? 1231 : 1237);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		LayerProperties other = (LayerProperties) obj;
+		if (layerIdentifier == null) {
+			if (other.layerIdentifier != null)
+				return false;
+		} else if (!layerIdentifier.equals(other.layerIdentifier))
+			return false;
+		if (Double.doubleToLongBits(opacity) != Double
+				.doubleToLongBits(other.opacity))
+			return false;
+		if (visible != other.visible)
+			return false;
+		return true;
+	}
+	
+
 }
