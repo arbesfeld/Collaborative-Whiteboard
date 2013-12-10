@@ -1,16 +1,17 @@
 package packet;
 
-import name.LayerIdentifier;
+import layer.LayerProperties;
+
 public class PacketLayerOrderList extends Packet {
 	
 	private static final long serialVersionUID = 5126362530793078834L;
-	private final LayerIdentifier[] layers;
+	private final LayerProperties[] layers;
 	
-	public PacketLayerOrderList(LayerIdentifier[] layers){
+	public PacketLayerOrderList(LayerProperties[] layers){
 		this.layers = layers;
 	}
 	
-	public LayerIdentifier[] layers() {
+	public LayerProperties[] layers() {
 		return layers.clone();
 	}
 
