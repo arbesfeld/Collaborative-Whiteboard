@@ -16,9 +16,11 @@ import packet.PacketClientReady;
 import packet.PacketDrawCommand;
 import packet.PacketExitBoard;
 import packet.PacketJoinBoard;
+import packet.PacketLayerOrderList;
 import packet.PacketMessage;
 import packet.PacketNewBoard;
 import packet.PacketNewClient;
+import packet.PacketNewLayer;
 import server.SocketHandler;
 import stroke.StrokeProperties;
 import stroke.StrokeType;
@@ -214,5 +216,18 @@ public class ClientController extends SocketHandler {
 	
 	public int getBoardHeight() {
 		return this.model.height();
+	}
+
+	@Override
+	public void receivedLayerOrderListPacket(
+			PacketLayerOrderList packetLayerOrderList) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void receivedNewLayerPacket(PacketNewLayer packetNewLayer) {
+		// TODO Auto-generated method stub
+		
 	}
 }

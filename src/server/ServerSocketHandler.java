@@ -12,9 +12,11 @@ import packet.PacketClientReady;
 import packet.PacketDrawCommand;
 import packet.PacketExitBoard;
 import packet.PacketJoinBoard;
+import packet.PacketLayerOrderList;
 import packet.PacketMessage;
 import packet.PacketNewBoard;
 import packet.PacketNewClient;
+import packet.PacketNewLayer;
 import canvas.command.DrawCommand;
 
 public class ServerSocketHandler extends SocketHandler {
@@ -139,4 +141,17 @@ public class ServerSocketHandler extends SocketHandler {
             ((ServerSocketHandler) handler).sendPacket(packet);
         }
     }
+
+	@Override
+	public void receivedLayerOrderListPacket(
+			PacketLayerOrderList packetLayerOrderList) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void receivedNewLayerPacket(PacketNewLayer packetNewLayer) {
+		// TODO Auto-generated method stub
+		
+	}
 }
