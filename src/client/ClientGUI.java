@@ -31,6 +31,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.Vector;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -59,6 +60,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
@@ -70,6 +72,7 @@ import javax.swing.table.AbstractTableModel;
 import models.BoardModel;
 import name.BoardIdentifier;
 import name.Identifiable;
+import name.LayerIdentifier;
 import stroke.StrokeProperties;
 import stroke.StrokeType;
 import stroke.StrokeTypeBasic;
@@ -120,7 +123,11 @@ class ClientGUI extends JFrame{
     
     private final JTable userTable;
     private final JTextArea chatText;
-    private final UserTableModel tableModel;
+    private final UserTableModel userTableModel;
+    
+    private final Vector<Vector<Object>> layerVector;
+    private final LayerTableModel layerTableModel;
+    private final JTable layerTable;
     
     private static final int STROKE_MAX = 20;
     private static final int STROKE_MIN = 1;
@@ -246,8 +253,21 @@ class ClientGUI extends JFrame{
         this.chatBar = new JPanel();
         this.chatText = new JTextArea();
         this.chatText.setEditable(false);
-        this.tableModel = new UserTableModel();
-        this.userTable = new JTable(this.tableModel);
+        this.userTableModel = new UserTableModel();
+        this.userTable = new JTable(this.userTableModel);
+        
+        this.layerVector = new Vector<Vector<Object>>();
+        this.layerTableModel = new LayerTableModel(layerVector);
+        this.layerTable = new JTable(this.layerTableModel);
+        this.layerTable.setRowHeight(50);
+        this.layerTable.getColumnModel().getColumn(0).setPreferredWidth(30);
+        this.layerTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        
+        //TODO remove below
+//        this.addLayer();
+//        this.addLayer();
+//        
         setSideBar();
         
         if (isWindows) {
@@ -291,8 +311,13 @@ class ClientGUI extends JFrame{
         allBrushPanel.setLayout(new BoxLayout(allBrushPanel, BoxLayout.Y_AXIS));
         allBrushPanel.add(brushPanel);
         allBrushPanel.add(sliderPanel);
-        TitledBorder BrushPanelBorder = BorderFactory.createTitledBorder("Brush Settings");
-        allBrushPanel.setBorder(BrushPanelBorder);
+        TitledBorder brushPanelBorder = BorderFactory.createTitledBorder("Brush Settings");
+        allBrushPanel.setBorder(brushPanelBorder);
+        
+        JPanel layerPanel = new JPanel();
+        layerPanel.add(layerTable);
+        TitledBorder layersBorder = BorderFactory.createTitledBorder("Layers");
+        layerPanel.setBorder(layersBorder);
         
         JPanel toolBar = new JPanel();
         toolBar.add(brushToggle);
@@ -324,6 +349,10 @@ class ClientGUI extends JFrame{
         
         c.gridx = 0;
         c.gridy = 2;
+        sidebar.add(layerPanel, c); 
+        
+        c.gridx = 0;
+        c.gridy = 3;
         sidebar.add(chatBar, c);
         
         colorButton.addActionListener(new ActionListener() {
@@ -739,7 +768,7 @@ class ClientGUI extends JFrame{
 
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                tableModel.updateData(tableData);
+                userTableModel.updateData(tableData);
                 pack();
             }
         });
@@ -755,6 +784,37 @@ class ClientGUI extends JFrame{
                 setBoardNames(boards);
             }
         });
+    }
+    
+//    public void addLayer() {
+//        ImageIcon icon = new ImageIcon(((new ImageIcon("resources/brushIcon.png")).getImage()));
+//        Image img = icon.getImage();  
+//        Image newimg = img.getScaledInstance(45, 45,  java.awt.Image.SCALE_SMOOTH);  
+//        ImageIcon newIcon = new ImageIcon(newimg); 
+//        
+//        Vector<Object> newLayer = new Vector<Object>();
+//        newLayer.add(true);
+//        newLayer.add(newIcon);
+//        newLayer.add("Test");
+//             
+//        this.layerTableModel.addRow(newLayer);
+//        this.layerTable.revalidate();
+//    }
+    
+    public void setLayer(Layer[] layers) {
+    	while(this.layerTable.getRowCount()!=0)
+    		this.layerTable.remove(0);
+    	
+    	for (Layer l:layers) {
+    	
+    	ImageIcon icon = new ImageIcon(((new ImageIcon("resources/brushIcon.png")).getImage()));
+        Image img = icon.getImage();  
+        Image newimg = img.getScaledInstance(45, 45,  java.awt.Image.SCALE_SMOOTH);  
+        ImageIcon newIcon = new ImageIcon(newimg); 
+        
+        Vector<Object> newLayer = new Vector<Object>();
+        newLayer.add(l.layerProperties().getVisibility(), newIcon, l.layerProperties.toString());
+    	}
     }
     
     /**
@@ -840,35 +900,61 @@ class ClientGUI extends JFrame{
 
     }
     
-    public class LayerTableModel extends AbstractTableModel{
-        private String[] columnNames = {"Visible", "Thumbnail", "Name", "UP", "DOWN"};      
-        private Object[][] data = new Object[0][0];
+    public class LayerTableModel extends AbstractTableModel {
+        private Vector<Vector<Object>> data;
+        private final String[] COLUMN_NAMES = new String[] {"Visible", "Thumbnail", "Name"};
+        private final Class<?>[] COLUMN_TYPES = new Class<?>[] {Boolean.class, Icon.class, LayerIdentifier.class};
+        
+        public LayerTableModel(Vector<Vector<Object>> data) {
+            this.data = data;
+
+        }
         
         public int getColumnCount() {
-            return columnNames.length;
+            return COLUMN_NAMES.length;
         }
 
         public int getRowCount() {
-            return data.length;
+            return data.size();
         }
 
         public String getColumnName(int col) {
-            return columnNames[col];
+            return COLUMN_NAMES[col];
         }
 
         public Object getValueAt(int row, int col) {
-            return data[row][col];
+            return data.get(row).get(col);
+        }
+        
+        public boolean isCellEditable(int row, int column){
+            if (column == 0) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        
+        @Override
+        public Class<?> getColumnClass(int columnIndex) {
+            return COLUMN_TYPES[columnIndex];
         }
 
         public void setValueAt(Object value, int row, int col) {
-            data[row][col] = value;
+            data.get(row).set(col, value);
+            if(col == 0){
+            	System.out.println("Just changed value of checkbox to " + value.toString());
+            	// TODO
+            }
             fireTableCellUpdated(row, col);
+        } 
+        
+        public void addRow(Vector<Object> row) {
+            data.add(row);
+            fireTableRowsInserted(0, getRowCount() - 1);
         }
-      
-        public void updateData(Object[][] newData) {
-            data = newData;
-            fireTableDataChanged();
-        }
+        
+		
 
     }
 

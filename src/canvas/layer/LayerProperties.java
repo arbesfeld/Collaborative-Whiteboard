@@ -13,6 +13,7 @@ public class LayerProperties implements Serializable {
 	public LayerProperties(LayerIdentifier layerIdentifier){
 		this.layerIdentifier = layerIdentifier;
 		this.opacity = 1.0;
+		this.visible=true;
 	}
 	
 	public void setOpacity(double opacity){
@@ -20,5 +21,9 @@ public class LayerProperties implements Serializable {
 	}
 	public void setVisibility(Boolean visible){
 		this.visible=visible;
+	}
+	
+	public String toString() {
+		return this.layerIdentifier.toString();
 	}
 }
