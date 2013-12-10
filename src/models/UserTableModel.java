@@ -1,9 +1,12 @@
 package models;
+/*
+ * Table Model to represent connect users. One model for board.
+ */
 
 import javax.swing.table.AbstractTableModel;
 
 public class UserTableModel extends AbstractTableModel{
-
+    private static final long serialVersionUID = 8305718477610260762L;
     private String[] columnNames = {"Users"};      
     private Object[][] data = new Object[0][0];
     

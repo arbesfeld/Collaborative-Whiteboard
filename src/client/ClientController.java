@@ -31,6 +31,9 @@ import canvas.command.DrawCommand;
 import canvas.layer.LayerAdjustment;
 import canvas.layer.LayerProperties;
 
+/**
+ * Controller for client
+ */
 public class ClientController extends SocketHandler {
 	private static final long serialVersionUID = 6673644308053728584L;
 	

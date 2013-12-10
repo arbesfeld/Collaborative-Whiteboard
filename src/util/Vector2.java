@@ -1,30 +1,55 @@
 package util;
 
+/**
+ * Representation of a 2D vector
+ */
 public class Vector2 {
     private final double x, y;
     
+    /**
+     * Create a vector point at the location (x,y) in a 2D grid 
+     * @param x coordinate
+     * @param y coordinate
+     */
     public Vector2(double x, double y) {
         this.x = x;
         this.y = y;
     }
     
+    /**
+     * @return x coordinate
+     */
     public double x() {
         return x;
     }
     
+    /**
+     * @return y coordinate
+     */
     public double y() {
         return y;
     }
 
+    /**
+     * computes the length of the vector between the origin and (x,y) point
+     * @return vector length
+     */
     public double abs() {
         return Math.sqrt(x*x + y*y);
     }
     
+    /**
+     * create a normalized version of the vector
+     * @return normalized vector
+     */
     public Vector2 normalized() {
         double abs = abs();
         return new Vector2(x / abs, y / abs); 
     }
     
+    /**
+     * @return clone of object
+     */
     public Vector2 clone() {
         return new Vector2(x, y);
     }

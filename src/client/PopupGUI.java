@@ -11,7 +11,9 @@ import javax.swing.JTextField;
 
 import server.Server;
 
-
+/**
+ * popup for user to set username and join server
+ */
 public class PopupGUI extends JFrame {
   
     private static final long serialVersionUID = 1L;

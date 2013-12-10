@@ -1,5 +1,9 @@
 package util;
 
+/**
+ * This class is used to generate a random mineral for board names. Mineral name from "http://www.mineralseducationcoalition.org/minerals"
+ */
+
 public class MineralNames {
     static final String[] names = { "Acerila", "Cornelian", "Kingman Turquoise",
             "Precious Cat's Eye", "Achroite", "Cornflower Sapphire",
@@ -114,6 +118,9 @@ public class MineralNames {
             "Zinc",
             "Zirconium" };
     
+    /**
+     * @return random mineral name
+     */
     public static String getName() {
         return names[(int)(Math.random() * (names.length - 1))];
     }

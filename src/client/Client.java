@@ -4,8 +4,18 @@ import java.io.IOException;
 
 import javax.swing.SwingUtilities;
 
+/**
+ * Starts client 
+ */
 public class Client {
     
+    /**
+     * Build GUI and Controller for client
+     * @param userName of client
+     * @param hostName of server
+     * @param portNumber
+     * @throws IOException 
+     */
     public static void startClient(String userName, String hostName, int portNumber) throws IOException {
 
         final ClientController controller = new ClientController(userName, hostName, portNumber);
@@ -25,6 +35,10 @@ public class Client {
         });
     }
     
+    /**
+     * Initialize popup to start board
+     * @param args
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {

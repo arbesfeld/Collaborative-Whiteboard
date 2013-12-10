@@ -10,7 +10,6 @@ import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -19,7 +18,6 @@ import java.awt.Insets;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.PointerInfo;
-import java.awt.RenderingHints;
 import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -69,10 +67,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
 
 import models.BoardModel;
 import models.UserTableModel;
@@ -87,13 +82,16 @@ import stroke.StrokeTypePressure;
 import stroke.StrokeTypeProc6;
 import stroke.StrokeTypeProc7;
 import stroke.StrokeTypeSquares;
+import util.ColorSquareIcon;
 import util.MineralNames;
 import util.Utils;
 import canvas.layer.Layer;
 import canvas.layer.LayerAdjustment;
 import canvas.layer.LayerProperties;
 
-
+/**
+ * GUI for client
+ */
 class ClientGUI extends JFrame{
     private static final long serialVersionUID = -8313236674630578250L;
     
@@ -151,18 +149,18 @@ class ClientGUI extends JFrame{
      * event-dispatching thread.
      */
     public ClientGUI() {
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");  
         setResizable(false);
+        
+        // Set the title
+        setTitle(title);
+        
         this.container = this.getContentPane();
         this.layout = new GroupLayout(container);
         container.setLayout(layout);
         layout.setAutoCreateGaps(true);
-        layout.setAutoCreateContainerGaps(true);
-        
-        this.save = new JMenuItem("Save to png", KeyEvent.VK_T);
-        
-        // Set the title
-        setTitle(title);
+        layout.setAutoCreateContainerGaps(true);    
         
         // Create Cursors
         Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -182,15 +180,15 @@ class ClientGUI extends JFrame{
         hotSpot = new Point(2,2);
         this.eraserCursor = toolkit.createCustomCursor(fillImage, hotSpot, "eraserCursor");
         
+        // Create swing objects
         this.colorButton = new JButton("Color");
-        this.colorButton.setIcon(new ColorIcon(10, Color.black));
+        this.colorButton.setIcon(new ColorSquareIcon(10, Color.black));
         this.colorButton.setFocusPainted(false);
-
         this.colorButton.setHorizontalAlignment(SwingConstants.LEFT);
         this.colorChooser = new JColorChooser();
         this.strokeButton = new JButton("Stroke");
         this.strokeButton.setFocusPainted(false);
-        this.strokeButton.setIcon(new ColorIcon(STROKE_INIT, Color.black));
+        this.strokeButton.setIcon(new ColorSquareIcon(STROKE_INIT, Color.black));
 
         this.strokeButton.setHorizontalAlignment(SwingConstants.LEFT);
         this.strokeSlider = new JSlider(JSlider.HORIZONTAL, STROKE_MIN, STROKE_MAX, STROKE_INIT);
@@ -237,16 +235,17 @@ class ClientGUI extends JFrame{
         this.strokeTypes = new StrokeType[6];
             strokeTypes[0] = new StrokeTypeBasic();
             strokeTypes[1] = new StrokeTypePressure();
-            //strokeTypes[2] = new StrokeTypeSpray();
-            //strokeTypes[3] = new StrokeTypeProc2();
-            //strokeTypes[4] = new StrokeTypeProc1();
-            //strokeTypes[5] = new StrokeTypeProc3();
-            //strokeTypes[6] = new StrokeTypeProc4();
-            //strokeTypes[7] = new StrokeTypeProc5();
             strokeTypes[2] = new StrokeTypeProc6();
             strokeTypes[3] = new StrokeTypeSquares(); 
             strokeTypes[4] = new StrokeTypeFur(); 
             strokeTypes[5] = new StrokeTypeProc7();
+            // Other strokes that can be added by uncommenting and changing the stroketypes array size
+            //strokeTypes[6] = new StrokeTypeSpray();
+            //strokeTypes[7] = new StrokeTypeProc2();
+            //strokeTypes[8] = new StrokeTypeProc1();
+            //strokeTypes[9] = new StrokeTypeProc3();
+            //strokeTypes[10] = new StrokeTypeProc4();
+            //strokeTypes[11] = new StrokeTypeProc5();
 
             
        this.strokeDropdown = new JComboBox<StrokeType>(strokeTypes);
@@ -254,11 +253,9 @@ class ClientGUI extends JFrame{
         
         // Join Game submenu.
         this.joinGameSubmenu = new JMenu("Join Game");
-        
-        //Create and set up the window.
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.save = new JMenuItem("Save to png", KeyEvent.VK_T);
     
-        //Build Sidebar
+        //Create Sidebar objects
         this.sidebar = new JPanel();
         this.chatBar = new JPanel();
         this.chatText = new JTextArea();
@@ -306,8 +303,10 @@ class ClientGUI extends JFrame{
 
     }
     
-    private void setSideBar() {
-        
+    /**
+     * Builds sidebar from components
+     */
+    private void setSideBar() { 
         
         JPanel brushPanel = new JPanel();
         brushPanel.add(strokeButton);
@@ -367,6 +366,7 @@ class ClientGUI extends JFrame{
         JPanel toolBar = new JPanel();
         toolBar.add(brushToggle);
         toolBar.add(fillToggle);
+        //uncomment if clone implemented
         //toolBar.add(cloneToggle);
         toolBar.add(eraseToggle);
         toolBar.add(dropperToggle);
@@ -566,7 +566,7 @@ class ClientGUI extends JFrame{
                                 pointer = MouseInfo.getPointerInfo();
                                 Point coord = pointer.getLocation();
                                 Color color = robot.getPixelColor((int)coord.getX(), (int)coord.getX());
-                                colorButton.setIcon(new ColorIcon(10, color));
+                                colorButton.setIcon(new ColorSquareIcon(10, color));
                                 controller.setStrokeColor(color);
                                 canvas.removeMouseListener(this); 
                                 brushToggle.setSelected(true);
@@ -605,7 +605,10 @@ class ClientGUI extends JFrame{
         fillToggle.setSelected(fill);
         dropperToggle.setSelected(dropper);
     }
-       
+    
+    /**
+     * Builds chat client panel
+     */
     private void setChatClient() {
         chatBar.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -660,6 +663,9 @@ class ClientGUI extends JFrame{
         
     }
     
+    /**
+     * Builds the top menu bar
+     */
     private void buildMenuBar() {     
         // Create the menu bar.
         JMenuBar menuBar = new JMenuBar();
@@ -731,7 +737,7 @@ class ClientGUI extends JFrame{
         ActionListener okListener = new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 Color color = colorChooser.getColor();
-                colorButton.setIcon(new ColorIcon(10, color));
+                colorButton.setIcon(new ColorSquareIcon(10, color));
                 controller.setStrokeColor(color);
             }
           };
@@ -742,7 +748,7 @@ class ClientGUI extends JFrame{
     }
     
     private void setStroke() {
-        strokeButton.setIcon(new ColorIcon(Math.max((int)(strokeSlider.getValue() * 3/5), 2), Color.black));
+        strokeButton.setIcon(new ColorSquareIcon(Math.max((int)(strokeSlider.getValue() * 3/5), 2), Color.black));
         controller.setStrokeWidth(strokeSlider.getValue());
     }
     
@@ -772,6 +778,10 @@ class ClientGUI extends JFrame{
         }
     }
     
+    /**
+     * Update the brush cursor circle to resize according the the stroke.
+     * The resizing cursor is not supported on Windows, defaults to crosshair.
+     */
     private void updateCursor() {
         if (!isWindows) {
             Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -932,43 +942,6 @@ class ClientGUI extends JFrame{
         });
     }
     
-    /**
-     * Creates icon for color button
-     */
-    private static class ColorIcon implements Icon {
-
-        private int size;
-        private int forcedSize;
-        private Color color;
-
-        public ColorIcon(int size, Color color) {
-            this.size = size;
-            this.color = color;
-            this.forcedSize = 10;
-        }
-
-        @Override
-        public void paintIcon(Component c, Graphics g, int x, int y) {
-            Graphics2D g2d = (Graphics2D) g;
-            g2d.setRenderingHint(
-                RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON);
-            g2d.setColor(Color.black);
-            g2d.fillRect(x + (forcedSize - size) / 2, y + (forcedSize - size) / 2, size, size);
-            g2d.setColor(color);
-            g2d.fillRect(x + (forcedSize - size) / 2, y + (forcedSize - size) / 2, size - 2, size -2);
-        }
-
-        @Override
-        public int getIconWidth() {
-            return forcedSize;
-        }
-
-        @Override
-        public int getIconHeight() {
-            return forcedSize;
-        }
-    }
     
     public class LayerTableModel extends AbstractTableModel {
         private Vector<Vector<Object>> data;
@@ -1020,11 +993,18 @@ class ClientGUI extends JFrame{
             fireTableCellUpdated(row, col);
         } 
         
+        /**
+         * Adds new row to the table.
+         * @param row The row should have a boolean, image, and layer name, in that order
+         */
         public void addRow(Vector<Object> row) {
             data.add(row);
             fireTableRowsInserted(0, getRowCount() - 1);
         }
         
+        /**
+         * Clears the table
+         */
 		public void clearTable() {
 			data=new Vector<Vector<Object>>();
 			fireTableDataChanged();
