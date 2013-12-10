@@ -69,7 +69,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.AbstractTableModel;
 
-import canvas.layer.Layer;
 import models.BoardModel;
 import name.BoardIdentifier;
 import name.Identifiable;
@@ -85,6 +84,7 @@ import stroke.StrokeTypeSquares;
 import util.MineralNames;
 import util.Utils;
 import canvas.layer.Layer;
+import canvas.layer.LayerProperties;
 
 
 class ClientGUI extends JFrame{
@@ -850,31 +850,39 @@ class ClientGUI extends JFrame{
     public void setLayers(final Layer[] layers) {        
     	SwingUtilities.invokeLater(new Runnable() {
 	        public void run() {
+	        	LayerProperties selectedLayer = selectedLayer();
+	        	int newSelectedRowNum=0;
 	    	    layerTableModel.clearTable();
 	        	
-	        	for (Layer l : layers) {
+	        	for (int i = layers.length -1; i >= 0 ; i--) {
+	        		Layer l = layers[i];
 	    	    	ImageIcon icon = new ImageIcon(((new ImageIcon("resources/brushIcon.png")).getImage()));
 	    	        Image img = icon.getImage();  
 	    	        Image newimg = img.getScaledInstance(45, 45,  java.awt.Image.SCALE_SMOOTH);  
 	    	        ImageIcon newIcon = new ImageIcon(newimg); 
 	    	        
+	    	        if (l.layerProperties() == selectedLayer)
+	    	        	newSelectedRowNum=layers.length - i - 1;
 	    	        Vector<Object> newLayer = new Vector<Object>();
 	    	        newLayer.add(l.layerProperties().getVisibility());
 	    	        newLayer.add(newIcon);
-	    	        newLayer.add(l.layerProperties().layerIdentifier());
+	    	        newLayer.add(l.layerProperties());
+	 
 	    	        layerTableModel.addRow(newLayer);
 	    	        layerTable.revalidate();
 	        	}
+	        	layerTable.setRowSelectionInterval(newSelectedRowNum, newSelectedRowNum);
+	        	
 	        }
 	    });
     }
     
-    public LayerIdentifier selectedLayer() {
+    public LayerProperties selectedLayer() {
     	int selectedRow = layerTable.getSelectedRow();
     	if (selectedRow == -1)
     		selectedRow = 0;
     	
-    	return (LayerIdentifier) layerTableModel.getValueAt(selectedRow, 2);
+    	return (LayerProperties) layerTableModel.getValueAt(selectedRow, 2);
     }
     /**
      * Add new chat message
@@ -962,7 +970,7 @@ class ClientGUI extends JFrame{
     public class LayerTableModel extends AbstractTableModel {
         private Vector<Vector<Object>> data;
         private final String[] COLUMN_NAMES = new String[] {"Visible", "Thumbnail", "Name"};
-        private final Class<?>[] COLUMN_TYPES = new Class<?>[] {Boolean.class, Icon.class, LayerIdentifier.class};
+        private final Class<?>[] COLUMN_TYPES = new Class<?>[] {Boolean.class, Icon.class, LayerProperties.class};
         
         public LayerTableModel(Vector<Vector<Object>> data) {
             this.data = data;
