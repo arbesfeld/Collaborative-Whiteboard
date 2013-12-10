@@ -218,7 +218,7 @@ class ClientGUI extends JFrame{
         this.brushToggle.setEnabled(false);
         this.brushToggle.setSelected(true);
         
-        this.symetrySlider = new JSlider(JSlider.HORIZONTAL, 1, 5, 1);
+        this.symetrySlider = new JSlider(JSlider.HORIZONTAL, 1, 7, 1);
         this.symetrySlider.setMinorTickSpacing(1);
         this.symetrySlider.setPaintTicks(true);
         this.symetrySlider.setSnapToTicks(true);
@@ -304,7 +304,7 @@ class ClientGUI extends JFrame{
         JPanel toolBar = new JPanel();
         toolBar.add(brushToggle);
         toolBar.add(fillToggle);
-        toolBar.add(cloneToggle);
+        //toolBar.add(cloneToggle);
         toolBar.add(eraseToggle);
         toolBar.add(dropperToggle);
         TitledBorder toolBorder = BorderFactory.createTitledBorder("Tools");

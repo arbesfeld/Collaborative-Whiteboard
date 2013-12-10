@@ -104,40 +104,32 @@ public class Canvas2d extends DrawableBase implements Drawable, Serializable {
         }
         g.setStroke(stroke);
         
-        int rots = symetry;
-        double y1 = -pixelStart.y() + height/2;
-        double x1 = pixelStart.x() - width/2;
-        double distanceStart = Math.sqrt(Math.pow(x1, 2) + Math.pow(y1, 2));
-        double thetaStart = Math.atan2(y1, x1);
-        
-        double y2 = -pixelEnd.y() + height/2;
-        double x2 = pixelEnd.x() - width/2;
-        double distanceEnd = Math.sqrt(Math.pow(x2, 2) + Math.pow(y2, 2));
-        double thetaEnd = Math.atan2(y2,x2);
-        
-        double rotAmmount = 2 * Math.PI / rots;
-        
-        
-        for (int i = 0; i < rots; i++) {
-            g.drawLine(width/2 + (int)(Math.sin(thetaStart) * distanceStart), height/2 + (int)(Math.cos(thetaStart) * distanceStart), 
-                    width/2 + (int)(Math.sin(thetaEnd) * distanceEnd), height/2 + (int)(Math.cos(thetaEnd) * distanceEnd));
-            thetaStart += rotAmmount;
-            thetaEnd += rotAmmount;
+        if (symetry > 1) {
+            double y1 = -pixelStart.y() + height/2;
+            double x1 = pixelStart.x() - width/2;
+            double distanceStart = Math.sqrt(Math.pow(x1, 2) + Math.pow(y1, 2));
+            double thetaStart = Math.atan2(y1, x1);
+            
+            double y2 = -pixelEnd.y() + height/2;
+            double x2 = pixelEnd.x() - width/2;
+            double distanceEnd = Math.sqrt(Math.pow(x2, 2) + Math.pow(y2, 2));
+            double thetaEnd = Math.atan2(y2,x2);
+            
+            double rotAmmount = 2 * Math.PI / symetry;
+            
+            
+            for (int i = 0; i < symetry; i++) {
+                g.drawLine(width/2 + (int)(Math.cos(thetaStart) * distanceStart), height/2 - (int)(Math.sin(thetaStart) * distanceStart), 
+                        width/2 + (int)(Math.cos(thetaEnd) * distanceEnd), height/2 - (int)(Math.sin(thetaEnd) * distanceEnd));
+                g.drawLine(width/2 - (int)(Math.sin(thetaStart) * distanceStart), height/2 + (int)(Math.cos(thetaStart) * distanceStart), 
+                        width/2 - (int)(Math.sin(thetaEnd) * distanceEnd), height/2 + (int)(Math.cos(thetaEnd) * distanceEnd));
+                thetaStart += rotAmmount;
+                thetaEnd += rotAmmount;
+            }
         }
-//        g.drawLine(pixelStart.x(), pixelStart.y(), pixelEnd.x(), pixelEnd.y());
-//        if (symetry >= 2) {
-//            g.drawLine(width - pixelStart.x(), height - pixelStart.y(), width - pixelEnd.x(), height - pixelEnd.y());
-//        }
-//        if (symetry >= 3) {
-//            g.drawLine(pixelStart.y(), pixelStart.x(), pixelEnd.y(), pixelEnd.x());
-//            g.drawLine(width - pixelStart.y(), height - pixelStart.x(), width - pixelEnd.y(), height - pixelEnd.x());
-//        }
-//        if (symetry >= 4) {
-//            g.drawLine(pixelStart.x(), height - pixelStart.y(), pixelEnd.x(), height - pixelEnd.y());
-//            g.drawLine(pixelStart.y(), height - pixelStart.x(), pixelEnd.y(), height - pixelEnd.x());
-//            g.drawLine(width - pixelStart.x(),pixelStart.y(), width - pixelEnd.x(),pixelEnd.y());
-//            g.drawLine(width - pixelStart.y(),pixelStart.x(), width - pixelEnd.y(),pixelEnd.x());
-//        }
+        else {
+            g.drawLine(pixelStart.x(), pixelStart.y(), pixelEnd.x(), pixelEnd.y());
+        }
     }
     
     public synchronized void drawFill(Pixel pixel) {
