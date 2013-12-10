@@ -141,7 +141,7 @@ public class ClientController extends SocketHandler {
 		setGUILayers();
 	}
 	
-	private void setGUILayers() {
+	public void setGUILayers() {
         view.setLayers(model.canvas().layers());
 	}
 	

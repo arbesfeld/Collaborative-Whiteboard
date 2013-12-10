@@ -51,10 +51,13 @@ public class DefaultDrawingController extends DrawingController {
         lastY = y;
     }
 
+    public void mouseReleased(MouseEvent e) {
+    	clientController.setGUILayers();
+    }
+    
     // Ignore all these other mouse events.
     public void mouseMoved(MouseEvent e) { }
     public void mouseClicked(MouseEvent e) { }
-    public void mouseReleased(MouseEvent e) { }
     public void mouseEntered(MouseEvent e) { }
     public void mouseExited(MouseEvent e) { }
 }
