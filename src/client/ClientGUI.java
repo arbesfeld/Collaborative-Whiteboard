@@ -408,7 +408,6 @@ class ClientGUI extends JFrame{
         downButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	System.out.println("Down");
             	controller.adjustLayer(selectedLayer(), LayerAdjustment.DOWN);
             }
         });
@@ -1018,8 +1017,9 @@ class ClientGUI extends JFrame{
         public void setValueAt(Object value, int row, int col) {
             data.get(row).set(col, value);
             if(col == 0){
-            	System.out.println("Just changed value of checkbox to " + value.toString());
-            	// TODO
+        		LayerProperties properties = selectedLayer();
+        		properties.setVisibility((boolean)value);
+        		controller.adjustLayer(properties, LayerAdjustment.PROPERTIES);
             }
             fireTableCellUpdated(row, col);
         } 
