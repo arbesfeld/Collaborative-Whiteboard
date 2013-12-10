@@ -446,7 +446,7 @@ class ClientGUI extends JFrame{
                         final Robot robot = new Robot();
                         canvas.setCursor(dropperCursor);
 
-                        controller.setStrokeWidth(-1);
+                        controller.setStrokeWidth(0);
                         MouseListener mouseListener = new MouseListener() {
                             
                         	@Override
