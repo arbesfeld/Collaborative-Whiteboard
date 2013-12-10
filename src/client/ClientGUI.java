@@ -269,15 +269,14 @@ class ClientGUI extends JFrame{
         this.layerTable = new JTable(this.layerTableModel);
         this.layerTable.setRowHeight(50);
         this.layerTable.getColumnModel().getColumn(0).setPreferredWidth(30);
+        this.layerTable.getColumnModel().getColumn(1).setPreferredWidth(30);
+        this.layerTable.setShowVerticalLines(false);
+        this.layerTable.setSelectionBackground(Color.LIGHT_GRAY);
+        this.layerTable.setSelectionForeground(Color.BLACK);
+        this.layerTable.setGridColor(Color.GRAY);
         this.layerTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        JScrollPane scrollPane = new JScrollPane(layerTable, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        add(scrollPane);
-        //TODO Add scroll pane
         
-        //TODO remove below
-//        this.addLayer();
-//        this.addLayer();
-//        
+     
         setSideBar();
         
         if (isWindows) {
@@ -336,7 +335,9 @@ class ClientGUI extends JFrame{
         
         JPanel layerPanel = new JPanel();
         layerPanel.setLayout(new BoxLayout(layerPanel, BoxLayout.Y_AXIS));
-        layerPanel.add(layerTable);
+        JScrollPane scrollPane = new JScrollPane(layerTable, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setPreferredSize(new Dimension(120,150));
+        layerPanel.add(scrollPane);
         JPanel layerButtons = new JPanel();
         opacitySlider = new JSlider(1,100,100);
         JButton newLayerButton = new JButton(new ImageIcon(((new ImageIcon("resources/newPage.png")).getImage())
@@ -351,6 +352,7 @@ class ClientGUI extends JFrame{
                 .getScaledInstance(15, 15, java.awt.Image.SCALE_SMOOTH))); 
         downButton.setPreferredSize(new Dimension(20,20));
         downButton.setFocusable(false);
+        layerButtons.add(new JLabel("Opacity"));
         layerButtons.add(opacitySlider);
         layerButtons.add(newLayerButton);
         layerButtons.add(upButton);
