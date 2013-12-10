@@ -314,20 +314,24 @@ class ClientGUI extends JFrame{
         allBrushPanel.add(brushPanel);
         allBrushPanel.add(sliderPanel);
         TitledBorder brushPanelBorder = BorderFactory.createTitledBorder("Brush Settings");
-        allBrushPanel.setBorder(brushPanelBorder);
+        allBrushPanel.setBorder(brushPanelBorder); 
         
         JPanel layerPanel = new JPanel();
+        layerPanel.setLayout(new BoxLayout(layerPanel, BoxLayout.Y_AXIS));
         layerPanel.add(layerTable);
         JPanel layerButtons = new JPanel();
         JButton newLayerButton = new JButton(new ImageIcon(((new ImageIcon("resources/newPage.png")).getImage())
-                .getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH)));  
-        newLayerButton.setPreferredSize(new Dimension(40,40));
-        JButton upButton = new JButton(new ImageIcon(((new ImageIcon("resources/upArrow.png")).getImage())
-                .getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH)));  
-        upButton.setPreferredSize(new Dimension(40,40));
-        JButton downButton = new JButton(new ImageIcon(((new ImageIcon("resources/downArrow.png")).getImage())
-                .getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH))); 
-        downButton.setPreferredSize(new Dimension(40,40));
+                .getScaledInstance(15, 15, java.awt.Image.SCALE_SMOOTH)));  
+        newLayerButton.setPreferredSize(new Dimension(20,20));
+        newLayerButton.setFocusable(false);
+        JButton upButton = new JButton(new ImageIcon(((new ImageIcon("resources/upArrowIcon.png")).getImage())
+                .getScaledInstance(15, 15, java.awt.Image.SCALE_SMOOTH)));  
+        upButton.setPreferredSize(new Dimension(20,20));
+        upButton.setFocusable(false);
+        JButton downButton = new JButton(new ImageIcon(((new ImageIcon("resources/downArrowIcon.png")).getImage())
+                .getScaledInstance(15, 15, java.awt.Image.SCALE_SMOOTH))); 
+        downButton.setPreferredSize(new Dimension(20,20));
+        downButton.setFocusable(false);
         layerButtons.add(newLayerButton);
         layerButtons.add(upButton);
         layerButtons.add(downButton);
