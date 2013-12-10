@@ -75,6 +75,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import models.BoardModel;
+import models.UserTableModel;
 import name.BoardIdentifier;
 import name.Identifiable;
 import name.LayerIdentifier;
@@ -967,39 +968,6 @@ class ClientGUI extends JFrame{
         public int getIconHeight() {
             return forcedSize;
         }
-    }
-    
-    public class UserTableModel extends AbstractTableModel{
-
-        private String[] columnNames = {"Users"};      
-        private Object[][] data = new Object[0][0];
-        
-        public int getColumnCount() {
-            return columnNames.length;
-        }
-
-        public int getRowCount() {
-            return data.length;
-        }
-
-        public String getColumnName(int col) {
-            return columnNames[col];
-        }
-
-        public Object getValueAt(int row, int col) {
-            return data[row][col];
-        }
-
-        public void setValueAt(Object value, int row, int col) {
-            data[row][col] = value;
-            fireTableCellUpdated(row, col);
-        }
-      
-        public void updateData(Object[][] newData) {
-            data = newData;
-            fireTableDataChanged();
-        }
-
     }
     
     public class LayerTableModel extends AbstractTableModel {
