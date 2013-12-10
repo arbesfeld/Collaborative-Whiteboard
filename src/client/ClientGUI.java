@@ -398,7 +398,8 @@ class ClientGUI extends JFrame{
         newLayerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JTextField layerName = new JTextField("Layer 0");
+            	int layerNum = layerTable.getRowCount();
+                JTextField layerName = new JTextField("Layer " + layerNum);
                 JPanel panel = new JPanel(new GridLayout(0, 1));
                 
                 panel.add(new JLabel("Layer Name"));
