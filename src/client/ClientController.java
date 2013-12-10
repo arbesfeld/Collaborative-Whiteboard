@@ -29,6 +29,7 @@ import util.Utils;
 import canvas.CanvasController;
 import canvas.command.DrawCommand;
 import canvas.layer.LayerAdjustment;
+import canvas.layer.LayerProperties;
 
 public class ClientController extends SocketHandler {
 	private static final long serialVersionUID = 6673644308053728584L;
@@ -217,8 +218,8 @@ public class ClientController extends SocketHandler {
     	sendPacket(new PacketNewLayer(identifier));
     }
     
-    public void adjustLayer(LayerIdentifier layerIdentifier, LayerAdjustment adjustment) {
-    	sendPacket(new PacketLayerAdjustment(layerIdentifier, adjustment));
+    public void adjustLayer(LayerProperties layerProperties, LayerAdjustment adjustment) {
+    	sendPacket(new PacketLayerAdjustment(layerProperties, adjustment));
     }
     
 	@Override
@@ -250,7 +251,6 @@ public class ClientController extends SocketHandler {
 	}
 	
 	public LayerIdentifier selectedLayer() {
-		System.out.println(view.selectedLayer());
-		return view.selectedLayer();
+		return view.selectedLayer().layerIdentifier();
 	}
 }

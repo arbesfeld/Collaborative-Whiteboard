@@ -2,19 +2,24 @@ package packet;
 
 import name.LayerIdentifier;
 import canvas.layer.LayerAdjustment;
+import canvas.layer.LayerProperties;
 
 public class PacketLayerAdjustment extends Packet {
 	private static final long serialVersionUID = 5126362530793078834L;
-	private final LayerIdentifier layer;
 	private final LayerAdjustment adjustment;
+	private final LayerProperties properties;
 	
-	public PacketLayerAdjustment(LayerIdentifier layer, LayerAdjustment adjustment){
-		this.layer = layer;
+	public PacketLayerAdjustment(LayerProperties properties, LayerAdjustment adjustment){
+		this.properties = properties;
 		this.adjustment = adjustment;
+	}
+
+	public LayerProperties layerProperties() {
+		return properties;
 	}
 	
 	public LayerIdentifier layer() {
-		return layer;
+		return properties.layerIdentifier();
 	}
 	
 	public LayerAdjustment adjustment() {
