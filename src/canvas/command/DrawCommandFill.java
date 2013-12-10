@@ -1,5 +1,6 @@
 package canvas.command;
 
+import name.LayerIdentifier;
 import canvas.Drawable;
 import canvas.Pixel;
 

@@ -19,26 +19,40 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import name.LayerIdentifier;
 import canvas.DrawableBase;
 import canvas.Pixel;
 
 public class Layer extends DrawableBase {
-
-    // image where the user's drawing is stored
+	private static final long serialVersionUID = -5558390701591471173L;
+	
+	// image where the user's drawing is stored
     private transient BufferedImage image;
+    private final LayerProperties layerProperties;
+    private int level;
     
 	/**
      * Make a canvas.
      * @param width width in pixels
      * @param height height in pixels
+	 * @param layerIdentifier 
      */
-    public Layer(int width, int height) {
+    public Layer(int width, int height, LayerIdentifier layerIdentifier, int level) {
         super(width, height);
+        this.layerProperties = new LayerProperties(layerIdentifier);
+        this.level = level;
     }
     
-    public Layer(BufferedImage image) {
-        super(image.getWidth(), image.getHeight());
-        this.image = image;
+    public LayerProperties layerProperties() {
+    	return layerProperties;
+    }
+    
+    public void setLevel(int level) {
+    	this.level = level;
+    }
+    
+    public int level() {
+    	return level;
     }
     /*
      * Make the drawing buffer and draw some starting content for it.
@@ -177,14 +191,6 @@ public class Layer extends DrawableBase {
     	}
 
         g.drawImage(image, 0, 0, null);
-    }
-
-    public synchronized BufferedImage image() {
-        if (image == null) {
-            makeImage();
-        }
-        
-        return image;
     }
 	
 	private void writeObject(ObjectOutputStream s) throws IOException {

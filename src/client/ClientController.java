@@ -16,7 +16,7 @@ import packet.PacketClientReady;
 import packet.PacketDrawCommand;
 import packet.PacketExitBoard;
 import packet.PacketJoinBoard;
-import packet.PacketLayerOrderList;
+import packet.PacketLayerAdjustment;
 import packet.PacketMessage;
 import packet.PacketNewBoard;
 import packet.PacketNewClient;
@@ -119,6 +119,27 @@ public class ClientController extends SocketHandler {
 	public void receivedMessagePacket(PacketMessage packet) {
 		view.addChatLine(packet.text());
 	}
+
+
+	@Override
+	public void receivedLayerAdjustmentPacket(
+			PacketLayerAdjustment packetLayerOrderList) {
+		assert model != null;
+		assert clientState == ClientState.PLAYING;
+		model.adjustLayer(packetLayerOrderList.layer(), packetLayerOrderList.adjustment());
+	}
+
+	@Override
+	public void receivedNewLayerPacket(PacketNewLayer packetNewLayer) {
+		assert model != null;
+		assert clientState == ClientState.PLAYING;
+		model.addLayer(packetNewLayer.layerName());
+		
+	}
+	
+	private void setGUILayers() {
+        view.setLayers(model.canvas().layers());
+	}
 	
     /*
      * Methods for sending packets.
@@ -155,7 +176,7 @@ public class ClientController extends SocketHandler {
     public void sendDrawCommand(DrawCommand drawCommand) {
         assert model != null;
         
-        PacketDrawCommand packet = new PacketDrawCommand(drawCommand);
+        PacketDrawCommand packet = new PacketDrawCommand(drawCommand, view.currentLayer());
         sendPacket(packet);
     }
 
@@ -216,18 +237,5 @@ public class ClientController extends SocketHandler {
 	
 	public int getBoardHeight() {
 		return this.model.height();
-	}
-
-	@Override
-	public void receivedLayerOrderListPacket(
-			PacketLayerOrderList packetLayerOrderList) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void receivedNewLayerPacket(PacketNewLayer packetNewLayer) {
-		// TODO Auto-generated method stub
-		
 	}
 }

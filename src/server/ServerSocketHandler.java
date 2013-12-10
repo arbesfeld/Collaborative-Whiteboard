@@ -12,7 +12,7 @@ import packet.PacketClientReady;
 import packet.PacketDrawCommand;
 import packet.PacketExitBoard;
 import packet.PacketJoinBoard;
-import packet.PacketLayerOrderList;
+import packet.PacketLayerAdjustment;
 import packet.PacketMessage;
 import packet.PacketNewBoard;
 import packet.PacketNewClient;
@@ -112,6 +112,22 @@ public class ServerSocketHandler extends SocketHandler {
 	public void receivedMessagePacket(PacketMessage packet) {
 		broadcastPacketToBoard(packet);
 	}
+
+
+	@Override
+	public void receivedLayerAdjustmentPacket(
+			PacketLayerAdjustment packetAdjustment) {
+        assert state == ServerSocketState.PLAYING;
+        assert model != null;
+		model.adjustLayer(packetAdjustment.layer(), packetAdjustment.adjustment());
+	}
+
+	@Override
+	public void receivedNewLayerPacket(PacketNewLayer packetNewLayer) {
+        assert state == ServerSocketState.PLAYING;
+        assert model != null;
+		model.addLayer(packetNewLayer.layerName());
+	}
 	
     @Override
     public void receivedBoardModelPacket(PacketBoardModel packet) {
@@ -141,17 +157,4 @@ public class ServerSocketHandler extends SocketHandler {
             ((ServerSocketHandler) handler).sendPacket(packet);
         }
     }
-
-	@Override
-	public void receivedLayerOrderListPacket(
-			PacketLayerOrderList packetLayerOrderList) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void receivedNewLayerPacket(PacketNewLayer packetNewLayer) {
-		// TODO Auto-generated method stub
-		
-	}
 }

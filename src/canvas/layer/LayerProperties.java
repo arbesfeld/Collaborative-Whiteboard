@@ -1,8 +1,10 @@
 package canvas.layer;
 
+import java.io.Serializable;
+
 import name.LayerIdentifier;
 
-public class LayerProperties {
+public class LayerProperties implements Serializable {
 	
 	private LayerIdentifier layerIdentifier;
 	private double opacity;

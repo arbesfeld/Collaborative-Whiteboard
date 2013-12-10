@@ -15,6 +15,6 @@ public interface PacketHandler {
      void receivedBoardIdentifierListPacket(PacketBoardIdentifierList packet);
      void receivedDrawCommandPacket(PacketDrawCommand packet);
      void receivedMessagePacket(PacketMessage packet);
-     void receivedLayerOrderListPacket(PacketLayerOrderList packetLayerOrderList);
+     void receivedLayerAdjustmentPacket(PacketLayerAdjustment packetLayerOrderList);
      void receivedNewLayerPacket(PacketNewLayer packetNewLayer);
 }

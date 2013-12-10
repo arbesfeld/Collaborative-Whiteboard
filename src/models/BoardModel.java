@@ -14,10 +14,12 @@ import javax.swing.JPanel;
 
 import name.BoardIdentifier;
 import name.Identifiable;
+import name.LayerIdentifier;
 import canvas.Canvas;
 import canvas.CanvasController;
 import canvas.Drawable;
 import canvas.Pixel;
+import canvas.layer.LayerAdjustment;
 
 public class BoardModel extends JPanel implements Drawable, Identifiable, Serializable {
 	private static final long serialVersionUID = -7812022750931126889L;
@@ -111,4 +113,13 @@ public class BoardModel extends JPanel implements Drawable, Identifiable, Serial
 	public void setDrawingControllerDefault() {
 		canvas.setDefaultDrawingController(this);
 	}
+
+	public void addLayer(LayerIdentifier layer) {
+		canvas.canvas().addLayer(layer);
+	}
+	
+	public void adjustLayer(LayerIdentifier layer, LayerAdjustment adjustment) {
+		canvas.canvas().adjustLayer(layer, adjustment);
+	}
+	
 }

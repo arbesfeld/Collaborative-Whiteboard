@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import name.LayerIdentifier;
 import canvas.Drawable;
 import canvas.Pixel;
 
@@ -17,7 +18,7 @@ public class DrawCommandLine extends DrawCommand {
     private final int symetry;
     
     public DrawCommandLine(Pixel pixelStart, Pixel pixelEnd, BasicStroke stroke, int symetry) {
-        this.pixelStart = pixelStart;
+    	this.pixelStart = pixelStart;
         this.pixelEnd = pixelEnd;
         this.stroke = stroke;
         this.symetry = symetry;
