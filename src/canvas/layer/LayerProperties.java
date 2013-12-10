@@ -25,6 +25,11 @@ public class LayerProperties implements Serializable {
 	public boolean getVisibility() {
 		return this.visible;
 	}
+	
+	public LayerIdentifier layerIdentifier() {
+		return layerIdentifier;
+	}
+	
 	public String toString() {
 		return this.layerIdentifier.toString();
 	}

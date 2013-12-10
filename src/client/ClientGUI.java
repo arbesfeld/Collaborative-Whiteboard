@@ -374,7 +374,18 @@ class ClientGUI extends JFrame{
         newLayerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //TODO
+                JTextField layerName = new JTextField("Layer 0");
+                JPanel panel = new JPanel(new GridLayout(0, 1));
+                
+                panel.add(new JLabel("Layer Name"));
+                panel.add(layerName);
+                
+                int result = JOptionPane.showConfirmDialog(null, panel, "Create Layer",
+                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+                if (result == JOptionPane.OK_OPTION) {
+                    LayerIdentifier layerIdentifier = new LayerIdentifier(Utils.generateId(), layerName.getText());
+                    controller.addLayer(layerIdentifier);
+                }
             }
         });
         
@@ -787,7 +798,7 @@ class ClientGUI extends JFrame{
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 setContentPaneGUI(model);
-         
+                setLayers(model.canvas().layers());
             }
         });
     }
@@ -823,26 +834,34 @@ class ClientGUI extends JFrame{
         });
     }
     
-    public void setLayers(Layer[] layers) {
-	    this.layerTableModel.clearTable();
-    	
-    	for (Layer l : layers) {
-	    	ImageIcon icon = new ImageIcon(((new ImageIcon("resources/brushIcon.png")).getImage()));
-	        Image img = icon.getImage();  
-	        Image newimg = img.getScaledInstance(45, 45,  java.awt.Image.SCALE_SMOOTH);  
-	        ImageIcon newIcon = new ImageIcon(newimg); 
-	        
-	        Vector<Object> newLayer = new Vector<Object>();
-	        newLayer.add(l.layerProperties().getVisibility());
-	        newLayer.add(newIcon);
-	        newLayer.add(l.layerProperties().toString());
-	        this.layerTableModel.addRow(newLayer);
-	        this.layerTable.revalidate();
-    	}
+    public void setLayers(final Layer[] layers) {        
+    	SwingUtilities.invokeLater(new Runnable() {
+	        public void run() {
+	    	    layerTableModel.clearTable();
+	        	
+	        	for (Layer l : layers) {
+	    	    	ImageIcon icon = new ImageIcon(((new ImageIcon("resources/brushIcon.png")).getImage()));
+	    	        Image img = icon.getImage();  
+	    	        Image newimg = img.getScaledInstance(45, 45,  java.awt.Image.SCALE_SMOOTH);  
+	    	        ImageIcon newIcon = new ImageIcon(newimg); 
+	    	        
+	    	        Vector<Object> newLayer = new Vector<Object>();
+	    	        newLayer.add(l.layerProperties().getVisibility());
+	    	        newLayer.add(newIcon);
+	    	        newLayer.add(l.layerProperties().layerIdentifier());
+	    	        layerTableModel.addRow(newLayer);
+	    	        layerTable.revalidate();
+	        	}
+	        }
+	    });
     }
     
     public LayerIdentifier selectedLayer() {
-    	return (LayerIdentifier) this.layerTableModel.getValueAt(this.layerTable.getSelectedRow(),2);
+    	int selectedRow = layerTable.getSelectedRow();
+    	if (selectedRow == -1)
+    		selectedRow = 0;
+    	
+    	return (LayerIdentifier) layerTableModel.getValueAt(selectedRow, 2);
     }
     /**
      * Add new chat message
