@@ -22,7 +22,9 @@ public class LayerProperties implements Serializable {
 	public void setVisibility(Boolean visible){
 		this.visible=visible;
 	}
-	
+	public boolean getVisibility() {
+		return this.visible;
+	}
 	public String toString() {
 		return this.layerIdentifier.toString();
 	}

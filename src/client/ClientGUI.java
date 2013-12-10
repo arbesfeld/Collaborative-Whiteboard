@@ -787,37 +787,27 @@ class ClientGUI extends JFrame{
         });
     }
     
-//    public void addLayer() {
-//        ImageIcon icon = new ImageIcon(((new ImageIcon("resources/brushIcon.png")).getImage()));
-//        Image img = icon.getImage();  
-//        Image newimg = img.getScaledInstance(45, 45,  java.awt.Image.SCALE_SMOOTH);  
-//        ImageIcon newIcon = new ImageIcon(newimg); 
-//        
-//        Vector<Object> newLayer = new Vector<Object>();
-//        newLayer.add(true);
-//        newLayer.add(newIcon);
-//        newLayer.add("Test");
-//             
-//        this.layerTableModel.addRow(newLayer);
-//        this.layerTable.revalidate();
-//    }
-    
     public void setLayers(Layer[] layers) {
-    	while(this.layerTable.getRowCount()!=0)
-    		this.layerTable.remove(0);
+	    this.layerTableModel.clearTable();
     	
-    	for (Layer l:layers) {
-    	
-    	ImageIcon icon = new ImageIcon(((new ImageIcon("resources/brushIcon.png")).getImage()));
-        Image img = icon.getImage();  
-        Image newimg = img.getScaledInstance(45, 45,  java.awt.Image.SCALE_SMOOTH);  
-        ImageIcon newIcon = new ImageIcon(newimg); 
-        
-        Vector<Object> newLayer = new Vector<Object>();
-        newLayer.add(l.layerProperties().getVisibility(), newIcon, l.layerProperties.toString());
+    	for (Layer l : layers) {
+	    	ImageIcon icon = new ImageIcon(((new ImageIcon("resources/brushIcon.png")).getImage()));
+	        Image img = icon.getImage();  
+	        Image newimg = img.getScaledInstance(45, 45,  java.awt.Image.SCALE_SMOOTH);  
+	        ImageIcon newIcon = new ImageIcon(newimg); 
+	        
+	        Vector<Object> newLayer = new Vector<Object>();
+	        newLayer.add(l.layerProperties().getVisibility());
+	        newLayer.add(newIcon);
+	        newLayer.add(l.layerProperties().toString());
+	        this.layerTableModel.addRow(newLayer);
+	        this.layerTable.revalidate();
     	}
     }
     
+    public LayerIdentifier selectedLayer() {
+    	return (LayerIdentifier) this.layerTableModel.getValueAt(this.layerTable.getSelectedRow(),2);
+    }
     /**
      * Add new chat message
      * @param string
@@ -954,7 +944,10 @@ class ClientGUI extends JFrame{
             fireTableRowsInserted(0, getRowCount() - 1);
         }
         
-		
+		public void clearTable() {
+			data=new Vector<Vector<Object>>();
+			fireTableDataChanged();
+		}
 
     }
 
