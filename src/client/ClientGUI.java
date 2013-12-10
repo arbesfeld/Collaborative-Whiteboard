@@ -814,6 +814,8 @@ class ClientGUI extends JFrame{
         
         Vector<Object> newLayer = new Vector<Object>();
         newLayer.add(l.layerProperties().getVisibility(), newIcon, l.layerProperties.toString());
+        this.layerTableModel.addRow(newLayer);
+        this.layerTable.revalidate();
     	}
     }
     
