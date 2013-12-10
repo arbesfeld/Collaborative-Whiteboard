@@ -73,6 +73,9 @@ public class Canvas extends DrawableBase {
     	}
     	
     	layer.setLevel(newLevel);
+    	Layer flippedLayer = layers.get(newLevel);
+    	flippedLayer.setLevel(level);
+    	
     	Collections.swap(layers, level, newLevel);
     	checkRep();
     }
