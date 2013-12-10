@@ -69,6 +69,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.AbstractTableModel;
 
+import canvas.layer.Layer;
 import models.BoardModel;
 import name.BoardIdentifier;
 import name.Identifiable;
@@ -317,6 +318,20 @@ class ClientGUI extends JFrame{
         
         JPanel layerPanel = new JPanel();
         layerPanel.add(layerTable);
+        JPanel layerButtons = new JPanel();
+        JButton newLayerButton = new JButton(new ImageIcon(((new ImageIcon("resources/newPage.png")).getImage())
+                .getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH)));  
+        newLayerButton.setPreferredSize(new Dimension(40,40));
+        JButton upButton = new JButton(new ImageIcon(((new ImageIcon("resources/upArrow.png")).getImage())
+                .getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH)));  
+        upButton.setPreferredSize(new Dimension(40,40));
+        JButton downButton = new JButton(new ImageIcon(((new ImageIcon("resources/downArrow.png")).getImage())
+                .getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH))); 
+        downButton.setPreferredSize(new Dimension(40,40));
+        layerButtons.add(newLayerButton);
+        layerButtons.add(upButton);
+        layerButtons.add(downButton);
+        layerPanel.add(layerButtons);
         TitledBorder layersBorder = BorderFactory.createTitledBorder("Layers");
         layerPanel.setBorder(layersBorder);
         
@@ -355,6 +370,27 @@ class ClientGUI extends JFrame{
         c.gridx = 0;
         c.gridy = 3;
         sidebar.add(chatBar, c);
+        
+        newLayerButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //TODO
+            }
+        });
+        
+        upButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //TODO
+            }
+        });
+        
+        downButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //TODO
+            }
+        });
         
         colorButton.addActionListener(new ActionListener() {
             @Override
