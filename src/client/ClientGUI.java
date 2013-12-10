@@ -327,7 +327,7 @@ class ClientGUI extends JFrame{
         JButton downButton = new JButton(new ImageIcon(((new ImageIcon("resources/downArrow.png")).getImage())
                 .getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH))); 
         downButton.setPreferredSize(new Dimension(40,40));
-        layerButtons.add(newLayerButton)
+        layerButtons.add(newLayerButton);
         layerButtons.add(upButton);
         layerButtons.add(downButton);
         layerPanel.add(layerButtons);
