@@ -67,6 +67,10 @@ import javax.swing.border.TitledBorder;
 import javax.swing.colorchooser.AbstractColorChooserPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 
 import models.BoardModel;
@@ -319,6 +323,16 @@ class ClientGUI extends JFrame{
         allBrushPanel.add(sliderPanel);
         TitledBorder brushPanelBorder = BorderFactory.createTitledBorder("Brush Settings");
         allBrushPanel.setBorder(brushPanelBorder); 
+
+        layerTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
+			@Override
+			public void valueChanged(ListSelectionEvent arg0) {
+                if (layerTableModel.getRowCount() <= 0)
+                	return;
+                setOpacitySlider(((LayerProperties)layerTableModel.getValueAt(layerTable.getSelectedRow(), 2)).getOpacity());
+			}
+        });
         
         JPanel layerPanel = new JPanel();
         layerPanel.setLayout(new BoxLayout(layerPanel, BoxLayout.Y_AXIS));
@@ -870,8 +884,7 @@ class ClientGUI extends JFrame{
 	        	
 	        	for (int i = layers.length -1; i >= 0 ; i--) {
 	        		Layer l = layers[i];
-	    	    	ImageIcon icon = new ImageIcon(((new ImageIcon("resources/brushIcon.png")).getImage()));
-	    	        Image img = icon.getImage();  
+	    	        Image img = layers[i].image();
 	    	        Image newimg = img.getScaledInstance(45, 45,  java.awt.Image.SCALE_SMOOTH);  
 	    	        ImageIcon newIcon = new ImageIcon(newimg); 
 	    	        
@@ -991,9 +1004,6 @@ class ClientGUI extends JFrame{
         
         public LayerTableModel(Vector<Vector<Object>> data) {
             this.data = data;
-            this.getSelectionModel().addListSelectionListener(new ActionListener() {
-            	
-            }
         }
         
         public int getColumnCount() {

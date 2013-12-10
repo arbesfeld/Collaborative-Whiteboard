@@ -224,5 +224,9 @@ public class Layer extends DrawableBase {
             image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
             image.getGraphics().drawImage(temp, 0, 0, null);
         }
-    } 
+    }
+
+	public Image image() {
+		return image;
+	} 
 }
