@@ -72,6 +72,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 
 import models.BoardModel;
 import name.BoardIdentifier;
@@ -313,7 +314,7 @@ class ClientGUI extends JFrame{
         brushPanel.add(strokeDropdown);
         
         JPanel sliderPanel = new JPanel();
-        sliderPanel.add(new JLabel("Symetry"));
+        sliderPanel.add(new JLabel("Symmetry"));
         sliderPanel.add(symetrySlider);
         
         JPanel allBrushPanel = new JPanel();
@@ -344,6 +345,7 @@ class ClientGUI extends JFrame{
                 .getScaledInstance(15, 15, java.awt.Image.SCALE_SMOOTH)));  
         newLayerButton.setPreferredSize(new Dimension(20,20));
         newLayerButton.setFocusable(false);
+        newLayerButton.setMnemonic(java.awt.event.KeyEvent.VK_L);
         JButton upButton = new JButton(new ImageIcon(((new ImageIcon("resources/upArrowIcon.png")).getImage())
                 .getScaledInstance(15, 15, java.awt.Image.SCALE_SMOOTH)));  
         upButton.setPreferredSize(new Dimension(20,20));
@@ -1062,5 +1064,6 @@ class ClientGUI extends JFrame{
 
 
     }
-
+    
 }
+
