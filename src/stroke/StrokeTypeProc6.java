@@ -22,8 +22,10 @@ public class StrokeTypeProc6 implements StrokeType {
         int bound = 30;
         for (int i = -bound; i < bound; i++) {
             for (int j = -bound; j < bound; j++) {
-                Pixel checkPixel =new Pixel(x1 + i, y1 + j, new Color(color.getRed(), color.getGreen(),color. getBlue(), 0));
+                Pixel checkPixel =new Pixel(x1 + i, y1 + j, new Color(color.getRed(), color.getGreen(),color.getBlue(), 0));
                 if (canvas.getPixelColor(identifier, checkPixel).equals(color)) {
+                    //System.out.println("alpha: " + canvas.getPixelColor(identifier, checkPixel).getAlpha());
+                    //System.out.println("color: " + canvas.getPixelColor(identifier, checkPixel));
                     if (Math.random() > .95) {
                         result.add(new DrawCommandLine(identifier, new Pixel(x1, y1, color), new Pixel(x1 + i/2, y1 + j/2, color), stroke, symetry));
                         result.add(new DrawCommandLine(identifier, new Pixel(x1, y1, color), checkPixel, stroke, symetry));

@@ -165,8 +165,7 @@ public class Layer extends DrawableBase {
 		if (!isValidPixel(pixel)) {
 			return pixel.color();
 		}
-		
-		return new Color(image.getRGB(pixel.x(), pixel.y()));
+		return new Color(image.getRGB(pixel.x(), pixel.y()), true);
 	}
 
     public synchronized void paintOnGraphics(Graphics g) {
