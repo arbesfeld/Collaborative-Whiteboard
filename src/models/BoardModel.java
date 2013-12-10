@@ -4,44 +4,39 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Stroke;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-import util.Vector2;
 import name.BoardIdentifier;
 import name.Identifiable;
+import canvas.Canvas;
+import canvas.CanvasController;
 import canvas.Drawable;
-import canvas.DrawableBase;
 import canvas.Pixel;
-import canvas.command.DrawCommand;
 
-public class BoardModel implements Drawable, Identifiable, Serializable {
+public class BoardModel extends JPanel implements Drawable, Identifiable, Serializable {
 	private static final long serialVersionUID = -7812022750931126889L;
 
 	private final BoardIdentifier boardName;
-
-    private final DrawableBase canvas;
+    private final CanvasController canvas;
     private final Set<Identifiable> users;
     
-    public BoardModel(BoardIdentifier boardName, DrawableBase canvas) {
-        this.boardName = boardName;
-        this.canvas = canvas;
-        this.users = Collections.synchronizedSet(new HashSet<Identifiable>());
+    // Server only
+    public BoardModel(BoardIdentifier boardName, CanvasController canvas) {
+    	this(boardName, canvas, new Identifiable[]{});
     }
     
-    public BoardModel(BoardIdentifier boardName, DrawableBase canvas, Identifiable[] initUsers) {
+    // Client only
+    public BoardModel(BoardIdentifier boardName, CanvasController canvas, Identifiable[] initUsers) {
         this.boardName = boardName;
         this.canvas = canvas;
         this.users = Collections.synchronizedSet(new HashSet<Identifiable>(Arrays.asList(initUsers)));
+        this.setPreferredSize(new Dimension(width(), height()));
     }
     
     public void addUser(Identifiable user) {
@@ -69,16 +64,19 @@ public class BoardModel implements Drawable, Identifiable, Serializable {
     @Override
     public void drawPixel(Pixel pixel) {
         canvas.drawPixel(pixel);
+        repaint();
     }
 
     @Override
     public void drawLine(Pixel pixelStart, Pixel pixelEnd, Stroke stroke, int symetry) {
         canvas.drawLine(pixelStart, pixelEnd, stroke, symetry);
+        repaint();
     }
     
     @Override
     public void drawFill(Pixel pixel) {
         canvas.drawFill(pixel);
+        repaint();
     }
     
     @Override
@@ -96,17 +94,21 @@ public class BoardModel implements Drawable, Identifiable, Serializable {
         return canvas.height();
     }
     
-    public DrawableBase canvas() {
-        return canvas;
-    }
-    
     @Override
     public BoardIdentifier identifier() {
         return boardName;
     }
     
+    @Override
     public void paintComponent(Graphics g) {
-        canvas.paintComponent(g);
+        canvas.paintOnGraphics(g);
     }
     
+    public Canvas canvas() {
+    	return canvas.canvas();
+    }
+
+	public void setDrawingControllerDefault() {
+		canvas.setDefaultDrawingController(this);
+	}
 }

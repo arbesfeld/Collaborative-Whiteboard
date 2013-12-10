@@ -1,7 +1,5 @@
 package canvas.command;
 
-import java.awt.BasicStroke;
-
 import canvas.Drawable;
 import canvas.Pixel;
 

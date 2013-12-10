@@ -11,6 +11,6 @@ public interface Drawable {
     public void drawPixel(Pixel pixel);
     public void drawLine(Pixel pixelStart, Pixel pixelEnd, Stroke stroke, int symetry);
     public void drawFill(Pixel pixel);
-    public void paintComponent(Graphics g);
+
     public Color getPixelColor(Pixel pixel);
 }

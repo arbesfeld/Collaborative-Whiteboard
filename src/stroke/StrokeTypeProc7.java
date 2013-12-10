@@ -10,7 +10,6 @@ import canvas.Drawable;
 import canvas.Pixel;
 import canvas.command.DrawCommand;
 import canvas.command.DrawCommandLine;
-import canvas.command.DrawCommandPixel;
 
 public class StrokeTypeProc7 implements StrokeType {
 

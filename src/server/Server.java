@@ -17,8 +17,7 @@ import packet.Packet;
 import packet.PacketBoardIdentifierList;
 import packet.PacketJoinBoard;
 import packet.PacketNewBoard;
-import canvas.Canvas2d;
-import canvas.DrawableBase;
+import canvas.CanvasController;
 /**
  * Class that runs the server that handles all the boards and the clients connecting to each board
  * Current default port is 4444, stores a Map of the BoardIdentifier to the BoardModels and a Set of all the clients as
@@ -116,7 +115,7 @@ public class Server implements Identifiable {
         int height = packet.height();
         
         // Create a new model under this boardName.
-        DrawableBase canvas = new Canvas2d(width, height);
+        CanvasController canvas = new CanvasController(width, height);
         BoardModel model = new BoardModel(boardName, canvas);
         addBoard(boardName, model);
         

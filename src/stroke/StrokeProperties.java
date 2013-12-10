@@ -1,14 +1,10 @@
 package stroke;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Stroke;
 
 import util.Vector2;
 import canvas.Drawable;
-import canvas.Pixel;
 import canvas.command.DrawCommand;
-import canvas.command.DrawCommandLine;
 
 public class StrokeProperties {
     public final static Color DEFAULT_STROKE_COLOR = Color.BLACK;

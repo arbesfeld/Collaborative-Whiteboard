@@ -1,12 +1,9 @@
 package canvas.command;
 
 import java.awt.BasicStroke;
-import java.awt.Stroke;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-
-import javax.imageio.ImageIO;
 
 import canvas.Drawable;
 import canvas.Pixel;
