@@ -69,7 +69,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.AbstractTableModel;
 
-import canvas.layer.Layer;
 import models.BoardModel;
 import name.BoardIdentifier;
 import name.Identifiable;
@@ -85,6 +84,7 @@ import stroke.StrokeTypeSquares;
 import util.MineralNames;
 import util.Utils;
 import canvas.layer.Layer;
+import canvas.layer.LayerAdjustment;
 
 
 class ClientGUI extends JFrame{
@@ -396,14 +396,14 @@ class ClientGUI extends JFrame{
         upButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //TODO
+            	controller.adjustLayer(selectedLayer(), LayerAdjustment.UP);	
             }
         });
         
         downButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //TODO
+            	controller.adjustLayer(selectedLayer(), LayerAdjustment.DOWN);
             }
         });
         

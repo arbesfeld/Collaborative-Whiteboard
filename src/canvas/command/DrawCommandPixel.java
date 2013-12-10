@@ -1,5 +1,6 @@
 package canvas.command;
 
+import name.LayerIdentifier;
 import canvas.Drawable;
 import canvas.Pixel;
 
@@ -8,12 +9,13 @@ public class DrawCommandPixel extends DrawCommand {
     
     private final Pixel pixel;
     
-    public DrawCommandPixel(Pixel pixel) {
+    public DrawCommandPixel(LayerIdentifier id, Pixel pixel) {
+    	super(id);
         this.pixel = pixel;
     }
     
     @Override
     public void drawOn(Drawable drawable) {
-        drawable.drawPixel(pixel);
+        drawable.drawPixel(id, pixel);
     }
 }

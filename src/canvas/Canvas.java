@@ -22,7 +22,6 @@ public class Canvas extends DrawableBase {
     // image where the user's drawing is stored
     private final List<Layer> layers;
     private final Map<LayerIdentifier, Layer> layerSet;
-    private LayerIdentifier currentLayer;
     
     /**
      * Make a canvas. Only used by the server.
@@ -34,10 +33,10 @@ public class Canvas extends DrawableBase {
         this.layers = new LinkedList<Layer>();
         this.layerSet = new HashMap<LayerIdentifier, Layer>();
         addLayer(new LayerIdentifier(Utils.generateId(), BASE_NAME));
-        this.layers.get(0).fillWithColor(Color.WHITE);
+//        this.layers.get(0).fillWithColor(Color.TRANSPARENT);
     }
     
-    public void checkRep() {
+    private void checkRep() {
     	assert layers.size() == layerSet.size();
     }
     
@@ -45,7 +44,6 @@ public class Canvas extends DrawableBase {
     	Layer layer = new Layer(width, height, layerIdentifier, layers.size());
     	layerSet.put(layerIdentifier, layer);
     	layers.add(layer);
-    	this.currentLayer = layerIdentifier;
     	checkRep();
     }
     
@@ -77,18 +75,18 @@ public class Canvas extends DrawableBase {
     }
     
     @Override
-    public synchronized void drawPixel(Pixel pixel) {
-    	layerSet.get(currentLayer).drawPixel(pixel);
+    public synchronized void drawPixel(LayerIdentifier identifier, Pixel pixel) {
+    	layerSet.get(identifier).drawPixel(identifier, pixel);
     }
     
     @Override
-    public synchronized void drawLine(Pixel pixelStart, Pixel pixelEnd, Stroke stroke, int symetry) {
-    	layerSet.get(currentLayer).drawLine(pixelStart, pixelEnd, stroke, symetry);
+    public synchronized void drawLine(LayerIdentifier identifier, Pixel pixelStart, Pixel pixelEnd, Stroke stroke, int symetry) {
+    	layerSet.get(identifier).drawLine(identifier, pixelStart, pixelEnd, stroke, symetry);
     }
     
     @Override
-    public synchronized void drawFill(Pixel pixel) {
-    	layerSet.get(currentLayer).drawFill(pixel);
+    public synchronized void drawFill(LayerIdentifier identifier, Pixel pixel) {
+    	layerSet.get(identifier).drawFill(identifier, pixel);
     }
 
     @Override
@@ -104,6 +102,8 @@ public class Canvas extends DrawableBase {
 
     @Override
     public synchronized void paintOnGraphics(Graphics g) {
+        g.setColor(Color.WHITE);
+        g.fillRect(0, 0, width, height);
     	for (Layer layer : layers) {
     	    layer.paintOnGraphics(g);
     	}

@@ -2,6 +2,7 @@ package stroke;
 
 import java.awt.Color;
 
+import name.LayerIdentifier;
 import util.Vector2;
 import canvas.Drawable;
 import canvas.command.DrawCommand;
@@ -58,15 +59,15 @@ public class StrokeProperties {
         this.symetry = symetry;
     }
 
-    public DrawCommand[] paintLine(Drawable canvas, int x1, int y1, int x2, int y2, Vector2 velocity) {
+    public DrawCommand[] paintLine(LayerIdentifier identifier, Drawable canvas, int x1, int y1, int x2, int y2, Vector2 velocity) {
         if (eraserOn) {
-            return eraserStroke.paintLine(canvas, Color.WHITE, strokeWidth, x1, y1, x2, y2, velocity, symetry);
+            return eraserStroke.paintLine(identifier, canvas, Color.WHITE, strokeWidth, x1, y1, x2, y2, velocity, symetry);
         }
         else if (fillOn) {
-            return fillStroke.paintLine(canvas, strokeColor, strokeWidth, x1, y1, x2, y2, velocity, symetry);
+            return fillStroke.paintLine(identifier, canvas, strokeColor, strokeWidth, x1, y1, x2, y2, velocity, symetry);
         }
         else {
-            return strokeType.paintLine(canvas, strokeColor, strokeWidth, x1, y1, x2, y2, velocity, symetry);
+            return strokeType.paintLine(identifier, canvas, strokeColor, strokeWidth, x1, y1, x2, y2, velocity, symetry);
         }
     }
 }

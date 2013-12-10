@@ -64,20 +64,20 @@ public class BoardModel extends JPanel implements Drawable, Identifiable, Serial
     }
     
     @Override
-    public void drawPixel(Pixel pixel) {
-        canvas.drawPixel(pixel);
+    public void drawPixel(LayerIdentifier identifier, Pixel pixel) {
+        canvas.drawPixel(identifier, pixel);
         repaint();
     }
 
     @Override
-    public void drawLine(Pixel pixelStart, Pixel pixelEnd, Stroke stroke, int symetry) {
-        canvas.drawLine(pixelStart, pixelEnd, stroke, symetry);
+    public void drawLine(LayerIdentifier identifier, Pixel pixelStart, Pixel pixelEnd, Stroke stroke, int symetry) {
+        canvas.drawLine(identifier, pixelStart, pixelEnd, stroke, symetry);
         repaint();
     }
     
     @Override
-    public void drawFill(Pixel pixel) {
-        canvas.drawFill(pixel);
+    public void drawFill(LayerIdentifier identifier, Pixel pixel) {
+        canvas.drawFill(identifier, pixel);
         repaint();
     }
     
@@ -120,6 +120,7 @@ public class BoardModel extends JPanel implements Drawable, Identifiable, Serial
 	
 	public void adjustLayer(LayerIdentifier layer, LayerAdjustment adjustment) {
 		canvas.canvas().adjustLayer(layer, adjustment);
+		repaint();
 	}
 	
 }

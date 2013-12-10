@@ -63,12 +63,12 @@ public class Layer extends DrawableBase {
     	
         final Graphics2D g = (Graphics2D) image.getGraphics();
 
-        g.setColor(Color.WHITE);
+        g.setColor(color);
         g.fillRect(0, 0, width, height);
     }
     
     @Override
-    public synchronized void drawPixel(Pixel pixel) {
+    public synchronized void drawPixel(LayerIdentifier identifier, Pixel pixel) {
         if (!isValidPixel(pixel)) {
             return;
         }
@@ -81,7 +81,7 @@ public class Layer extends DrawableBase {
     }
     
     @Override
-    public synchronized void drawLine(Pixel pixelStart, Pixel pixelEnd, Stroke stroke, int symetry) {
+    public synchronized void drawLine(LayerIdentifier identifier, Pixel pixelStart, Pixel pixelEnd, Stroke stroke, int symetry) {
         if (!isValidPixel(pixelStart) || !isValidPixel(pixelEnd)) {
             return;
         }
@@ -124,7 +124,7 @@ public class Layer extends DrawableBase {
         }
     }
     
-    public synchronized void drawFill(Pixel pixel) {
+    public synchronized void drawFill(LayerIdentifier identifier, Pixel pixel) {
         if (!isValidPixel(pixel)) {
             return;
         }
@@ -141,7 +141,7 @@ public class Layer extends DrawableBase {
             Pixel newPixel = queue.remove();
             if (!pixels.contains(newPixel)) {
                 if (getPixelColor(newPixel).equals(initialColor)) { 
-                    drawPixel(newPixel);
+                    drawPixel(null, newPixel);
                     pixels.add(newPixel);
                     for (int i = -1; i <= 2; i++) {
                         for (int j = -1; j <= 2; j++) {

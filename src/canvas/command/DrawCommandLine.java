@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import name.LayerIdentifier;
 import canvas.Drawable;
 import canvas.Pixel;
 
@@ -16,7 +17,8 @@ public class DrawCommandLine extends DrawCommand {
     private transient BasicStroke stroke;
     private final int symetry;
     
-    public DrawCommandLine(Pixel pixelStart, Pixel pixelEnd, BasicStroke stroke, int symetry) {
+    public DrawCommandLine(LayerIdentifier id, Pixel pixelStart, Pixel pixelEnd, BasicStroke stroke, int symetry) {
+    	super(id);
     	this.pixelStart = pixelStart;
         this.pixelEnd = pixelEnd;
         this.stroke = stroke;
@@ -25,7 +27,7 @@ public class DrawCommandLine extends DrawCommand {
     
     @Override
     public void drawOn(Drawable drawable) {
-        drawable.drawLine(pixelStart, pixelEnd, stroke, symetry);
+        drawable.drawLine(id, pixelStart, pixelEnd, stroke, symetry);
     }
     
     private synchronized void writeObject(ObjectOutputStream out) throws IOException {

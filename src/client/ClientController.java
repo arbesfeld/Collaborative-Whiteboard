@@ -102,6 +102,7 @@ public class ClientController extends SocketHandler {
         
         // We should only receive these packets if we have loaded.
         assert clientState == ClientState.PLAYING;
+        
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 packet.drawCommand().drawOn(model);
@@ -177,8 +178,7 @@ public class ClientController extends SocketHandler {
     
     public void sendDrawCommand(DrawCommand drawCommand) {
         assert model != null;
-        
-        PacketDrawCommand packet = new PacketDrawCommand(drawCommand, view.selectedLayer());
+        PacketDrawCommand packet = new PacketDrawCommand(drawCommand);
         sendPacket(packet);
     }
 
@@ -247,5 +247,10 @@ public class ClientController extends SocketHandler {
 	
 	public int getBoardHeight() {
 		return this.model.height();
+	}
+	
+	public LayerIdentifier selectedLayer() {
+		System.out.println(view.selectedLayer());
+		return view.selectedLayer();
 	}
 }

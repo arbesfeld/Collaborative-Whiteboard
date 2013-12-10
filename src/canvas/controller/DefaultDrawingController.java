@@ -26,7 +26,7 @@ public class DefaultDrawingController extends DrawingController {
         lastX = e.getX();
         lastY = e.getY();
         
-        DrawCommand[] commands = strokeProperties.paintLine(canvas, lastX, lastY, lastX, lastY, 
+        DrawCommand[] commands = strokeProperties.paintLine(clientController.selectedLayer(), canvas, lastX, lastY, lastX, lastY, 
         new Vector2(0,0));
         for (DrawCommand command : commands) {
             clientController.sendDrawCommand(command);
@@ -41,7 +41,7 @@ public class DefaultDrawingController extends DrawingController {
         int x = e.getX();
         int y = e.getY();
         
-        DrawCommand[] commands = strokeProperties.paintLine(canvas, lastX, lastY, x, y, 
+        DrawCommand[] commands = strokeProperties.paintLine(clientController.selectedLayer(), canvas, lastX, lastY, x, y, 
                                                             new Vector2(x-lastX,y-lastY));
         for (DrawCommand command : commands) {
             clientController.sendDrawCommand(command);
