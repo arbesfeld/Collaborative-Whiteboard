@@ -1,5 +1,6 @@
 package canvas.layer;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
@@ -169,7 +170,10 @@ public class Layer extends DrawableBase {
 	}
 
     public synchronized void paintOnGraphics(Graphics g) {
+    	Graphics2D g2d = (Graphics2D) g;
     	if (isVisible()) {
+    		AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float)opacity());
+    		g2d.setComposite(ac);
             g.drawImage(image, 0, 0, null);
     	}
     }

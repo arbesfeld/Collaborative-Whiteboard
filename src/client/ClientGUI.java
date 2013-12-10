@@ -321,7 +321,7 @@ class ClientGUI extends JFrame{
         layerPanel.setLayout(new BoxLayout(layerPanel, BoxLayout.Y_AXIS));
         layerPanel.add(layerTable);
         JPanel layerButtons = new JPanel();
-        JSlider opacitySlider = new JSlider(1,100,100);
+        final JSlider opacitySlider = new JSlider(1,100,100);
         JButton newLayerButton = new JButton(new ImageIcon(((new ImageIcon("resources/newPage.png")).getImage())
                 .getScaledInstance(15, 15, java.awt.Image.SCALE_SMOOTH)));  
         newLayerButton.setPreferredSize(new Dimension(20,20));
@@ -420,7 +420,11 @@ class ClientGUI extends JFrame{
         opacitySlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                //TODO
+            	double value = opacitySlider.getValue()/100.0;
+
+        		LayerProperties properties = selectedLayer();
+        		properties.setOpacity(value);
+        		controller.adjustLayer(properties, LayerAdjustment.PROPERTIES);
             }
         });
 
@@ -1009,11 +1013,12 @@ class ClientGUI extends JFrame{
         }
 
         public void setValueAt(Object value, int row, int col) {
-            data.get(row).set(col, value);
             if(col == 0){
         		LayerProperties properties = selectedLayer();
         		properties.setVisibility((boolean)value);
         		controller.adjustLayer(properties, LayerAdjustment.PROPERTIES);
+            } else {
+                data.get(row).set(col, value);
             }
             fireTableCellUpdated(row, col);
         } 
