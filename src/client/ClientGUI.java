@@ -111,6 +111,7 @@ class ClientGUI extends JFrame{
     private final JToggleButton cloneToggle;
     private final JComboBox<StrokeType> strokeDropdown;
     private final JSlider symetrySlider;
+    private JSlider opacitySlider;
     
     private final StrokeType[] strokeTypes;
     
@@ -323,7 +324,7 @@ class ClientGUI extends JFrame{
         layerPanel.setLayout(new BoxLayout(layerPanel, BoxLayout.Y_AXIS));
         layerPanel.add(layerTable);
         JPanel layerButtons = new JPanel();
-        final JSlider opacitySlider = new JSlider(1,100,100);
+        opacitySlider = new JSlider(1,100,100);
         JButton newLayerButton = new JButton(new ImageIcon(((new ImageIcon("resources/newPage.png")).getImage())
                 .getScaledInstance(15, 15, java.awt.Image.SCALE_SMOOTH)));  
         newLayerButton.setPreferredSize(new Dimension(20,20));
@@ -725,6 +726,10 @@ class ClientGUI extends JFrame{
         controller.setStrokeWidth(strokeSlider.getValue());
     }
     
+    private void setOpacitySlider(double opacity) {
+    	opacitySlider.setValue((int) (opacity*100));
+    }
+    
     private void setContentPaneGUI(BoardModel model) {
         if (model != null) {
             this.save.setEnabled(true);
@@ -870,7 +875,7 @@ class ClientGUI extends JFrame{
 	    	        Image newimg = img.getScaledInstance(45, 45,  java.awt.Image.SCALE_SMOOTH);  
 	    	        ImageIcon newIcon = new ImageIcon(newimg); 
 	    	        
-	    	        if (l.layerProperties() == selectedLayer)
+	    	        if (l.layerProperties().layerIdentifier().equals(selectedLayer.layerIdentifier()))
 	    	        	newSelectedRowNum=layers.length - i - 1;
 	    	        Vector<Object> newLayer = new Vector<Object>();
 	    	        newLayer.add(l.layerProperties().getVisibility());
@@ -1038,6 +1043,7 @@ class ClientGUI extends JFrame{
 			data=new Vector<Vector<Object>>();
 			fireTableDataChanged();
 		}
+
 
     }
 
