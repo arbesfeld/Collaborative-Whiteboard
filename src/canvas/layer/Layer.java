@@ -136,34 +136,43 @@ public class Layer extends DrawableBase {
 
         final Graphics2D g = (Graphics2D) image.getGraphics();
 
-        g.setColor(Color.BLACK);
-
         HashSet<Pixel> pixels = new HashSet<Pixel>();
         Queue<Pixel> queue = new LinkedList<Pixel>();
         queue.add(pixel);
-        Color initialColor = getPixelColor(identifier, pixel);
+        
+        Color initialColor = null;
+        try {
+            initialColor = getPixelColor(identifier, pixel);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
         while (!queue.isEmpty()) {
             Pixel newPixel = queue.remove();
-            if (!pixels.contains(newPixel)) {
-                if (getPixelColor(identifier, newPixel).equals(initialColor)) { 
-                    drawPixel(null, newPixel);
-                    pixels.add(newPixel);
-                    for (int i = -1; i <= 2; i++) {
-                        for (int j = -1; j <= 2; j++) {
-                            if (!pixels.contains(new Pixel(newPixel.x() + i,  newPixel.y() + j, pixel.color()))) {
-                                queue.add(new Pixel(newPixel.x() + i,  newPixel.y() + j, pixel.color()));
+            pixels.add(newPixel);
+            try {
+                Color newPixelColor = getPixelColor(identifier, newPixel);
+                if (newPixelColor.equals(initialColor)) { 
+                    drawPixel(identifier, newPixel);
+                    for (int i = -1; i <= 1; i++) {
+                        for (int j = -1; j <= 1; j++) {
+                            Pixel nextPixel = new Pixel(newPixel.x() + i,  newPixel.y() + j, pixel.color());
+                            if (!pixels.contains(nextPixel)) {
+                                pixels.add(nextPixel);
+                                queue.add(nextPixel);
                             }
                         }
-                    }   
+                    }
                 }
+            } catch (Exception e) {
             }
         }
     }
 
     @Override
-	public synchronized Color getPixelColor(LayerIdentifier id, Pixel pixel) {
+	public synchronized Color getPixelColor(LayerIdentifier id, Pixel pixel) throws Exception {
 		if (!isValidPixel(pixel)) {
-			return pixel.color();
+			throw new Exception();
 		}
 		return new Color(image.getRGB(pixel.x(), pixel.y()), true);
 	}

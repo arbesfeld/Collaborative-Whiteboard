@@ -109,9 +109,9 @@ public class Canvas extends DrawableBase {
     }
 
     @Override
-	public synchronized Color getPixelColor(LayerIdentifier id, Pixel pixel) {
-    	    Color pixelColor = layerSet.get(id).getPixelColor(id, pixel);
-    	    	return pixelColor;
+	public synchronized Color getPixelColor(LayerIdentifier id, Pixel pixel) throws Exception {
+	    Color pixelColor = layerSet.get(id).getPixelColor(id, pixel);
+	    return pixelColor;
 	}
 
     @Override

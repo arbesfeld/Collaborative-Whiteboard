@@ -39,6 +39,7 @@ public interface Drawable {
      * @param id for layer
      * @param pixel
      * @return The pixel color
+     * @throws Exception 
      */
-    public Color getPixelColor(LayerIdentifier id, Pixel pixel);
+    public Color getPixelColor(LayerIdentifier id, Pixel pixel) throws Exception;
 }
