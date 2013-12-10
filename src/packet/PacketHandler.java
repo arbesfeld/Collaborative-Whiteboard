@@ -5,6 +5,11 @@ package packet;
  *
  */
 public interface PacketHandler {
+    /**
+     * Methods for receiving specific packets. Add "assert false" if the implementation does not support 
+     * receiving the packet.
+     * @param packet
+     */
      void receivedNewClientPacket(PacketNewClient packet);
      void receivedNewBoardPacket(PacketNewBoard packet);
      void receivedClientReadyPacket(PacketClientReady packet);

@@ -19,6 +19,12 @@ import packet.PacketNewClient;
 import packet.PacketNewLayer;
 import canvas.command.DrawCommand;
 
+/**
+ * The socket created when a client joins the server. Handles communication with
+ * just one client, and talks to the |Server| to receive information about the board.
+ * @author Matthew
+ *
+ */
 public class ServerSocketHandler extends SocketHandler {
 	private static final long serialVersionUID = 5321337579877366643L;
 	

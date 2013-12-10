@@ -40,6 +40,10 @@ public class Canvas extends DrawableBase {
     	assert layers.size() == layerSet.size();
     }
     
+    /**
+     * Add layer to the top of the stack.
+     * @param layerIdentifier
+     */
     public synchronized void addLayer(LayerIdentifier layerIdentifier) {
     	Layer layer = new Layer(width, height, layerIdentifier, layers.size());
     	layerSet.put(layerIdentifier, layer);
@@ -47,6 +51,11 @@ public class Canvas extends DrawableBase {
     	checkRep();
     }
     
+    /**
+     * Adjust layer.
+     * @param properties the properties that should be adjusted
+     * @param adjustment the adjustment that should be made
+     */
     public synchronized void adjustLayer(LayerProperties properties, LayerAdjustment adjustment) {
     	Layer layer = layerSet.get(properties.layerIdentifier());
     	
