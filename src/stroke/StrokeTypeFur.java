@@ -24,7 +24,7 @@ public class StrokeTypeFur implements StrokeType {
         for (int i = -bound; i < bound; i++) {
             for (int j = -bound; j < bound; j++) {
                 Pixel checkPixel =new Pixel(x1 + i, y1 + j, new Color(color.getRed(), color.getGreen(), color.getGreen(),0));
-                if (canvas.getPixelColor(checkPixel).equals(color)) {
+                if (canvas.getPixelColor(identifier, checkPixel).equals(color)) {
                     double size = -Math.random() * 1.5;
                     int dx = i;
                     int dy = j;

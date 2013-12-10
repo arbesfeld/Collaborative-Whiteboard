@@ -83,8 +83,8 @@ public class BoardModel extends JPanel implements Drawable, Identifiable, Serial
     }
     
     @Override
-    public Color getPixelColor(Pixel pixel) {
-        return canvas.getPixelColor(pixel);
+    public Color getPixelColor(LayerIdentifier id, Pixel pixel) {
+        return canvas.getPixelColor(id,pixel);
     }
 
     @Override

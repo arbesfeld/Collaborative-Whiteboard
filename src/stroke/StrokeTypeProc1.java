@@ -23,7 +23,7 @@ public class StrokeTypeProc1 implements StrokeType {
         for (int j = 0; j < strokeWidth * length; j++) {
             Pixel pixel = new Pixel((int)(x1 + Math.sin(rand+j/(float)(strokeWidth * spinniness))*j), (int)(y1 + Math.cos(rand+j/(float)(strokeWidth * spinniness))*j), color);
 
-            if (!canvas.getPixelColor(pixel).equals(pixel.color())) {
+            if (!canvas.getPixelColor(identifier, pixel).equals(pixel.color())) {
                 result.add(new DrawCommandPixel(identifier, pixel));
             }
         }

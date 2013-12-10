@@ -13,5 +13,5 @@ public interface Drawable {
     public void drawLine(LayerIdentifier identifier, Pixel pixelStart, Pixel pixelEnd, Stroke stroke, int symetry);
     public void drawFill(LayerIdentifier identifier, Pixel pixel);
 
-    public Color getPixelColor(Pixel pixel);
+    public Color getPixelColor(LayerIdentifier id, Pixel pixel);
 }

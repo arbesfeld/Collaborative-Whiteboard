@@ -24,7 +24,7 @@ public class StrokeTypeSpray implements StrokeType {
                 if (Math.random() > .5) {
                     Pixel pixel = new Pixel(i, j, color);
 
-                    if (!canvas.getPixelColor(pixel).equals(pixel.color())) {
+                    if (!canvas.getPixelColor(identifier, pixel).equals(pixel.color())) {
                         result.add(new DrawCommandPixel(identifier, pixel));
                     }
                 }

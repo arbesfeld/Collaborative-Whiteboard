@@ -141,11 +141,11 @@ public class Layer extends DrawableBase {
         HashSet<Pixel> pixels = new HashSet<Pixel>();
         Queue<Pixel> queue = new LinkedList<Pixel>();
         queue.add(pixel);
-        Color initialColor = getPixelColor(pixel);
+        Color initialColor = getPixelColor(identifier, pixel);
         while (!queue.isEmpty()) {
             Pixel newPixel = queue.remove();
             if (!pixels.contains(newPixel)) {
-                if (getPixelColor(newPixel).equals(initialColor)) { 
+                if (getPixelColor(identifier, newPixel).equals(initialColor)) { 
                     drawPixel(null, newPixel);
                     pixels.add(newPixel);
                     for (int i = -1; i <= 2; i++) {
@@ -161,7 +161,7 @@ public class Layer extends DrawableBase {
     }
 
     @Override
-	public synchronized Color getPixelColor(Pixel pixel) {
+	public synchronized Color getPixelColor(LayerIdentifier id, Pixel pixel) {
 		if (!isValidPixel(pixel)) {
 			return pixel.color();
 		}

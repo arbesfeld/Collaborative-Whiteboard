@@ -26,7 +26,7 @@ public class StrokeTypeProc5 implements StrokeType {
         for (int j = 0; j < 2 * length; j++) {
             Pixel pixel = new Pixel((int)(x + Math.min(velocity.x()*j, 20)), (int)(y + Math.min(velocity.y()*j, 20)), new Color(color.getRed(),color.getGreen(), color.getBlue(), (int)(j/(float)(2 * length)*255)));
 
-            if (!canvas.getPixelColor(pixel).equals(pixel.color())) {
+            if (!canvas.getPixelColor(identifier, pixel).equals(pixel.color())) {
                 result.add(new DrawCommandPixel(identifier, pixel));
             }
             

@@ -21,7 +21,7 @@ public class StrokeTypeProc3 implements StrokeType {
         for (int j = 0; j < strokeWidth * length; j++) {
             Pixel pixel = new Pixel((int)(x1 + Math.min(velocity.x()*j, 20)), (int)(y1 + Math.min(velocity.y()*j, 20)), new Color(color.getRed(),color.getGreen(), color.getBlue(), (int)(j/(float)(strokeWidth * length)*255)));
 
-            if (!canvas.getPixelColor(pixel).equals(pixel.color())) {
+            if (!canvas.getPixelColor(identifier, pixel).equals(pixel.color())) {
                 result.add(new DrawCommandPixel(identifier, pixel));
             }
         }

@@ -34,7 +34,7 @@ public class Canvas extends DrawableBase {
         this.layers = new LinkedList<Layer>();
         this.layerSet = new HashMap<LayerIdentifier, Layer>();
         addLayer(new LayerIdentifier(Utils.generateId(), BASE_NAME));
-//        this.layers.get(0).fillWithColor(Color.TRANSPARENT);
+        this.layers.get(0).fillWithColor(Color.WHITE);
     }
     
     private void checkRep() {
@@ -101,14 +101,9 @@ public class Canvas extends DrawableBase {
     }
 
     @Override
-	public synchronized Color getPixelColor(Pixel pixel) {
-    	for (Layer layer : layers) {
-    	    Color pixelColor = layer.getPixelColor(pixel);
-    	    if (!pixelColor.equals(Color.WHITE)) {
+	public synchronized Color getPixelColor(LayerIdentifier id, Pixel pixel) {
+    	    Color pixelColor = layerSet.get(id).getPixelColor(id, pixel);
     	    	return pixelColor;
-    	    }
-    	}
-    	return Color.WHITE;
 	}
 
     @Override
