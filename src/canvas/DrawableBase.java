@@ -3,9 +3,7 @@ package canvas;
 import java.awt.Graphics;
 import java.io.Serializable;
 
-import javax.swing.JPanel;
-
-public abstract class DrawableBase extends JPanel implements Drawable, Serializable {
+public abstract class DrawableBase implements Drawable, Serializable {
     private static final long serialVersionUID = -6788405670250928889L;
     
     protected final int width;
@@ -16,10 +14,7 @@ public abstract class DrawableBase extends JPanel implements Drawable, Serializa
         this.height = height;
     }
     
-    @Override
-    public abstract void drawPixel(Pixel pixel);
-    @Override
-    public abstract void paintComponent(Graphics g);
+    public abstract void paintOnGraphics(Graphics g);
     
     public int width() {
         return width;
