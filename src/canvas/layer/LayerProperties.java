@@ -60,27 +60,6 @@ public class LayerProperties implements Serializable {
 		return result;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		LayerProperties other = (LayerProperties) obj;
-		if (layerIdentifier == null) {
-			if (other.layerIdentifier != null)
-				return false;
-		} else if (!layerIdentifier.equals(other.layerIdentifier))
-			return false;
-		if (Double.doubleToLongBits(opacity) != Double
-				.doubleToLongBits(other.opacity))
-			return false;
-		if (visible != other.visible)
-			return false;
-		return true;
-	}
 	
 
 }
