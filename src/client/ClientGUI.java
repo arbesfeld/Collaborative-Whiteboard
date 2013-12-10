@@ -986,6 +986,9 @@ class ClientGUI extends JFrame{
         
         public LayerTableModel(Vector<Vector<Object>> data) {
             this.data = data;
+            this.getSelectionModel().addListSelectionListener(new ActionListener() {
+            	
+            }
         }
         
         public int getColumnCount() {
