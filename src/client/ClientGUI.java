@@ -802,8 +802,7 @@ class ClientGUI extends JFrame{
 //    }
     
     public void setLayer(Layer[] layers) {
-    	while(this.layerTable.getRowCount()!=0)
-    		this.layerTable.remove(0);
+	    this.layerTableModel.clearTable();
     	
     	for (Layer l:layers) {
     	
@@ -819,6 +818,9 @@ class ClientGUI extends JFrame{
     	}
     }
     
+    public LayerIdentifier selectedLayer() {
+    	return (LayerIdentifier) this.layerTableModel.getValueAt(this.layerTable.getSelectedRow(),2);
+    }
     /**
      * Add new chat message
      * @param string
@@ -956,7 +958,10 @@ class ClientGUI extends JFrame{
             fireTableRowsInserted(0, getRowCount() - 1);
         }
         
-		
+		public void clearTable() {
+			data=new Vector<Vector<Object>>();
+			fireTableDataChanged();
+		}
 
     }
 
