@@ -109,6 +109,8 @@ public class ClientController extends SocketHandler {
                 packet.drawCommand().drawOn(model);
             }
         });
+
+        setGUILayers();
     }
 
 	@Override

@@ -226,7 +226,7 @@ public class Layer extends DrawableBase {
         }
     }
 
-	public Image image() {
+	public BufferedImage image() {
 		return image;
 	} 
 }

@@ -885,7 +885,7 @@ class ClientGUI extends JFrame{
 	        	
 	        	for (int i = layers.length -1; i >= 0 ; i--) {
 	        		Layer l = layers[i];
-	    	        Image img = layers[i].image();
+	    	        BufferedImage img = layers[i].image();
 	    	        Image newimg = img.getScaledInstance(45, 45,  java.awt.Image.SCALE_SMOOTH);  
 	    	        ImageIcon newIcon = new ImageIcon(newimg); 
 	    	        
