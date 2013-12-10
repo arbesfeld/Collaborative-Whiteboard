@@ -320,6 +320,7 @@ class ClientGUI extends JFrame{
         layerPanel.setLayout(new BoxLayout(layerPanel, BoxLayout.Y_AXIS));
         layerPanel.add(layerTable);
         JPanel layerButtons = new JPanel();
+        JSlider opacitySlider = new JSlider(1,100,100);
         JButton newLayerButton = new JButton(new ImageIcon(((new ImageIcon("resources/newPage.png")).getImage())
                 .getScaledInstance(15, 15, java.awt.Image.SCALE_SMOOTH)));  
         newLayerButton.setPreferredSize(new Dimension(20,20));
@@ -332,6 +333,7 @@ class ClientGUI extends JFrame{
                 .getScaledInstance(15, 15, java.awt.Image.SCALE_SMOOTH))); 
         downButton.setPreferredSize(new Dimension(20,20));
         downButton.setFocusable(false);
+        layerButtons.add(opacitySlider);
         layerButtons.add(newLayerButton);
         layerButtons.add(upButton);
         layerButtons.add(downButton);
@@ -411,6 +413,13 @@ class ClientGUI extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 setColor(e);
+            }
+        });
+        
+        opacitySlider.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                //TODO
             }
         });
 
