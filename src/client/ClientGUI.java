@@ -406,7 +406,6 @@ class ClientGUI extends JFrame{
         downButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	System.out.println("Down");
             	controller.adjustLayer(selectedLayer(), LayerAdjustment.DOWN);
             }
         });

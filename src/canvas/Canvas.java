@@ -48,7 +48,8 @@ public class Canvas extends DrawableBase {
     }
     
     public synchronized void adjustLayer(LayerIdentifier layerIdentifier, LayerAdjustment adjustment) {
-    	int level = layerSet.get(layerIdentifier).level();
+    	Layer layer = layerSet.get(layerIdentifier);
+    	int level = layer.level();
 
     	int modifier = 0;
     	switch (adjustment) {
@@ -65,6 +66,7 @@ public class Canvas extends DrawableBase {
     		return;
     	}
     	
+    	layer.setLevel(newLevel);
     	Collections.swap(layers, level, newLevel);
     	checkRep();
     }
