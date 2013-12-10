@@ -1,6 +1,5 @@
 package canvas.command;
 
-import name.LayerIdentifier;
 import canvas.Drawable;
 import canvas.Pixel;
 
@@ -16,7 +15,6 @@ public class DrawCommandFill extends DrawCommand {
     @Override
     public void drawOn(Drawable drawable) {
         drawable.drawFill(pixel);
-
     }
 
 }

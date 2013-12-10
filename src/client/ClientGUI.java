@@ -83,6 +83,7 @@ import stroke.StrokeTypeProc7;
 import stroke.StrokeTypeSquares;
 import util.MineralNames;
 import util.Utils;
+import canvas.layer.Layer;
 
 
 class ClientGUI extends JFrame{
@@ -801,7 +802,7 @@ class ClientGUI extends JFrame{
 //        this.layerTable.revalidate();
 //    }
     
-    public void setLayer(Layer[] layers) {
+    public void setLayers(Layer[] layers) {
     	while(this.layerTable.getRowCount()!=0)
     		this.layerTable.remove(0);
     	
@@ -907,7 +908,6 @@ class ClientGUI extends JFrame{
         
         public LayerTableModel(Vector<Vector<Object>> data) {
             this.data = data;
-
         }
         
         public int getColumnCount() {

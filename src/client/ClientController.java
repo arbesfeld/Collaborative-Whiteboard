@@ -9,6 +9,7 @@ import javax.swing.SwingUtilities;
 import models.BoardModel;
 import name.BoardIdentifier;
 import name.ClientIdentifier;
+import name.LayerIdentifier;
 import packet.PacketBoardIdentifierList;
 import packet.PacketBoardModel;
 import packet.PacketBoardUsers;
@@ -27,6 +28,7 @@ import stroke.StrokeType;
 import util.Utils;
 import canvas.CanvasController;
 import canvas.command.DrawCommand;
+import canvas.layer.LayerAdjustment;
 
 public class ClientController extends SocketHandler {
 	private static final long serialVersionUID = 6673644308053728584L;
@@ -120,13 +122,13 @@ public class ClientController extends SocketHandler {
 		view.addChatLine(packet.text());
 	}
 
-
 	@Override
 	public void receivedLayerAdjustmentPacket(
 			PacketLayerAdjustment packetLayerOrderList) {
 		assert model != null;
 		assert clientState == ClientState.PLAYING;
 		model.adjustLayer(packetLayerOrderList.layer(), packetLayerOrderList.adjustment());
+		setGUILayers();
 	}
 
 	@Override
@@ -134,7 +136,7 @@ public class ClientController extends SocketHandler {
 		assert model != null;
 		assert clientState == ClientState.PLAYING;
 		model.addLayer(packetNewLayer.layerName());
-		
+		setGUILayers();
 	}
 	
 	private void setGUILayers() {
@@ -176,7 +178,7 @@ public class ClientController extends SocketHandler {
     public void sendDrawCommand(DrawCommand drawCommand) {
         assert model != null;
         
-        PacketDrawCommand packet = new PacketDrawCommand(drawCommand, view.currentLayer());
+        PacketDrawCommand packet = new PacketDrawCommand(drawCommand, view.selectedLayer());
         sendPacket(packet);
     }
 
@@ -211,6 +213,14 @@ public class ClientController extends SocketHandler {
         strokeProperties.setSymetry(symetry);
     }
 
+    public void addLayer(LayerIdentifier identifier) {
+    	model.addLayer(identifier);
+    }
+    
+    public void adjustLayer(LayerIdentifier layerIdentifier, LayerAdjustment adjustment) {
+    	model.adjustLayer(layerIdentifier, adjustment);
+    }
+    
 	@Override
 	public void receivedNewClientPacket(PacketNewClient packet) {
 		assert false;
