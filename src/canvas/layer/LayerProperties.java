@@ -20,4 +20,8 @@ public class LayerProperties {
 	public void setVisibility(Boolean visible){
 		this.visible=visible;
 	}
+	
+	public String toString() {
+		return this.layerIdentifier.toString();
+	}
 }

@@ -72,6 +72,7 @@ import javax.swing.table.AbstractTableModel;
 import models.BoardModel;
 import name.BoardIdentifier;
 import name.Identifiable;
+import name.LayerIdentifier;
 import stroke.StrokeProperties;
 import stroke.StrokeType;
 import stroke.StrokeTypeBasic;
@@ -264,9 +265,9 @@ class ClientGUI extends JFrame{
 
         
         //TODO remove below
-        this.addLayer();
-        this.addLayer();
-        
+//        this.addLayer();
+//        this.addLayer();
+//        
         setSideBar();
         
         if (isWindows) {
@@ -785,19 +786,35 @@ class ClientGUI extends JFrame{
         });
     }
     
-    public void addLayer() {
-        ImageIcon icon = new ImageIcon(((new ImageIcon("resources/brushIcon.png")).getImage()));
+//    public void addLayer() {
+//        ImageIcon icon = new ImageIcon(((new ImageIcon("resources/brushIcon.png")).getImage()));
+//        Image img = icon.getImage();  
+//        Image newimg = img.getScaledInstance(45, 45,  java.awt.Image.SCALE_SMOOTH);  
+//        ImageIcon newIcon = new ImageIcon(newimg); 
+//        
+//        Vector<Object> newLayer = new Vector<Object>();
+//        newLayer.add(true);
+//        newLayer.add(newIcon);
+//        newLayer.add("Test");
+//             
+//        this.layerTableModel.addRow(newLayer);
+//        this.layerTable.revalidate();
+//    }
+    
+    public void setLayer(Layer[] layers) {
+    	while(this.layerTable.getRowCount()!=0)
+    		this.layerTable.remove(0);
+    	
+    	for (Layer l:layers) {
+    	
+    	ImageIcon icon = new ImageIcon(((new ImageIcon("resources/brushIcon.png")).getImage()));
         Image img = icon.getImage();  
         Image newimg = img.getScaledInstance(45, 45,  java.awt.Image.SCALE_SMOOTH);  
         ImageIcon newIcon = new ImageIcon(newimg); 
         
         Vector<Object> newLayer = new Vector<Object>();
-        newLayer.add(true);
-        newLayer.add(newIcon);
-        newLayer.add("Test");
-             
-        this.layerTableModel.addRow(newLayer);
-        this.layerTable.revalidate();
+        newLayer.add(l.layerProperties().getVisibility(), newIcon, l.layerProperties.toString());
+    	}
     }
     
     /**
@@ -886,7 +903,7 @@ class ClientGUI extends JFrame{
     public class LayerTableModel extends AbstractTableModel {
         private Vector<Vector<Object>> data;
         private final String[] COLUMN_NAMES = new String[] {"Visible", "Thumbnail", "Name"};
-        private final Class<?>[] COLUMN_TYPES = new Class<?>[] {Boolean.class, Icon.class, String.class};
+        private final Class<?>[] COLUMN_TYPES = new Class<?>[] {Boolean.class, Icon.class, LayerIdentifier.class};
         
         public LayerTableModel(Vector<Vector<Object>> data) {
             this.data = data;
