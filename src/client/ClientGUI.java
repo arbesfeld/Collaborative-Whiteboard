@@ -75,17 +75,10 @@ import name.Identifiable;
 import stroke.StrokeProperties;
 import stroke.StrokeType;
 import stroke.StrokeTypeBasic;
-import stroke.StrokeTypeFill;
 import stroke.StrokeTypeFur;
 import stroke.StrokeTypePressure;
-import stroke.StrokeTypeProc1;
-import stroke.StrokeTypeProc2;
-import stroke.StrokeTypeProc3;
-import stroke.StrokeTypeProc4;
-import stroke.StrokeTypeProc5;
 import stroke.StrokeTypeProc6;
 import stroke.StrokeTypeProc7;
-import stroke.StrokeTypeSpray;
 import stroke.StrokeTypeSquares;
 import util.MineralNames;
 import util.Utils;
@@ -665,7 +658,7 @@ class ClientGUI extends JFrame{
     private void setContentPaneGUI(BoardModel model) {
         if (model != null) {
             this.save.setEnabled(true);
-            this.canvas = model.canvas();
+            this.canvas = model;
             updateCursor();
             container.removeAll();
             Group horizontal = layout.createSequentialGroup();

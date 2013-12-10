@@ -2,15 +2,12 @@ package stroke;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.util.LinkedList;
-import java.util.List;
 
 import util.Vector2;
 import canvas.Drawable;
 import canvas.Pixel;
 import canvas.command.DrawCommand;
 import canvas.command.DrawCommandLine;
-import canvas.command.DrawCommandPixel;
 
 public final class StrokeTypeEraser implements StrokeType {
 

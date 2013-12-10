@@ -1,17 +1,12 @@
 package stroke;
 
 import java.awt.Color;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
 
 import util.Vector2;
 import canvas.Drawable;
 import canvas.Pixel;
 import canvas.command.DrawCommand;
 import canvas.command.DrawCommandFill;
-import canvas.command.DrawCommandPixel;
 
 public class StrokeTypeFill implements StrokeType {
 

@@ -16,19 +16,16 @@ import packet.PacketClientReady;
 import packet.PacketDrawCommand;
 import packet.PacketExitBoard;
 import packet.PacketJoinBoard;
+import packet.PacketLayerOrderList;
 import packet.PacketMessage;
 import packet.PacketNewBoard;
 import packet.PacketNewClient;
+import packet.PacketNewLayer;
 import server.SocketHandler;
 import stroke.StrokeProperties;
 import stroke.StrokeType;
-import stroke.StrokeTypeBasic;
-import stroke.StrokeTypeEraser;
 import util.Utils;
-import canvas.Canvas2d;
-import canvas.Drawable;
-import canvas.DrawableBase;
-import canvas.DrawableCanvas2d;
+import canvas.CanvasController;
 import canvas.command.DrawCommand;
 
 public class ClientController extends SocketHandler {
@@ -68,9 +65,10 @@ public class ClientController extends SocketHandler {
         assert clientState == ClientState.IDLE;
         clientState = ClientState.PLAYING;
         
-        DrawableBase drawableCanvas = packet.canvas().makeDrawable(strokeProperties, this);
-        BoardModel newModel = new BoardModel(packet.boardName(), drawableCanvas, packet.users());
+        CanvasController canvasController = new CanvasController(strokeProperties, this, packet.canvas());
+        BoardModel newModel = new BoardModel(packet.boardName(), canvasController, packet.users());
         this.model = newModel;
+        this.model.setDrawingControllerDefault();
        
         sendPacket(new PacketClientReady());
 
@@ -218,5 +216,18 @@ public class ClientController extends SocketHandler {
 	
 	public int getBoardHeight() {
 		return this.model.height();
+	}
+
+	@Override
+	public void receivedLayerOrderListPacket(
+			PacketLayerOrderList packetLayerOrderList) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void receivedNewLayerPacket(PacketNewLayer packetNewLayer) {
+		// TODO Auto-generated method stub
+		
 	}
 }
