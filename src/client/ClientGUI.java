@@ -261,6 +261,7 @@ class ClientGUI extends JFrame{
         this.layerTable.setRowHeight(50);
         this.layerTable.getColumnModel().getColumn(0).setPreferredWidth(30);
         this.layerTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
         
         //TODO remove below
         this.addLayer();
@@ -794,8 +795,6 @@ class ClientGUI extends JFrame{
         newLayer.add(true);
         newLayer.add(newIcon);
         newLayer.add("Test");
-        newLayer.add(new JButton("up"));
-        newLayer.add(new JButton("Down"));
              
         this.layerTableModel.addRow(newLayer);
         this.layerTable.revalidate();
@@ -884,10 +883,10 @@ class ClientGUI extends JFrame{
 
     }
     
-    public class LayerTableModel extends AbstractTableModel{
+    public class LayerTableModel extends AbstractTableModel {
         private Vector<Vector<Object>> data;
-        private final String[] COLUMN_NAMES = new String[] {"Visible", "Thumbnail", "Name", "Up", "Down"};
-        private final Class<?>[] COLUMN_TYPES = new Class<?>[] {Boolean.class, Icon.class, String.class,  JButton.class, JButton.class};
+        private final String[] COLUMN_NAMES = new String[] {"Visible", "Thumbnail", "Name"};
+        private final Class<?>[] COLUMN_TYPES = new Class<?>[] {Boolean.class, Icon.class, String.class};
         
         public LayerTableModel(Vector<Vector<Object>> data) {
             this.data = data;
@@ -926,6 +925,10 @@ class ClientGUI extends JFrame{
 
         public void setValueAt(Object value, int row, int col) {
             data.get(row).set(col, value);
+            if(col == 0){
+            	System.out.println("Just changed value of checkbox to " + value.toString());
+            	// TODO
+            }
             fireTableCellUpdated(row, col);
         } 
         
@@ -933,6 +936,8 @@ class ClientGUI extends JFrame{
             data.add(row);
             fireTableRowsInserted(0, getRowCount() - 1);
         }
+        
+		
 
     }
 

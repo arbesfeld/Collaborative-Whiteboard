@@ -8,7 +8,7 @@ public class PacketNewLayer extends Packet {
 	private final LayerIdentifier layerName;
 	
 	public PacketNewLayer(LayerIdentifier layerName){
-		this.layerName=layerName;
+		this.layerName = layerName;
 	}
 	
 	public LayerIdentifier layerName() {
