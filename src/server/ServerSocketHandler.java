@@ -31,12 +31,21 @@ public class ServerSocketHandler extends SocketHandler {
 	private final transient Server server;
     private transient ServerSocketState state;
     
+    /**
+     * Constructor which creates SocketHandler for server
+     * @param socket
+     * @param server
+     * @throws IOException
+     */
     public ServerSocketHandler(Socket socket, Server server) throws IOException {
         super(socket);
         this.server = server;
         this.state = ServerSocketState.INITIALIZING;
     }
     
+    /**
+     * Disconnects a client from the server
+     */
     @Override 
     protected void connectionClosed() {
         server.removeClient(this);
@@ -45,6 +54,9 @@ public class ServerSocketHandler extends SocketHandler {
         }
     }
     
+    /**
+     * Handles receiving a NewClientPacket
+     */
     @Override
     public void receivedNewClientPacket(PacketNewClient packet) {
         assert this.identifier == null;
@@ -54,6 +66,9 @@ public class ServerSocketHandler extends SocketHandler {
         this.identifier = packet.senderName();
     }
     
+    /**
+     * Handles receiving a NewBoardPacket and adds it to the server
+     */
     @Override
     public void receivedNewBoardPacket(PacketNewBoard packet) {
         assert model == null;
@@ -66,6 +81,10 @@ public class ServerSocketHandler extends SocketHandler {
         server.notifyBoardListChanged();    
     }
     
+    /**
+     * Handles receiving a JoinBoardPacket and adds the client to the server
+     * returns BoardModelPacket to the clients
+     */
     @Override
     public void receivedJoinBoardPacket(PacketJoinBoard packet) {
         assert model == null;
@@ -74,7 +93,11 @@ public class ServerSocketHandler extends SocketHandler {
 
         sendPacket(new PacketBoardModel(model));
     }
-
+    
+    /**
+     * Handles receiving an ExitBoardPacket and remove client from the board
+     * Notify all clients that BoardUsers have changed
+     */
     @Override
     public void receivedExitBoardPacket(PacketExitBoard packet) {
         assert state == ServerSocketState.PLAYING;
@@ -87,12 +110,17 @@ public class ServerSocketHandler extends SocketHandler {
         notifyBoardUsersChanged();
         model = null;
     }
-
+    /**
+     * Notifies all clients in Board of current users
+     */
 	private void notifyBoardUsersChanged() {
 		assert model != null;
 		broadcastPacketToBoard(new PacketBoardUsers(model.users()));
 	}
-
+	
+	/**
+	 * Handles receiving a ClientReadyPacket
+	 */
 	@Override
 	public void receivedClientReadyPacket(PacketClientReady packet) {
         assert state == ServerSocketState.IDLE;
@@ -101,7 +129,10 @@ public class ServerSocketHandler extends SocketHandler {
 		model.addUser(this);
         notifyBoardUsersChanged();
 	}
-
+	
+	/**
+	 * Handles receiving a DrawCommandPacket
+	 */
     @Override
     public void receivedDrawCommandPacket(PacketDrawCommand packet) {
         assert state == ServerSocketState.PLAYING;
@@ -113,13 +144,19 @@ public class ServerSocketHandler extends SocketHandler {
         
         broadcastPacketToBoard(packet);
     }
-    
+    /**
+     * Handles receiving a MessagePacket and broadcasting it to all the users
+     * to update the chat client
+     */
 	@Override
 	public void receivedMessagePacket(PacketMessage packet) {
 		broadcastPacketToBoard(packet);
 	}
 
-
+	/**
+	 * Handles receiving a LayerAdjustmentPacket and then broadcasting the new layering ordering
+	 * to all the clients on the current Board
+	 */
 	@Override
 	public void receivedLayerAdjustmentPacket(
 			PacketLayerAdjustment packet) {
@@ -128,7 +165,11 @@ public class ServerSocketHandler extends SocketHandler {
 		model.adjustLayer(packet.layerProperties(), packet.adjustment());
 		broadcastPacketToBoard(packet);
 	}
-
+	
+	/**
+	 * Handles receiving a NewLayerPacket and adding the layer to the model and then sending it out
+	 * to the other clients on the Board
+	 */
 	@Override
 	public void receivedNewLayerPacket(PacketNewLayer packet) {
         assert state == ServerSocketState.PLAYING;
@@ -137,18 +178,30 @@ public class ServerSocketHandler extends SocketHandler {
 		broadcastPacketToBoard(packet);
 	}
 	
+	/**
+	 * Handles Receiving a BoardModelPacket, which should never happen because these should only be
+	 * handled by the clients, never by the server
+	 */
     @Override
     public void receivedBoardModelPacket(PacketBoardModel packet) {
         // We only send GameStatePackets from the server.
         assert false;
     }
     
+    /**
+     * Handles receiving a BoardIdentifierListPacket which should never happen because these are
+     * handled by the clients, never by the server
+     */
     @Override
     public void receivedBoardIdentifierListPacket(PacketBoardIdentifierList packet) {
         // We only send BoardStatePackets from the server.
         assert false;
     }
     
+    /**
+     * Handles receiving a BoardUsersPacket which is asserted false because that is only server
+     * to client
+     */
 	@Override
 	public void receivedBoardUsersPacket(PacketBoardUsers packet) {
 		// Only server to client.
