@@ -27,7 +27,10 @@ public class ColorSquareIcon implements Icon {
         this.color = color;
         this.forcedSize = 10;
     }
-
+    
+    /**
+     * Paints the icon on the canvas
+     */
     @Override
     public void paintIcon(Component c, Graphics g, int x, int y) {
         Graphics2D g2d = (Graphics2D) g;
@@ -39,12 +42,18 @@ public class ColorSquareIcon implements Icon {
         g2d.setColor(color);
         g2d.fillRect(x + (forcedSize - size) / 2, y + (forcedSize - size) / 2, size - 2, size -2);
     }
-
+    
+    /**
+     * Returns icon width
+     */
     @Override
     public int getIconWidth() {
         return forcedSize;
     }
 
+    /**
+     * Returns icon height
+     */
     @Override
     public int getIconHeight() {
         return forcedSize;

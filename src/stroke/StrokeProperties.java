@@ -8,7 +8,9 @@ import canvas.Drawable;
 import canvas.command.DrawCommand;
 
 /**
- * Contains all of the information for the current users stroke properties
+ * Contains all of the information for the current users stroke properties, including strokeColor, strokeWidth,
+ * strokeType, if eraser is on, if fillOn and current symmetry level
+ * 
  */
 public class StrokeProperties {
     public final static Color DEFAULT_STROKE_COLOR = Color.BLACK;

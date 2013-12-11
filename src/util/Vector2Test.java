@@ -8,7 +8,11 @@ import java.awt.Color;
 import org.junit.Test;
 
 import canvas.Pixel;
-
+/**
+ * Test class that tests Vector2 class and each method in it
+ * @author Bindu
+ *
+ */
 public class Vector2Test {  
     
     @Test

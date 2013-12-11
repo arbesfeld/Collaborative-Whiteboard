@@ -13,7 +13,10 @@ import name.Identifiable;
 import name.Identifier;
 import packet.Packet;
 import packet.PacketHandler;
-
+/**
+ * Abstract class SocketHandler that handles all connections between server and client over sockets
+ *
+ */
 public abstract class SocketHandler 
 	implements PacketHandler, Runnable, Identifiable, Serializable 
 {
@@ -26,6 +29,11 @@ public abstract class SocketHandler
     protected transient BoardModel model;
     protected Identifier identifier;
     
+    /**
+     * Constructor that creates the input and output streams on the socket
+     * @param socket
+     * @throws IOException
+     */
     protected SocketHandler(Socket socket) throws IOException {
         this.socket = socket;
         
@@ -33,6 +41,9 @@ public abstract class SocketHandler
         in = new ObjectInputStream(socket.getInputStream());
     }
     
+    /**
+     * Runs the SocketHandler and closes the socket if we ever stop handling the connection or it breaks
+     */
     @Override
     public final void run() {
         try {
@@ -50,7 +61,12 @@ public abstract class SocketHandler
             }
         }
     }
-
+    
+    /**
+     * Handles the connection between server and client by reading in the objects coming on the input
+     * Object stream
+     * @throws IOException
+     */
     protected final void handleConnection() throws IOException {
         try {
             for (Object obj = in.readObject(); obj != null; obj = in.readObject()) {
@@ -70,9 +86,16 @@ public abstract class SocketHandler
             in.close();
         }   
     }
-
+    
+    /**
+     * Closes the connection
+     */
     protected void connectionClosed() { }
 
+    /**
+     * Sends packet across the outputObjectStream
+     * @param packet
+     */
     public synchronized void sendPacket(Packet packet) {
         try {
             out.writeObject(packet);
@@ -81,6 +104,9 @@ public abstract class SocketHandler
         }
     }
     
+    /**
+     * Returns the identifier
+     */
     @Override
     public Identifier identifier() {
         return identifier;
