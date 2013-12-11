@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import name.LayerIdentifier;
-
 import util.Vector2;
 import canvas.Drawable;
 import canvas.Pixel;
@@ -24,8 +23,11 @@ public class StrokeTypeSpray implements StrokeType {
                 if (Math.random() > .5) {
                     Pixel pixel = new Pixel(i, j, color);
 
-                    if (!canvas.getPixelColor(identifier, pixel).equals(pixel.color())) {
-                        result.add(new DrawCommandPixel(identifier, pixel));
+                    try {
+                        if (!canvas.getPixelColor(identifier, pixel).equals(pixel.color())) {
+                            result.add(new DrawCommandPixel(identifier, pixel));
+                        }
+                    } catch (Exception e) {
                     }
                 }
             }

@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import name.LayerIdentifier;
-
 import util.Vector2;
 import canvas.Drawable;
 import canvas.Pixel;
@@ -24,18 +23,21 @@ public class StrokeTypeFur implements StrokeType {
         for (int i = -bound; i < bound; i++) {
             for (int j = -bound; j < bound; j++) {
                 Pixel checkPixel =new Pixel(x1 + i, y1 + j, new Color(color.getRed(), color.getGreen(), color.getGreen(),0));
-                if (canvas.getPixelColor(identifier, checkPixel).equals(color)) {
-                    double size = -Math.random() * 1.5;
-                    int dx = i;
-                    int dy = j;
-                    int d = dx * dx + dy * dy;
-                    if (Math.random() > .9) {
-                        Pixel startPixel = new Pixel((int)(x1 + (dx * size)), (int)(y1 + (dy * size)), new Color(color.getRed(), color.getGreen(), color.getGreen(),0));
-                        Pixel middlePixel = new Pixel(x1, y1, new Color(color.getRed(), color.getGreen(), color.getGreen(), 150));
-                        Pixel endPixel = new Pixel((int)(x1+1 - (dx * size)), (int)(y1+j - (dy * size)), new Color(color.getRed(), color.getGreen(), color.getGreen(),0));
-                        result.add(new DrawCommandLine(identifier, startPixel, middlePixel, stroke, symetry));
-                        result.add(new DrawCommandLine(identifier, middlePixel, endPixel, stroke, symetry));
+                try {
+                    if (canvas.getPixelColor(identifier, checkPixel).equals(color)) {
+                        double size = -Math.random() * 1.5;
+                        int dx = i;
+                        int dy = j;
+                        int d = dx * dx + dy * dy;
+                        if (Math.random() > .9) {
+                            Pixel startPixel = new Pixel((int)(x1 + (dx * size)), (int)(y1 + (dy * size)), new Color(color.getRed(), color.getGreen(), color.getGreen(),0));
+                            Pixel middlePixel = new Pixel(x1, y1, new Color(color.getRed(), color.getGreen(), color.getGreen(), 150));
+                            Pixel endPixel = new Pixel((int)(x1+1 - (dx * size)), (int)(y1+j - (dy * size)), new Color(color.getRed(), color.getGreen(), color.getGreen(),0));
+                            result.add(new DrawCommandLine(identifier, startPixel, middlePixel, stroke, symetry));
+                            result.add(new DrawCommandLine(identifier, middlePixel, endPixel, stroke, symetry));
+                        }
                     }
+                } catch (Exception e) {
                 }
             }
         }
