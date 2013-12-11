@@ -16,7 +16,7 @@ public final class StrokeTypeEraser implements StrokeType {
     @Override
     public DrawCommand[] paintLine(LayerIdentifier identifier, Drawable canvas, Color color, int strokeWidth, int x1, int y1, int x2, int y2, Vector2 velocity, int symetry) {
         BasicStroke stroke = new BasicStroke(strokeWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-        DrawCommand command = new DrawCommandLine(identifier, new Pixel(x1, y1, Color.WHITE), new Pixel(x2, y2, color), stroke, symetry);
+        DrawCommand command = new DrawCommandLine(identifier, new Pixel(x1, y1, Color.WHITE), new Pixel(x2, y2,  Color.WHITE), stroke, symetry);
         return new DrawCommand[]{ command };
     }
     

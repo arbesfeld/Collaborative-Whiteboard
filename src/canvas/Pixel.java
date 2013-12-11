@@ -12,10 +12,6 @@ public class Pixel implements Serializable {
     private Color color;
     
     public Pixel(int x, int y, Color color) {
-        if (x < 0 || y < 0) {
-            throw new IllegalArgumentException("Pixels must have positive x and y coordinates. x = "
-                                              + x + ", y = " + y + ".");
-        }
         this.x = x;
         this.y = y;
         this.color = color;
