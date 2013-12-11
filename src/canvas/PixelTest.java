@@ -10,18 +10,6 @@ import org.junit.Test;
 public class PixelTest {
     // TODO: Pixel tests
     
-    @Test (expected=IllegalArgumentException.class) 
-    public void testInvalidx() {
-        // test invalid x input
-        Pixel pixel = new Pixel(-1,2, Color.RED);
-    }
-    
-    @Test (expected=IllegalArgumentException.class) 
-    public void testInvalidy() {
-        // test invalid y input
-        Pixel pixel = new Pixel(1,-2, Color.RED);
-    }
-    
     @Test
     public void testx() {
         // test getting x value
@@ -30,10 +18,24 @@ public class PixelTest {
     }
     
     @Test
+    public void testNegativex() {
+        // test negative x input
+        Pixel pixel = new Pixel(-1,2, Color.RED);
+        assertEquals(pixel.x(), -1);
+    }
+    
+    @Test
     public void testy() {
         // test getting y value
         Pixel pixel = new Pixel(10,13, Color.RED);
         assertEquals(pixel.y(), 13);
+    }
+    
+    @Test
+    public void testNegativeY() {
+        // test negative y input
+        Pixel pixel = new Pixel(1,-2, Color.RED);
+        assertEquals(pixel.y(), -2);
     }
     
     @Test
