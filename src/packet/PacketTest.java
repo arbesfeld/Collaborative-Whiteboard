@@ -1,27 +1,16 @@
 package packet;
 
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+
+import canvas.Pixel;
+import name.BoardIdentifier;
+import name.ClientIdentifier;
 
 public class PacketTest {
      // TODO: test packets
-//    @Test
-//    public void newBoardPacketTest() {
-//        // Create a NewBoard, convert it to data, and ensure that
-//        // the reconstructed packet is identical to the original packet.
-//        
-//        Packet packet = new PacketNewBoard(new BoardIdentifier(4, "board"), new ClientIdentifier(20, "name"), 256, 512);
-//        String data = packet.data();
-//        PacketNewBoard newPacket = (PacketNewBoard) Packet.createPacketWithData(data);
-//        
-//        assertEquals(packet, newPacket);
-//        assertEquals(packet.hashCode(), newPacket.hashCode());
-//        
-//        assertTrue(newPacket.senderName().id() == 20);
-//        assertTrue(newPacket.senderName().name().equals("name"));
-//        assertTrue(newPacket.boardName().id() == 4);
-//        assertTrue(newPacket.boardName().name().equals("board"));
-//        assertTrue(newPacket.width() == 256);
-//        assertTrue(newPacket.height() == 512);
-//    }
+
 //    
 //    @Test
 //    public void joinBoardPacketTest() {
@@ -40,6 +29,14 @@ public class PacketTest {
 //        assertTrue(newPacket.boardName().id() == 4);
 //        assertTrue(newPacket.boardName().name().equals("board"));
 //    }
+    
+  @Test
+  public void joinBoardPacketConstTest() {
+      // test creating a JoinBoardPacket
+      PacketJoinBoard packet = new PacketJoinBoard(new BoardIdentifier(4, "board"));
+      assertTrue(packet.boardName().id() == 4);
+      assertTrue(packet.boardName().name().equals("board"));
+  }
 //    
 //    @Test
 //    public void exitBoardPacketTest() {
@@ -57,8 +54,7 @@ public class PacketTest {
 //        assertTrue(newPacket.senderName().name().equals("name"));
 //        assertTrue(newPacket.boardName().id() == 4);
 //        assertTrue(newPacket.boardName().name().equals("board"));
-//    }
-//    
+//    }   
 //    // TODO: Fix this test
 ////    @Test
 ////    public void gameStatePacketTest() {
@@ -100,6 +96,19 @@ public class PacketTest {
 //        assertEquals(packet.hashCode(), newPacket.hashCode());
 //        assertArrayEquals(newPacket.boards(), boards);
 //    }
+  
+    @Test
+    public void boardStatePacketConstTest() {
+        //Test constructing a boardStatePacket
+        BoardIdentifier[] boards = new BoardIdentifier[2];
+        
+        boards[0] = new BoardIdentifier(4, "name1");
+        boards[1] = new BoardIdentifier(7, "name2");
+        
+        PacketBoardIdentifierList packet = new PacketBoardIdentifierList(boards);   
+        assertArrayEquals(packet.boards(), boards);
+    }  
+  
 //
 //    @Test
 //    public void drawPixelPacketTest() {
@@ -121,7 +130,7 @@ public class PacketTest {
 //        assertEquals(packet, newPacket);
 //        assertEquals(packet.hashCode(), newPacket.hashCode());
 //        assertEquals(newPacket.pixel(), rgbPixel);
-//    }
+//    }   
 //    
 //    @Test
 //    public void differentPacketTest() {

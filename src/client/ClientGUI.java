@@ -91,6 +91,7 @@ import canvas.layer.LayerProperties;
 
 /**
  * GUI for client
+ * Icons are modifications of icons found at www.iconfinder.com
  */
 class ClientGUI extends JFrame{
     private static final long serialVersionUID = -8313236674630578250L;

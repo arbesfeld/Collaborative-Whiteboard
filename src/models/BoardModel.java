@@ -77,7 +77,7 @@ public class BoardModel extends JPanel implements Drawable, Identifiable, Serial
     }
     
     /**
-     * Removes user from set of users on boarad, for example when a client disconnects
+     * Removes user from set of users on board, for example when a client disconnects
      * @param user
      */
     public void removeUser(Identifiable user) {
