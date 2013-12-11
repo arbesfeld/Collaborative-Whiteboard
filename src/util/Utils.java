@@ -24,7 +24,7 @@ public class Utils {
     }
     
     /**
-     * Generates random integer in the range 0-10000000
+     * Generates random integer in the range (0,10000000]
      * @return ID
      */
     public static int generateId() {
