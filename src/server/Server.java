@@ -150,7 +150,8 @@ public class Server implements Identifiable {
         int port = DEFAULT_PORT;
         
         if (args.length > 0)
-            port = Integer.parseInt(args[0]);
+            port = Integer.parseInt(args[0].substring(2));
+            System.out.println(port);
         try {
             Server server = new Server(port);
             server.serve();
