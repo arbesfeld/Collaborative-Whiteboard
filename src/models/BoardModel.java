@@ -22,6 +22,12 @@ import canvas.Pixel;
 import canvas.layer.LayerAdjustment;
 import canvas.layer.LayerProperties;
 
+/**
+ * BoardModel is the underlying model that represents the board state and is updated with 
+ * draw commands. Also stores the Set of users in the board and stores a CanvasController which updates
+ * the canvas of the BoardModel
+ *
+ */
 public class BoardModel extends JPanel implements Drawable, Identifiable, Serializable {
 	private static final long serialVersionUID = -7812022750931126889L;
 
