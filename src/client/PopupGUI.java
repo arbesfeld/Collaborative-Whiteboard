@@ -13,6 +13,7 @@ import server.Server;
 
 /**
  * popup for user to set username and join server
+ * User inputs IP and port and username they want to connect with
  */
 public class PopupGUI extends JFrame {
   
