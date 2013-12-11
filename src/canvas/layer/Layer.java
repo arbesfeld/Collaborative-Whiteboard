@@ -23,7 +23,10 @@ import java.util.Queue;
 import name.LayerIdentifier;
 import canvas.DrawableBase;
 import canvas.Pixel;
-
+/**
+ * Represents a Layer in our GUI
+ *
+ */
 public class Layer extends DrawableBase {
 	private static final long serialVersionUID = -5558390701591471173L;
 	
@@ -45,19 +48,29 @@ public class Layer extends DrawableBase {
         this.image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
     }
     
+    /**
+     * @return layerProperties
+     */
     public LayerProperties layerProperties() {
     	return layerProperties;
     }
     
+    /**
+     * Set level of the layer
+     * @param level
+     */
     public void setLevel(int level) {
     	this.level = level;
     }
     
+    /**
+     * @return level
+     */
     public int level() {
     	return level;
     }
     
-    /*
+    /**
      * Make the drawing buffer entirely white.
      */
     public synchronized void fillWithColor(Color color) {
@@ -68,6 +81,9 @@ public class Layer extends DrawableBase {
         g.fillRect(0, 0, width, height);
     }
     
+    /**
+     * Draws pixel to the image
+     */
     @Override
     public synchronized void drawPixel(LayerIdentifier identifier, Pixel pixel) {
         if (!isValidPixel(pixel)) {
@@ -80,11 +96,18 @@ public class Layer extends DrawableBase {
         
         image.setRGB(pixel.x(), pixel.y(), pixel.color().getRGB());
     }
-
+    
+    /**
+     * Update the properties of the layer
+     * @param properties
+     */
 	public void setProperties(LayerProperties properties) {
 		this.layerProperties = properties;
 	}
 	
+	/**
+	 * Draws a line to the canvas
+	 */
     @Override
     public synchronized void drawLine(LayerIdentifier identifier, Pixel pixelStart, Pixel pixelEnd, Stroke stroke, int symetry) {
         if (!isValidPixel(pixelStart) || !isValidPixel(pixelEnd)) {
@@ -129,6 +152,9 @@ public class Layer extends DrawableBase {
         }
     }
     
+    /**
+     * Draws a fill command to the canvas
+     */
     public synchronized void drawFill(LayerIdentifier identifier, Pixel pixel) {
         if (!isValidPixel(pixel)) {
             return;
@@ -168,7 +194,10 @@ public class Layer extends DrawableBase {
             }
         }
     }
-
+    
+    /**
+     * Returns pixelColor at pixel location
+     */
     @Override
 	public synchronized Color getPixelColor(LayerIdentifier id, Pixel pixel) throws Exception {
 		if (!isValidPixel(pixel)) {
@@ -176,7 +205,10 @@ public class Layer extends DrawableBase {
 		}
 		return new Color(image.getRGB(pixel.x(), pixel.y()), true);
 	}
-
+    
+    /**
+     * Paints graphics onto image
+     */
     public synchronized void paintOnGraphics(Graphics g) {
     	Graphics2D g2d = (Graphics2D) g;
     	if (isVisible()) {
@@ -186,14 +218,27 @@ public class Layer extends DrawableBase {
     	}
     }
 	
+    /**
+     * Returns if layer is visible
+     * @return boolean
+     */
     public synchronized boolean isVisible() {
     	return layerProperties.getVisibility();
     }
     
+    /**
+     * Returns opacity of layer
+     * @return
+     */
     public synchronized double opacity() {
     	return layerProperties.getOpacity();
     }
     
+    /**
+     * Serializes and sends the Layer to the server
+     * @param s
+     * @throws IOException
+     */
 	private void writeObject(ObjectOutputStream s) throws IOException {
         s.defaultWriteObject();
         
@@ -217,7 +262,13 @@ public class Layer extends DrawableBase {
         s.writeInt(h);
         s.writeObject(pixels);
     }
-
+	
+	/**
+	 * Reads the serialized Pixel data and creates the image
+	 * @param s
+	 * @throws ClassNotFoundException
+	 * @throws IOException
+	 */
     private void readObject(ObjectInputStream s) throws ClassNotFoundException, IOException {
         s.defaultReadObject();
 
@@ -233,7 +284,11 @@ public class Layer extends DrawableBase {
             image.getGraphics().drawImage(temp, 0, 0, null);
         }
     }
-
+    
+    /**
+     * Returns the image
+     * @return image
+     */
 	public BufferedImage image() {
 		return image;
 	} 

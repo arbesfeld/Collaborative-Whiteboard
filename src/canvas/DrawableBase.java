@@ -2,7 +2,10 @@ package canvas;
 
 import java.awt.Graphics;
 import java.io.Serializable;
-
+/**
+ * Abstract class that represents a drawable base that we use to draw a drawable onto a graphic
+ *
+ */
 public abstract class DrawableBase implements Drawable, Serializable {
     private static final long serialVersionUID = -6788405670250928889L;
     

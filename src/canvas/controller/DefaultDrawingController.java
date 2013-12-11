@@ -7,19 +7,27 @@ import util.Vector2;
 import canvas.Drawable;
 import canvas.command.DrawCommand;
 import client.ClientController;
-
+/**
+ * The Default Drawing Controller used by the client, handles drawing to the canvas by user clicks and drags
+ *
+ */
 public class DefaultDrawingController extends DrawingController {
 
 	// store the coordinates of the last mouse event, so we can
     // draw a line segment from that last point to the point of the next mouse event.
     private int lastX, lastY; 
-    
+    /**
+     * Constructor
+     * @param clientController
+     * @param strokeProperties
+     * @param canvas
+     */
     public DefaultDrawingController(ClientController clientController,
 			StrokeProperties strokeProperties, Drawable canvas) {
 		super(clientController, strokeProperties, canvas);
 	}
     
-    /*
+    /**
      * When mouse button is pressed down, start drawing.
      */
     public void mousePressed(MouseEvent e) {
@@ -33,7 +41,7 @@ public class DefaultDrawingController extends DrawingController {
         }
     }
 
-    /*
+    /**
      * When mouse moves while a button is pressed down,
      * draw a line segment.
      */
@@ -50,7 +58,10 @@ public class DefaultDrawingController extends DrawingController {
         lastX = x;
         lastY = y;
     }
-
+    
+    /**
+     * Upon releasing the mouse, update the GUI and thumbnail images for the layer
+     */
     public void mouseReleased(MouseEvent e) {
     	clientController.setGUILayers();
     }

@@ -14,7 +14,10 @@ import util.Utils;
 import canvas.layer.Layer;
 import canvas.layer.LayerAdjustment;
 import canvas.layer.LayerProperties;
-
+/**
+ * Canvas represents the canvas on which we have layers and we can draw on the layers
+ *
+ */
 public class Canvas extends DrawableBase {
     private static final long serialVersionUID = -6329493755553689791L;
 
@@ -88,32 +91,50 @@ public class Canvas extends DrawableBase {
     	checkRep();
     }
     
+    /**
+     * Returns all the layers as an array
+     */
     public Layer[] layers() {
     	checkRep();
     	return layers.toArray(new Layer[layers.size()]);
     }
     
+    /**
+     * Synchronized method to draw a pixel onto a layer
+     */
     @Override
     public synchronized void drawPixel(LayerIdentifier identifier, Pixel pixel) {
     	layerSet.get(identifier).drawPixel(identifier, pixel);
     }
     
+    /**
+     * Synchronized method to draw a line onto a layer
+     */
     @Override
     public synchronized void drawLine(LayerIdentifier identifier, Pixel pixelStart, Pixel pixelEnd, Stroke stroke, int symetry) {
     	layerSet.get(identifier).drawLine(identifier, pixelStart, pixelEnd, stroke, symetry);
     }
     
+    /**
+     * Synchronized method to draw a fill command onto a layer
+     */
     @Override
     public synchronized void drawFill(LayerIdentifier identifier, Pixel pixel) {
     	layerSet.get(identifier).drawFill(identifier, pixel);
     }
-
+    
+    /**
+     * Synchronized method to get the pixel color of a pixel
+     */
     @Override
 	public synchronized Color getPixelColor(LayerIdentifier id, Pixel pixel) throws Exception {
 	    Color pixelColor = layerSet.get(id).getPixelColor(id, pixel);
 	    return pixelColor;
 	}
-
+    
+    /**
+     * Synchronized method to draw all the layers onto the graphics object
+     */
     @Override
     public synchronized void paintOnGraphics(Graphics g) {
         g.setColor(Color.WHITE);

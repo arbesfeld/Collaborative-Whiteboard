@@ -4,7 +4,10 @@ import java.awt.Color;
 import java.awt.Stroke;
 
 import name.LayerIdentifier;
-
+/**
+ * Interface which has methods of different ways to draw onto a graphics object
+ *
+ */
 public interface Drawable {
     public int width();
     public int height();
