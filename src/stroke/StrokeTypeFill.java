@@ -3,7 +3,6 @@ package stroke;
 import java.awt.Color;
 
 import name.LayerIdentifier;
-
 import util.Vector2;
 import canvas.Drawable;
 import canvas.Pixel;

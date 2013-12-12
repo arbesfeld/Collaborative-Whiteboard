@@ -538,7 +538,6 @@ class ClientGUI extends JFrame{
                 if (cloneToggle.isSelected()) {
                     cloneToggle.setEnabled(false);
                     setBrushToggles(false,false,true,false,false);
-                    //TODO implement clone
                 }
                 else {
                     cloneToggle.setEnabled(true);
@@ -975,6 +974,8 @@ class ClientGUI extends JFrame{
     
     
     public class LayerTableModel extends AbstractTableModel {
+        private static final long serialVersionUID = -1985093762031490019L;
+        
         private Vector<Vector<Object>> data;
         private final String[] COLUMN_NAMES = new String[] {"Visible", "Thumbnail", "Name"};
         private final Class<?>[] COLUMN_TYPES = new Class<?>[] {Boolean.class, Icon.class, LayerProperties.class};

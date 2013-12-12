@@ -1,12 +1,10 @@
 package packet;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertTrue;
+import name.BoardIdentifier;
 
 import org.junit.Test;
-
-import canvas.Pixel;
-import name.BoardIdentifier;
-import name.ClientIdentifier;
 
 public class PacketTest {
     

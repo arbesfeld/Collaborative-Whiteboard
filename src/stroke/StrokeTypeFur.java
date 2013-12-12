@@ -44,7 +44,6 @@ public class StrokeTypeFur implements StrokeType {
                         double size = -Math.random() * 1.5;
                         int dx = i;
                         int dy = j;
-                        int d = dx * dx + dy * dy;
                         if (Math.random() > .9) {
                             Pixel startPixel = new Pixel((int)(x1 + (dx * size)), (int)(y1 + (dy * size)), new Color(color.getRed(), color.getGreen(), color.getGreen(),0));
                             Pixel middlePixel = new Pixel(x1, y1, new Color(color.getRed(), color.getGreen(), color.getGreen(), 150));

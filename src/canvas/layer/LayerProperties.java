@@ -8,8 +8,9 @@ import name.LayerIdentifier;
  *
  */
 public class LayerProperties implements Serializable {
-	
-	private LayerIdentifier layerIdentifier;
+    private static final long serialVersionUID = -5376511100707269511L;
+    
+    private LayerIdentifier layerIdentifier;
 	private double opacity;
 	private boolean visible;
 	/**

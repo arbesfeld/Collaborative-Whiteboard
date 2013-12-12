@@ -1,6 +1,5 @@
 package packet;
 
-import name.LayerIdentifier;
 import canvas.command.DrawCommand;
 
 /**

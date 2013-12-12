@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import name.LayerIdentifier;
-
 import util.Vector2;
 import canvas.Drawable;
 import canvas.Pixel;

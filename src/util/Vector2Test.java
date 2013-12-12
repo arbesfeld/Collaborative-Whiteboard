@@ -1,13 +1,12 @@
 package util;
 
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.*;
-
-import java.awt.Color;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-
-import canvas.Pixel;
 /**
  * Test class that tests Vector2 class and each method in it
  * @author Bindu

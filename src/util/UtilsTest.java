@@ -1,5 +1,5 @@
 package util;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.awt.Color;
 
@@ -20,7 +20,7 @@ public class UtilsTest {
     @Test (expected=IllegalArgumentException.class)
     public void testInvalidcolorFromString() {
         // test incorrect color name
-        Color color = Utils.colorFromString("read");
+        Utils.colorFromString("read");
     }
     
     @Test

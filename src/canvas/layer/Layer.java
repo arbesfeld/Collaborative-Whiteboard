@@ -160,8 +160,6 @@ public class Layer extends DrawableBase {
             return;
         }
 
-        final Graphics2D g = (Graphics2D) image.getGraphics();
-
         HashSet<Pixel> pixels = new HashSet<Pixel>();
         Queue<Pixel> queue = new LinkedList<Pixel>();
         queue.add(pixel);
