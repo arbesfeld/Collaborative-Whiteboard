@@ -14,6 +14,14 @@ import server.Server;
 /**
  * popup for user to set username and join server
  * User inputs IP and port and username they want to connect with
+ * 
+ * GUI Testing:
+ * We checked that the following were true-
+ * the window displays a textfield under a "Username" label. The textfield is preset with the user's account name.
+ * There is another textfield under a "Server Address" label. This field is preset with "localhost"
+ * The final textfield is under a "Port" label and is preset to "4444".
+ * Then there is a "cancel" and "join" button. The cancel button cancels the program. The joing button joins the server.
+ * If the server is incorrect, the GUI should display a red error label in the window. 
  */
 public class PopupGUI extends JFrame {
   
