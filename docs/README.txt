@@ -5,7 +5,7 @@ The files in this directory should be:
 - design-milestone.pdf
 - design-revised.pdf
 - design-diagram.pdf
-- screenshot.pdf
+- screenshot.png
 
 If you add any other documents to this directory, please add the filenames to
 the above list.
