@@ -91,6 +91,36 @@ import canvas.layer.LayerProperties;
 
 /**
  * GUI for client
+ * 
+ * GUI Testing:
+ * As we ran our application we expected to see the following:
+ * When it starts, there should be menu bar with grey empty window. 
+ * Under "File" in the menu bar there are 3 options:
+ *  -"New Board" 
+ *  -"Join Game" A submenu that lists other whiteboards on the server.
+ *  -"Save to pgn" currently grayed out
+ * When "New Board" is clicked, a popup asks for a board name and board dimensions. It then creates this board on the screen.
+ * In the case of "Join Game", a board should appear with work already done by other clients.
+ * A side bar appears next to the canvas and the "Save to png" menu item becomes clickable.
+ * If the paint button is selected in the sidebar, the user should be able to paint on the canvas.
+ * Clicking the stroke button should reveal a slider that alters the stroke width. When dragging the slider, the brush cursor
+ * should change size (in on mac) and the stroke button icon should change size. Clicking the color button should change the
+ * brushes drawing color and the color in the button icon. Selecting items in the brush dropdown should change the way the 
+ * mouse draws on the screen. Changing the symmetry values will add symmetry as the user draws. Selecting the paint bucket icon will
+ * turn on fill mode and allow the user to fill selections of the painting (in the same manner as MS Paint). Only the color option
+ * effects the fill mode. Clicking the eraser allows the user to erase items on the canvas. Only stroke size effects how the erase works.
+ * Clicking the dropper tool allows the user to select a color on the canvas by clicking the pixel. Once the user picks a color, the picker
+ * turns off and switched to the brush. No two tools can be selected at the same time. Selecting one should deselect the others.
+ * In the layers panel, the current layers should be visible. Clicking the new layer button should add a new layer. The layer will be added 
+ * above the other layers. Drawing should only occur on the layer selected. If a layer is higher than another, the the associated paint, will
+ * be above the paint on the other layer. Clicking the up and down arrows will move the selected layer up and down. Unchecking the visible checkbox 
+ * on the selected layer will turn off its visibility. Changing the opacity slider will change the opacity of the selected layer. 
+ * Each layer should have its own unique opacity.
+ * The chat client should show the currently connected users. Typing a message in the text box and pressing send will send the message to other
+ * users in the same session. If other users send messages, you should see the messages in the chat.
+ * Finally, if you press the "Save to png" button, a dialog should popup with a file browsers. When a locations is selected, the image
+ * should save in that location.
+ * 
  * Icons are modifications of icons found at www.iconfinder.com
  */
 class ClientGUI extends JFrame{
