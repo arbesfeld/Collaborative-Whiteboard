@@ -14,4 +14,6 @@ public abstract class Packet implements Serializable {
 	 * @param handler
 	 */
 	public abstract void process(PacketHandler handler);
+	
+	
 }
